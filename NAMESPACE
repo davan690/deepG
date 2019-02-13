@@ -2,6 +2,7 @@
 
 export(get_vocabulary)
 export(getstates)
+export(predict_next_nucleotide)
 export(preprocess)
 export(train_lstm)
 export(writedict)
