@@ -55,4 +55,5 @@ getstates <- function(model_path,
                 row.names = F)
 
   }
+  return(final_states)
 }
