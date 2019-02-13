@@ -2,7 +2,7 @@
 % Please edit documentation in R/train.R
 \name{train_lstm}
 \alias{train_lstm}
-\title{Train LSTM model}
+\title{Train standart LSTM model}
 \usage{
 train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
   layer_size = 128, batch_size = 128, validation_split = 0.5,
@@ -10,7 +10,7 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
   epochs = 1)
 }
 \arguments{
-\item{run_name}{for saving purpose}
+\item{run_name}{name of the run (without file ending)}
 
 \item{maxlen}{time steps to unroll for (e.g. length of semi-redundant chunks)}
 
@@ -30,10 +30,10 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
 
 \item{epochs}{number of full iterations over the dataset}
 
-\item{x}{list with X and Y}
+\item{x}{preprocessed input data (semi-redundant chunks)}
 
 \item{layer_size}{number of cells per network layer#'}
 }
 \description{
-Train LSTM model
+Train standart LSTM model
 }
