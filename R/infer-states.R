@@ -1,0 +1,58 @@
+#' Get cell states of semi-redundant chunks
+#'
+#' @param model keras model in hdf5 format
+#' @param x semi-redundant chunks (one-hot)
+#' @param maxlen time steps to unroll for
+#' @param batch_size how many samples are trained in parallel
+#' @param run_name name of output files without ending
+#' @param type will save as hdf5 if type is set to 'hdf5', otherwise as csv
+#' @export
+getstates <- function(model_path,
+                      x,
+                      maxlen = 30,
+                      batch_size = 100,
+                      run_name = "output",
+                      type = "csv"){
+  require(dplyr)
+  require(h5)
+  require(keras)
+
+  Check <- ArgumentCheck::newArgCheck()
+  #* Add an error if maxlen <1
+  if (maxlen < 1)
+    ArgumentCheck::addError(
+      msg = "'maxlen' must be >= 1",
+      argcheck = Check
+    )
+  #* Add an error if batch_size negative
+  if (batch_size < 1)
+    ArgumentCheck::addError(
+      msg = "'batch_size' should be a positive integer",
+      argcheck = Check
+    )
+  #* Return errors and warnings (if any)
+  ArgumentCheck::finishArgCheck(Check)
+
+  model <- load_model_hdf5(model_path)
+  # Remove the last 2 layers
+  keras::pop_layer(model)
+  keras::pop_layer(model)
+  states <- predict(model, x, batch_size = batch_size)
+  # we dont have predictions in the beginning so create some empty cell response
+  # so we set it to zero
+  states_begining <- states[1:maxlen,] * 0
+  final_states <- rbind(states_begining, states)
+  # save states as hdf5
+  print("saving states...")
+  if (type == "hdf5") {
+    file <- h5::h5file(paste0(run_name, "_states.hdf5"), mode = "a")
+    file["states1"] <- final_states
+    h5::h5close(file)
+  } else {
+    write.table(final_states,
+                file = paste0(run_name, "_states.csv"),
+                sep = ";", quote = F, col.names = F,
+                row.names = F)
+
+  }
+}
