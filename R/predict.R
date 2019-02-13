@@ -7,6 +7,20 @@
 predict_next_nucleotide <- function(sequence,
                                     model,
                                     vocabulary = c("\n", "a", "c", "g", "t")){
+  if (missing(sequence))
+    stop("Need to specify sequence")
+  if (missing(model))
+    stop("Need to specify model")
+  Check <- ArgumentCheck::newArgCheck()
+  #* Add an error if sequence length is too small
+  if (nchar(sequence) < 1)
+    ArgumentCheck::addError(
+      msg = "'sequence' must be of length > 0",
+      argcheck = Check
+    )
+  #* Return errors and warnings (if any)
+  ArgumentCheck::finishArgCheck(Check)
+  require(keras)
   require(dplyr)
   require(tokenizers)
   setClass(Class = "prediction",

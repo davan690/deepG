@@ -19,7 +19,6 @@
 #' head(crispr_full)
 "crispr_full"
 
-
 #' Training dataset of synthetic parenthesis language
 #' Can be loaded to workspace via data(parenthesis)
 #' @format Large character of 4.9 Mb
@@ -27,3 +26,10 @@
 #' @examples
 #' head(parenthesis)
 "parenthesis"
+
+#' Trained LSTM model (only for testing)
+#' @format keras model
+#' @references \url{http://github.com/philippmuench}
+#' @examples
+#' head(example_model)
+"example_model"
