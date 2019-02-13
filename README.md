@@ -3,7 +3,7 @@ Status](https://img.shields.io/codecov/c/github/hiddengenome/altum/master.svg)
 
 ## Overview
 
-altum is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets in genomic in human readable languages for testing.
+altum is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets of genomic and human readable languages for testing.
 
 ## installation
 
