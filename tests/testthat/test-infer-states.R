@@ -2,7 +2,6 @@ context("infer states")
 
 test_that("infer states successful", {
   model_path <- "../../data-raw/example_model.hdf5"
-  model_path <- "data-raw/example_model.hdf5"
   preprocessed <- preprocess(strrep("A",80),
                              vocabulary = c("\n", "a", "c", "g", "t"))
   expect_type(getstates(model_path = model_path,
