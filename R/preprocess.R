@@ -1,10 +1,11 @@
-#' Get vocabulary from character string
+#' Returns the vocabulary from character string
 #'
 #' Use this function with a character string as input such as data(train)
 #'
 #' @param char a character string of text, length of one
+#' @param verbose TRUE/FALSE
 #' @export
-get_vocabulary <- function(char) {
+get_vocabulary <- function(char, verbose = F) {
   library(dplyr)
   stopifnot(!is.null(char))
   stopifnot(nchar(char)>0)
@@ -13,7 +14,8 @@ get_vocabulary <- function(char) {
     tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE) %>%
     unique() %>%
     sort()
-  print(vocabulary)
+  if (verbose) print(vocabulary)
+  return(vocabulary)
 }
 
 #' Preprocess string to semi redundant one-hot vector
@@ -32,9 +34,10 @@ get_vocabulary <- function(char) {
 #' @param char a character string of text, length of one
 #' @param maxlen length of semi-redundant sequences of maxlen characters
 #' @param vocabulary char, should be sorted, if not set char vocabulary will be used
+#' @param verbose TRUE/FALSE
 #' @export
 #'
-preprocess <- function(char, maxlen = 30, vocabulary) {
+preprocess <- function(char, maxlen = 30, vocabulary, verbose=F) {
   require(dplyr)
   Check <- ArgumentCheck::newArgCheck()
   #* Add an error if maxlen <1
@@ -60,17 +63,17 @@ preprocess <- function(char, maxlen = 30, vocabulary) {
     stringr::str_to_lower() %>%
     stringr::str_c(collapse = "\n") %>%
     tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
-  print(sprintf("corpus length: %d", length(text)))
+  if (verbose) print(sprintf("corpus length: %d", length(text)))
 
   if(missing(vocabulary)) {
     vocabulary <- text %>%
       unique() %>%
       sort()
   }
-  print(sprintf("vocabulary size: %d", length(vocabulary)))
+  if (verbose) print(sprintf("vocabulary size: %d", length(vocabulary)))
 
   # Cut the text in semi-redundant sequences of maxlen characters
-  print("generation of semi-redundant sequences ...")
+  if (verbose) print("generation of semi-redundant sequences ...")
   dataset <- purrr::map(seq(1, length(text) - maxlen - 1, by = 1),
                         ~ list(sentece = text[.x:(.x + maxlen - 1)],
                                next_char = text[.x + maxlen]))
@@ -81,7 +84,7 @@ preprocess <- function(char, maxlen = 30, vocabulary) {
     array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
   y <-
     array(0, dim = c(length(dataset$sentece), length(vocabulary)))
-  print("vectorization ...")
+  if (verbose) print("vectorization ...")
   pb <-
     txtProgressBar(min = 0,
                    max = length(dataset$sentece),

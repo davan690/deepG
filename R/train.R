@@ -11,7 +11,8 @@
 #' @param layer_size number of cells per network layer#'
 #' @param cudnn if true, using layer_cudnn_lstm() instead of layer_lstm()
 #' @param vocabulary_size number of unique chars in training set'
-#' @param epochs number of full iterations over the dataset
+#' @param epochs number of full iterations over the dataset#
+#' @param verbose TRUE/FALSE
 #' @export
 train_lstm <- function(dat,
                         run_name = "run",
@@ -23,7 +24,8 @@ train_lstm <- function(dat,
                         learning_rate = 0.001,
                         cudnn = FALSE,
                         vocabulary_size = 5,
-                        epochs = 1) {
+                        epochs = 1,
+                       verbose = F) {
   require(dplyr)
   require(h5)
 
@@ -103,7 +105,7 @@ train_lstm <- function(dat,
 
   optimizer <- keras::optimizer_adam(lr = learning_rate)
   # save training metadata
-  print("save model...")
+  if (verbose) print("save model...")
   Rmodel <- keras::serialize_model(model, include_optimizer = TRUE)
   save(Rmodel, file = paste0(run_name, "_full_model.Rdata"))
   keras::save_model_hdf5(

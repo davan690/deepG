@@ -6,13 +6,15 @@
 #' @param batch_size how many samples are trained in parallel
 #' @param run_name name of output files without ending
 #' @param type will save as hdf5 if type is set to 'hdf5', otherwise as csv
+#' @param verbose TRUE/FALSE
 #' @export
 getstates <- function(model_path,
                       x,
                       maxlen = 30,
                       batch_size = 100,
                       run_name = "output",
-                      type = "csv"){
+                      type = "csv",
+                      verbose = F){
   require(dplyr)
   require(h5)
   require(keras)
@@ -43,7 +45,7 @@ getstates <- function(model_path,
   states_begining <- states[1:maxlen,] * 0
   final_states <- rbind(states_begining, states)
   # save states as hdf5
-  print("saving states...")
+  if (verbose) print("saving states...")
   if (type == "hdf5") {
     file <- h5::h5file(paste0(run_name, "_states.hdf5"), mode = "a")
     file["states1"] <- final_states

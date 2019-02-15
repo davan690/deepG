@@ -1,9 +1,10 @@
 #' generates hdf5 file containing the character id for each time step
 #'
 #' @param dat character
-#' @param dat filename where hdf5 file is written to
+#' @param filename filename where hdf5 file is written to
+#' @param verbose TRUE/FALSE
 #' @export
-writehdf5 <- function(dat, filename = "train.hdf5") {
+writehdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
 	require(dplyr)
 	require(plyr)
 	require(h5)
@@ -21,7 +22,7 @@ writehdf5 <- function(dat, filename = "train.hdf5") {
 	tokenized_index <- mapvalues(tokenized, from = charset,
 															 to = charset_index)
 
-	print("saving states...")
+	if (verbose) print("saving states...")
 	file <- h5::h5file(filename, mode = "a")
 	file["words"] <- array(tokenized_index)
 	h5::h5close(file)
