@@ -7,7 +7,7 @@
 train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
   layer_size = 128, batch_size = 128, validation_split = 0.5,
   learning_rate = 0.001, cudnn = FALSE, vocabulary_size = 5,
-  epochs = 1)
+  epochs = 1, verbose = F)
 }
 \arguments{
 \item{run_name}{name of the run (without file ending)}
@@ -28,7 +28,9 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
 
 \item{vocabulary_size}{number of unique chars in training set'}
 
-\item{epochs}{number of full iterations over the dataset}
+\item{epochs}{number of full iterations over the dataset#}
+
+\item{verbose}{TRUE/FALSE}
 
 \item{x}{preprocessed input data (semi-redundant chunks)}
 

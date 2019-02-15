@@ -8,7 +8,9 @@ predict_next_nucleotide(sequence, model, vocabulary = c("\\n", "a", "c",
   "g", "t"))
 }
 \arguments{
-\item{sequence}{input sequence}
+\item{sequence}{input sequence, length should be in sync with the model
+if length exceeds input_shape of model then only the right side of the
+sequence will be used}
 
 \item{model}{trained lstm}
 

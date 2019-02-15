@@ -4,12 +4,14 @@
 \alias{writehdf5}
 \title{generates hdf5 file containing the character id for each time step}
 \usage{
-writehdf5(dat, filename = "train.hdf5")
+writehdf5(dat, filename = "train.hdf5", verbose = F)
 }
 \arguments{
 \item{dat}{character}
 
-\item{dat}{filename where hdf5 file is written to}
+\item{filename}{filename where hdf5 file is written to}
+
+\item{verbose}{TRUE/FALSE}
 }
 \description{
 generates hdf5 file containing the character id for each time step

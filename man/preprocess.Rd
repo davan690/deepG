@@ -4,7 +4,7 @@
 \alias{preprocess}
 \title{Preprocess string to semi redundant one-hot vector}
 \usage{
-preprocess(char, maxlen = 30, vocabulary)
+preprocess(char, maxlen = 30, vocabulary, verbose = F)
 }
 \arguments{
 \item{char}{a character string of text, length of one}
@@ -12,6 +12,8 @@ preprocess(char, maxlen = 30, vocabulary)
 \item{maxlen}{length of semi-redundant sequences of maxlen characters}
 
 \item{vocabulary}{char, should be sorted, if not set char vocabulary will be used}
+
+\item{verbose}{TRUE/FALSE}
 }
 \description{
 Outputs semi-redundant set of input string

@@ -2,12 +2,14 @@
 % Please edit documentation in R/preprocess.R
 \name{get_vocabulary}
 \alias{get_vocabulary}
-\title{Get vocabulary from character string}
+\title{Returns the vocabulary from character string}
 \usage{
-get_vocabulary(char)
+get_vocabulary(char, verbose = F)
 }
 \arguments{
 \item{char}{a character string of text, length of one}
+
+\item{verbose}{TRUE/FALSE}
 }
 \description{
 Use this function with a character string as input such as data(train)
