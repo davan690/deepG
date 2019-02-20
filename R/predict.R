@@ -60,24 +60,6 @@ predict_next_nucleotide <- function(sequence,
              solution = paste0(sequence, next_char)))
 }
 
-#' One beam
-#' @param sequence input sequence
-#' @param model trained lstm
-#' @param vocabulary ordered vocabulary of input sequence
-#' @param num_alternatives number of best solutions
-#' @export
-one_beam <- function(sequence, model, vocabulary, num_alternatives = 2){
-  # getting num_alternative best indexes in vocabulary
-  solutions <- list()
-  confidences <- list()
-  prediction <- predict_next_nucleotide(sequence, model, vocabulary)
-  for (nth_best in 1:num_alternatives){
-    solutions[[nth_best]] <- paste0(sequence, vocabulary[Rfast::nth(prediction@alternative_probabilty, nth_best, descending = T, index.return=T)])
-    confidences[[nth_best]] <- Rfast::nth(prediction@alternative_probabilty, nth_best, descending = T)
-  }
-  return(list(solutions, confidences))
-}
-
 
 #' Replaces specific nucleotides in a sequence one by one
 #' @param sequence input sequence
@@ -85,10 +67,9 @@ one_beam <- function(sequence, model, vocabulary, num_alternatives = 2){
 #' @param char character that will be replaced
 #' @param vocabulary ordered vocabulary of input sequence
 #' @export
-replace_char <- function(sequence = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXAAAXAAA",
+replace_char <- function(sequence,
                          model,
                          char = "X",
-                         num_alternative = 2,
                          vocabulary = c("\n", "a", "c", "g", "t")){
   require(stringr)
   Check <- ArgumentCheck::newArgCheck()
@@ -109,13 +90,33 @@ replace_char <- function(sequence = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXAAAXAAA",
   while (str_detect(sequence, char)) {
     # get the position
     next_position <- stringr::str_locate_all(pattern = 'X', sequence)[[1]][[1]]
+    # seed text for model is the most-right chunk of text
+    # with size of model$input_shape[[2]]
     seed <- substr(sequence,
-                       next_position - model$input_shape[[2]] - 1,
-                       next_position - 1)
+                   next_position - model$input_shape[[2]] - 1,
+                   next_position - 1)
     prediction <- predict_next_nucleotide(seed, model, vocabulary)
     sequence <- paste0(prediction@solution,
                        substr(sequence, next_position + 1,
                               nchar(sequence)))
   }
   return(sequence)
+}
+
+#' One beam
+#' @param sequence input sequence
+#' @param model trained lstm
+#' @param vocabulary ordered vocabulary of input sequence
+#' @param num_alternatives number of best solutions
+#' @export
+one_beam <- function(sequence, model, vocabulary, num_alternatives = 2){
+  # getting num_alternative best indexes in vocabulary
+  solutions <- list()
+  confidences <- list()
+  prediction <- predict_next_nucleotide(sequence, model, vocabulary)
+  for (nth_best in 1:num_alternatives){
+    solutions[[nth_best]] <- paste0(sequence, vocabulary[Rfast::nth(prediction@alternative_probabilty, nth_best, descending = T, index.return = T)])
+    confidences[[nth_best]] <- Rfast::nth(prediction@alternative_probabilty, nth_best, descending = T)
+  }
+  return(list(solutions, confidences))
 }
