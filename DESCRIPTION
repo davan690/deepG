@@ -25,8 +25,8 @@ Imports:
     ArgumentCheck
 RoxygenNote: 6.1.1
 Remotes:
-    bioc::3.8/biomaRt,
-    bioc::3.8/Biostrings,
+    bioc::3.4/biomaRt,
+    bioc::3.4/Biostrings,
     ropensci/biomartr
 Suggests: 
     testthat
