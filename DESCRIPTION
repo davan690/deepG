@@ -19,8 +19,8 @@ Imports:
     magrittr,
     dplyr,
     h5,
-    ArgumentCheck,
-    biomartr
+    ArgumentCheck
 RoxygenNote: 6.1.1
+Remotes: ropensci/biomartr
 Suggests: 
     testthat
