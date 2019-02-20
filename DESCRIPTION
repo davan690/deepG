@@ -19,11 +19,14 @@ Imports:
     magrittr,
     dplyr,
     h5,
+    biomaRt,
+    Biostrings,
+    biomartr,
     ArgumentCheck
 RoxygenNote: 6.1.1
 Remotes:
-    bioc::biomaRt,
-    bioc::Biostrings,
+    bioc::3.8/biomaRt,
+    bioc::3.8/Biostrings,
     ropensci/biomartr
 Suggests: 
     testthat
