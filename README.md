@@ -8,8 +8,12 @@ altum is a package for generating LSTM models from genomic text and provides scr
 ## installation
 
 ``` r
-install.packages("devtools")
-devtools::install_github("hiddengenome/altum")
+#check for remotes
+if(!require(remotes))
+  install.packages("remotes")
+
+# install altum
+remotes::install_github("hiddengenome/altum")
 ```
 
 ### GPU support
