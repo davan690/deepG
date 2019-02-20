@@ -21,7 +21,9 @@ Imports:
     h5,
     ArgumentCheck
 RoxygenNote: 6.1.1
-Remotes: 
+Remotes:
+    bioc::biomaRt,
+    bioc::Biostrings,
     ropensci/biomartr
 Suggests: 
     testthat
