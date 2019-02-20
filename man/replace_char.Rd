@@ -4,8 +4,7 @@
 \alias{replace_char}
 \title{Replaces specific nucleotides in a sequence one by one}
 \usage{
-replace_char(sequence = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXAAAXAAA",
-  model, char = "X", num_alternative = 2, vocabulary = c("\\n", "a",
+replace_char(sequence, model, char = "X", vocabulary = c("\\n", "a",
   "c", "g", "t"))
 }
 \arguments{

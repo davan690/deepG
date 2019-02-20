@@ -19,7 +19,8 @@ Imports:
     magrittr,
     dplyr,
     h5,
-    ArgumentCheck
-RoxygenNote: 6.1.0.9000
+    ArgumentCheck,
+    biomartr
+RoxygenNote: 6.1.1
 Suggests: 
     testthat
