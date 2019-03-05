@@ -5,11 +5,13 @@
 \title{Train standart LSTM model}
 \usage{
 train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
-  layer_size = 128, batch_size = 128, validation_split = 0.5,
+  layer_size = 128, batch_size = 128, validation_split = 0.05,
   learning_rate = 0.001, cudnn = FALSE, vocabulary_size = 5,
   epochs = 1, verbose = F)
 }
 \arguments{
+\item{dat}{preprocessed input data (semi-redundant chunks)}
+
 \item{run_name}{name of the run (without file ending)}
 
 \item{maxlen}{time steps to unroll for (e.g. length of semi-redundant chunks)}
@@ -31,8 +33,6 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
 \item{epochs}{number of full iterations over the dataset#}
 
 \item{verbose}{TRUE/FALSE}
-
-\item{x}{preprocessed input data (semi-redundant chunks)}
 
 \item{layer_size}{number of cells per network layer#'}
 }
