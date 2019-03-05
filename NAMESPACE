@@ -3,6 +3,7 @@
 export(download_from_ncbi)
 export(get_vocabulary)
 export(getstates)
+export(getstates_ncbi)
 export(one_beam)
 export(predict_next_nucleotide)
 export(preprocess)

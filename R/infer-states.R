@@ -1,6 +1,6 @@
 #' Get cell states of semi-redundant chunks
 #'
-#' @param model keras model in hdf5 format
+#' @param model_path path to keras model in hdf5 format
 #' @param x semi-redundant chunks (one-hot)
 #' @param maxlen time steps to unroll for
 #' @param batch_size how many samples are trained in parallel
@@ -58,4 +58,28 @@ getstates <- function(model_path,
 
   }
   return(final_states)
+}
+
+
+#' Iterates over entries in NCBI list and export cell state responses from a model
+#'
+#' @param list_path path to file downloaded from NCBI
+#' @export
+getstates_ncbi <- function(list_path, model_path,  ...) {
+  # process additional arguments
+  dots = list(...)
+  # load NCBI list
+  ncbi_list <- read.table(list_path, header = F, sep = ",")
+  for (i in 1:nrow(ncbi_list)) {
+    preprocessed_genome <- altum::download_from_ncbi(ncbi_list[i,6])
+    def.vals = list(model = model_path,
+                    x = preprocessed_genome,
+                    maxlen = 30,
+                    run_name = paste0("batch_output_", ncbi_list[i,1]),
+                    batch_size = 200,
+                    type = "csv")
+    ind = unlist(lapply(dots[names(def.vals)], is.null))
+    dots[names(def.vals)[ind]] = def.vals[ind]
+    states <- do.call(altum::getstates, dots)
+  }
 }

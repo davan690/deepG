@@ -1,6 +1,6 @@
 #' Train standart LSTM model
 #'
-#' @param x preprocessed input data (semi-redundant chunks)
+#' @param dat preprocessed input data (semi-redundant chunks)
 #' @param run_name name of the run (without file ending)
 #' @param maxlen time steps to unroll for (e.g. length of semi-redundant chunks)
 #' @param dropout_rate dropout rate for LSTM

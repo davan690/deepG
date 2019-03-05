@@ -11,6 +11,11 @@ download_from_ncbi <- function(accession = "GCF_000007825.1", ...){
                       organism = accession,
                       reference = FALSE,
                       path = file.path("_ncbi_downloads","genomes"))
+
+  #file_path_gff <- getGFF(db = "genbank",
+  #                        organism = accession,
+  #                        reference = FALSE,
+  #                        path = file.path("_ncbi_downloads", "annotation"))
   # load fasta file
   genome <- biomartr::read_genome(file_path, format = "fasta")
   # get semi-redundant one-hot enconding
@@ -21,3 +26,4 @@ download_from_ncbi <- function(accession = "GCF_000007825.1", ...){
   genome_preprocessed <- do.call(altum::preprocess, dots)
   return(genome_preprocessed)
 }
+
