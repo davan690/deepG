@@ -8,6 +8,8 @@ getstates(model_path, x, maxlen = 30, batch_size = 100,
   run_name = "output", type = "csv", verbose = F)
 }
 \arguments{
+\item{model_path}{path to keras model in hdf5 format}
+
 \item{x}{semi-redundant chunks (one-hot)}
 
 \item{maxlen}{time steps to unroll for}
@@ -19,8 +21,6 @@ getstates(model_path, x, maxlen = 30, batch_size = 100,
 \item{type}{will save as hdf5 if type is set to 'hdf5', otherwise as csv}
 
 \item{verbose}{TRUE/FALSE}
-
-\item{model}{keras model in hdf5 format}
 }
 \description{
 Get cell states of semi-redundant chunks

@@ -7,9 +7,8 @@
 download_from_ncbi(accession = "GCF_000007825.1", ...)
 }
 \arguments{
-\item{accession}{refseq specific accession identifier}
-
-\item{verbose}{TRUE/FALSE}
+\item{accession}{RefSeq assembly accession e.g. 'GCA_000196515.1' forhttps://www.ncbi.nlm.nih.gov/assembly/GCA_000196515.1 . A collection of RefSeq accessions can be generated
+using https://www.ncbi.nlm.nih.gov/genome/browse}
 }
 \description{
 Download genome from NCBI and returns preprocessed object
