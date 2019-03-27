@@ -57,18 +57,35 @@ After we trained the CrisprNet we want to use the model and predict some bacteri
 ### training full CrisprNet
 To train the full _CrisprNet_ model we use `data(crispr_full)` and following prarameter configuration in `train_lstm()` on a V100 GPU.
 
-| Parameter     | Value  |
-| ------------- | ------ |
-| maxlen        | 50     |
-| layer_size    | 512    |
-| batch_size    | 512    |
-| learning_rate | 0.0005 |
-| cudnn         | `TRUE` |
-| epochs        | 100    |
+| Parameter        | Value  |
+| ---------------- | ------ |
+| maxlen           | 50     |
+| layer_size       | 512    |
+| batch_size       | 512    |
+| learning_rate    | 0.0005 |
+| validation_split | 0.05   |
+| cudnn            | `TRUE` |
+| epochs           | 50     |
+
+Code to train the CrisprNet model:
 
 ```
-train_lstm(crispr_preprocessed, run_name = "CrisprNet", maxlen=50, layer_size=512, batch_size=512, learning_rate = 0.0005, cudnn=TRUE, epochs=100)
+library(altum)
+data(crispr_full)
+crispr_preprocessed <- preprocess(crispr_full, maxlen = 50) # needs up to 25G RAM
+start_gpu_session() # limit process to one GPU
+history <- train_lstm(crispr_preprocessed, run_name = "CrisprNet", maxlen = 50, layer_size = 512, batch_size = 512, learning_rate = 0.0005, cudnn = TRUE, epochs = 1, validation_split = 0.05) # needs up to 60G RAM
+save(history, file="CrisprNet_history.Rdata")
+end_gpu_session()
 ```
+
+Code to get cell states from genomes
+```
+library(altum)
+start_gpu_session(gpus="1") # limit process to one GPU
+getstates_ncbi("ncbi.csv", "CrisprNet_full_model_test.hdf5")
+```
+
 
 ### LSTMVis
 
