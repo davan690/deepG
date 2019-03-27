@@ -91,7 +91,7 @@ train_lstm <- function(dat,
       keras::layer_activation("softmax")
   }
 
-  optimizer <- keras::optimizer_adam(lr = learning_rate)
+  optimizer <- keras::optimizer_RMSprop(lr = learning_rate)
   model %>% keras::compile(loss = "categorical_crossentropy",
                            optimizer = optimizer)
 
