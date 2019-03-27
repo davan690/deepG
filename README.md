@@ -1,5 +1,5 @@
 ![Coverage
-Status](https://img.shields.io/codecov/c/github/hiddengenome/altum/master.svg)
+Status](https://img.shields.io/codecov/c/github/hiddengenome/altum.svg?token=e2914fef-6e65-4145-b931-03d31277099f)
 
 ## Overview
 
