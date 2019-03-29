@@ -1,5 +1,9 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
+addons:
+  apt:
+    packages:
+    - hdf5-tools
 language: R
 sudo: false
 cache: packages
