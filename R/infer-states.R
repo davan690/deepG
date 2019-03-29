@@ -16,7 +16,7 @@ getstates <- function(model_path,
                       type = "csv",
                       verbose = F){
   require(dplyr)
-  require(h5)
+  require(hdf5r)
   require(keras)
 
   Check <- ArgumentCheck::newArgCheck()
@@ -47,9 +47,10 @@ getstates <- function(model_path,
   # save states as hdf5
   if (verbose) print("saving states...")
   if (type == "hdf5") {
-    file <- h5::h5file(paste0(run_name, "_states.hdf5"), mode = "a")
-    file["states1"] <- final_states
-    h5::h5close(file)
+    file <- hdf5r::H5File$new(paste0(run_name, "_states.hdf5"), mode = "a")
+    file.grp <- hdf5r::file.h5$create_group("states1")
+    file.grp <- final_states
+    hdf5r::h5close(file)
   } else {
     write.table(final_states,
                 file = paste0(run_name, "_states.csv"),

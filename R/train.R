@@ -27,7 +27,6 @@ train_lstm <- function(dat,
                         epochs = 1,
                        verbose = F) {
   require(dplyr)
-  require(h5)
 
   Check <- ArgumentCheck::newArgCheck()
   #* Add an error if maxlen <1
@@ -91,7 +90,7 @@ train_lstm <- function(dat,
       keras::layer_activation("softmax")
   }
 
-  optimizer <- keras::optimizer_RMSprop(lr = learning_rate)
+  optimizer <- keras::optimizer_rmsprop(lr = learning_rate)
   model %>% keras::compile(loss = "categorical_crossentropy",
                            optimizer = optimizer)
 
