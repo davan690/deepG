@@ -6,7 +6,7 @@ addons:
     - hdf5-tools
 
 before_install:
-  - sudo apt-get install -y libhdf5-dev
+  - sudo apt-get install -y libhdf5-serial-dev
 
 language: R
 sudo: required
