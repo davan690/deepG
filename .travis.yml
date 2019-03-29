@@ -1,13 +1,39 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+language: R
+sudo: required
+cache: packages
+
+os: linux
+dist: trusty
+
+env:
+  global:
+    - HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/releases"
+    - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 addons:
   apt:
     packages:
-    - hdf5-tools
+      - subversion
+      - autoconf
+      - build-essential
+      - libtool
+      - libmagick++-dev
 
-before_install:
-  - sudo apt-get install -y libhdf5-serial-dev
+env:
+  global:
+    - HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/releases"
+    - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
-language: R
-sudo: required
-cache: packages
+before_install: 
+  - chmod +x travis_setup.sh
+  - ./travis_setup.sh
+
+r_github_packages:
+- jimhester/covr
+
+after_success:
+- R --slave --vanilla -e 'library(covr); pc <- package_coverage(); pc; codecov(coverage
+  = pc)'
+
+notifications:
+  email: philipp.muench@helmholtz-hzi.de
