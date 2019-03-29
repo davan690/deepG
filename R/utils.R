@@ -7,7 +7,7 @@
 writehdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
 	require(dplyr)
 	require(plyr)
-	require(h5)
+	require(hdf5r)
 	tokenized <- dat %>%
 		tokenizers::tokenize_characters(strip_non_alphanum = FALSE,
 																		simplify = TRUE)
@@ -23,9 +23,10 @@ writehdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
 															 to = charset_index)
 
 	if (verbose) print("saving states...")
-	file <- h5::h5file(filename, mode = "a")
-	file["words"] <- array(tokenized_index)
-	h5::h5close(file)
+	file <- hdf5r::H5File$new(filename, mode = "a")
+	file.grp <- hdf5r::file.h5$create_group("words")
+	file.grp <- array(tokenized_index)
+	hdf5r::h5close(file)
 }
 
 
