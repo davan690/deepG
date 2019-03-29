@@ -4,6 +4,10 @@ addons:
   apt:
     packages:
     - hdf5-tools
+
+before_install:
+  - sudo apt-get install -y libhdf5-dev
+
 language: R
 sudo: required
 cache: packages
