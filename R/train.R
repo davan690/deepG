@@ -10,23 +10,28 @@
 #' @param learning_rate learning rate for optimizer
 #' @param layer_size number of cells per network layer#'
 #' @param cudnn if true, using layer_cudnn_lstm() instead of layer_lstm()
+#' @param multiple_gpu if true, multi_gpu_model will be used
+#' @param gpu_num number of GPUs to be used, only relevant if multiple_gpu is true
 #' @param vocabulary_size number of unique chars in training set'
 #' @param epochs number of full iterations over the dataset#
 #' @param verbose TRUE/FALSE
 #' @export
 train_lstm <- function(dat,
-                        run_name = "run",
-                        maxlen = 30,
-                        dropout_rate = .3,
-                        layer_size = 128,
-                        batch_size = 128,
-                        validation_split = 0.05,
-                        learning_rate = 0.001,
-                        cudnn = FALSE,
-                        vocabulary_size = 5,
-                        epochs = 1,
+                       run_name = "run",
+                       maxlen = 30,
+                       dropout_rate = .3,
+                       layer_size = 128,
+                       batch_size = 128,
+                       validation_split = 0.05,
+                       learning_rate = 0.001,
+                       cudnn = FALSE,
+                       multiple_gpu = FALSE,
+                       gpu_num = 2,
+                       vocabulary_size = 5,
+                       epochs = 1,
                        verbose = F) {
   require(dplyr)
+  require(tensorflow)
 
   Check <- ArgumentCheck::newArgCheck()
   #* Add an error if maxlen <1
@@ -40,19 +45,19 @@ train_lstm <- function(dat,
     ArgumentCheck::addError(
       msg = "'dropout_rate' must be between 0 and 1",
       argcheck = Check
-  )
+    )
   #* Add an error if layer_size negative
   if (layer_size < 1)
     ArgumentCheck::addError(
       msg = "'layer_size' should be a positive integer",
       argcheck = Check
-  )
+    )
   #* Add an error if layer_size negative
   if (batch_size < 1)
     ArgumentCheck::addError(
       msg = "'batch_size' should be a positive integer",
       argcheck = Check
-  )
+    )
   #* Add an error if dropout_rate is < 0 or > 1
   if (validation_split > 1 |  validation_split < 0)
     ArgumentCheck::addError(
@@ -62,8 +67,17 @@ train_lstm <- function(dat,
   #* Return errors and warnings (if any)
   ArgumentCheck::finishArgCheck(Check)
 
-  if (cudnn) {
+  # initialize model
+  if (multiple_gpu) {
+    # init template model under a CPU device scope
+    with(tf$device("/cpu:0"), {
+      model <- keras::keras_model_sequential()
+    })
+  } else {
     model <- keras::keras_model_sequential()
+  }
+
+  if (cudnn ) {
     model %>%
       keras::layer_cudnn_lstm(
         layer_size,
@@ -72,11 +86,9 @@ train_lstm <- function(dat,
       ) %>%
       keras::layer_dropout(rate = dropout_rate) %>%
       keras::layer_cudnn_lstm(layer_size) %>%
-      keras::layer_dropout(rate = dropout_rate) %>%
-      keras::layer_dense(vocabulary_size) %>%
-      keras::layer_activation("softmax")
+      keras::layer_dropout(rate = dropout_rate)
+
   } else {
-    model <- keras::keras_model_sequential()
     model %>%
       keras::layer_lstm(
         layer_size,
@@ -85,9 +97,14 @@ train_lstm <- function(dat,
       ) %>%
       keras::layer_dropout(rate = dropout_rate) %>%
       keras::layer_lstm(layer_size) %>%
-      keras::layer_dropout(rate = dropout_rate) %>%
-      keras::layer_dense(vocabulary_size) %>%
-      keras::layer_activation("softmax")
+      keras::layer_dropout(rate = dropout_rate)
+  }
+
+  model %>% keras::layer_dense(vocabulary_size) %>%
+    keras::layer_activation("softmax")
+
+  if (multiple_gpu) {
+    model <- keras::multi_gpu_model(model, gpus = gpu_num)
   }
 
   optimizer <- keras::optimizer_rmsprop(lr = learning_rate)
