@@ -6,6 +6,7 @@
 #' @param dropout_rate dropout rate for LSTM
 #' @param layer_size number of cells per network layer
 #' @param batch_size how many chunks are trained in parallel
+#' @param num_layers number of LSTM layers
 #' @param validation_split proportion of training set that will be used for validation
 #' @param learning_rate learning rate for optimizer
 #' @param layer_size number of cells per network layer#'
@@ -23,6 +24,7 @@ train_lstm <- function(dat,
                        dropout_rate = .3,
                        layer_size = 128,
                        batch_size = 256,
+                       num_layers = 2,
                        validation_split = 0.05,
                        learning_rate = 0.001,
                        cudnn = FALSE,
@@ -34,41 +36,31 @@ train_lstm <- function(dat,
                        verbose = F) {
   require(dplyr)
   require(tensorflow)
-
+  
   Check <- ArgumentCheck::newArgCheck()
   #* Add an error if maxlen <1
   if (maxlen < 1)
-    ArgumentCheck::addError(
-      msg = "'maxlen' must be >= 1",
-      argcheck = Check
-    )
+    ArgumentCheck::addError(msg = "'maxlen' must be >= 1",
+                            argcheck = Check)
   #* Add an error if dropout_rate is < 0 or > 1
   if (dropout_rate > 1 |  dropout_rate < 0)
-    ArgumentCheck::addError(
-      msg = "'dropout_rate' must be between 0 and 1",
-      argcheck = Check
-    )
+    ArgumentCheck::addError(msg = "'dropout_rate' must be between 0 and 1",
+                            argcheck = Check)
   #* Add an error if layer_size negative
   if (layer_size < 1)
-    ArgumentCheck::addError(
-      msg = "'layer_size' should be a positive integer",
-      argcheck = Check
-    )
+    ArgumentCheck::addError(msg = "'layer_size' should be a positive integer",
+                            argcheck = Check)
   #* Add an error if layer_size negative
   if (batch_size < 1)
-    ArgumentCheck::addError(
-      msg = "'batch_size' should be a positive integer",
-      argcheck = Check
-    )
+    ArgumentCheck::addError(msg = "'batch_size' should be a positive integer",
+                            argcheck = Check)
   #* Add an error if dropout_rate is < 0 or > 1
   if (validation_split > 1 |  validation_split < 0)
-    ArgumentCheck::addError(
-      msg = "'validation_split' must be between 0 and 1",
-      argcheck = Check
-    )
+    ArgumentCheck::addError(msg = "'validation_split' must be between 0 and 1",
+                            argcheck = Check)
   n#* Return errors and warnings (if any)
   ArgumentCheck::finishArgCheck(Check)
-
+  
   # initialize model
   if (multiple_gpu) {
     # init template model under a CPU device scope
@@ -78,40 +70,49 @@ train_lstm <- function(dat,
   } else {
     model <- keras::keras_model_sequential()
   }
-
-  if (cudnn ) {
+  
+  if (cudnn) {
+    for (i in 1:(num_layers - 1)) {
+      model %>%
+        keras::layer_cudnn_lstm(
+          layer_size,
+          input_shape = c(maxlen, vocabulary_size),
+          return_sequences = T
+        ) %>%
+        keras::layer_dropout(rate = dropout_rate)
+    }
+    # last LSTM layer should be with return_sequences = F
     model %>%
-      keras::layer_cudnn_lstm(
-        layer_size,
-        input_shape = c(maxlen, vocabulary_size),
-        return_sequences = T
-      ) %>%
-      keras::layer_dropout(rate = dropout_rate) %>%
       keras::layer_cudnn_lstm(layer_size) %>%
       keras::layer_dropout(rate = dropout_rate)
-
+    
   } else {
+      for (i in 1:(num_layers - 1)) {
+        model %>%
+          keras::layer_lstm(
+            layer_size,
+            input_shape = c(maxlen, vocabulary_size),
+            return_sequences = T
+          ) %>%
+          keras::layer_dropout(rate = dropout_rate)
+      }
+    # last LSTM layer should be with return_sequences = F
     model %>%
-      keras::layer_lstm(
-        layer_size,
-        input_shape = c(maxlen, vocabulary_size),
-        return_sequences = T
-      ) %>%
-      keras::layer_dropout(rate = dropout_rate) %>%
       keras::layer_lstm(layer_size) %>%
       keras::layer_dropout(rate = dropout_rate)
+    
   }
-
+  
   model %>% keras::layer_dense(vocabulary_size) %>%
     keras::layer_activation("softmax")
   optimizer <- keras::optimizer_rmsprop(lr = learning_rate)
-
+  
   if (multiple_gpu) {
     parallel_model <- keras::multi_gpu_model(model,
                                              gpus = gpu_num,
-                                             cpu_merge= cpu_merge)
+                                             cpu_merge = cpu_merge)
     parallel_model %>% keras::compile(loss = "categorical_crossentropy",
-                             optimizer = optimizer)
+                                      optimizer = optimizer)
     start.time <- Sys.time()
     history <- parallel_model %>% keras::fit(
       dat$X,
@@ -134,11 +135,12 @@ train_lstm <- function(dat,
     )
     end.time <- Sys.time()
   }
-
+  
   print(paste("Training time:", end.time - start.time))
-
+  
   # save training metadata
-  if (verbose) print("save model...")
+  if (verbose)
+    print("save model...")
   Rmodel <- keras::serialize_model(model, include_optimizer = TRUE)
   save(Rmodel, file = paste0(run_name, "_full_model.Rdata"))
   keras::save_model_hdf5(

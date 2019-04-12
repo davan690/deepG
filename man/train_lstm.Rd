@@ -2,12 +2,13 @@
 % Please edit documentation in R/train.R
 \name{train_lstm}
 \alias{train_lstm}
-\title{Train standart LSTM model}
+\title{Train standart LSTM model "Training time: 5.21544417142868" (2gpus)}
 \usage{
 train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
-  layer_size = 128, batch_size = 128, validation_split = 0.05,
-  learning_rate = 0.001, cudnn = FALSE, vocabulary_size = 5,
-  epochs = 1, verbose = F)
+  layer_size = 128, batch_size = 256, num_layers = 2,
+  validation_split = 0.05, learning_rate = 0.001, cudnn = FALSE,
+  multiple_gpu = FALSE, cpu_merge = TRUE, gpu_num = 2,
+  vocabulary_size = 5, epochs = 1, verbose = F)
 }
 \arguments{
 \item{dat}{preprocessed input data (semi-redundant chunks)}
@@ -22,11 +23,19 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
 
 \item{batch_size}{how many chunks are trained in parallel}
 
+\item{num_layers}{number of LSTM layers}
+
 \item{validation_split}{proportion of training set that will be used for validation}
 
 \item{learning_rate}{learning rate for optimizer}
 
 \item{cudnn}{if true, using layer_cudnn_lstm() instead of layer_lstm()}
+
+\item{multiple_gpu}{if true, multi_gpu_model will be used}
+
+\item{cpu_merge}{true on default, false recommend for NVlink, only relevant if multiple_gpu is true}
+
+\item{gpu_num}{number of GPUs to be used, only relevant if multiple_gpu is true}
 
 \item{vocabulary_size}{number of unique chars in training set'}
 
@@ -37,5 +46,5 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
 \item{layer_size}{number of cells per network layer#'}
 }
 \description{
-Train standart LSTM model
+Train standart LSTM model "Training time: 5.21544417142868" (2gpus)
 }
