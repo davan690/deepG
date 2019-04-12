@@ -1,4 +1,4 @@
-#' Train standart LSTM model
+#' Train standart LSTM model "Training time: 5.21544417142868" (2gpus)
 #'
 #' @param dat preprocessed input data (semi-redundant chunks)
 #' @param run_name name of the run (without file ending)
@@ -12,6 +12,7 @@
 #' @param cudnn if true, using layer_cudnn_lstm() instead of layer_lstm()
 #' @param multiple_gpu if true, multi_gpu_model will be used
 #' @param gpu_num number of GPUs to be used, only relevant if multiple_gpu is true
+#' @param cpu_merge true on default, false recommend for NVlink, only relevant if multiple_gpu is true
 #' @param vocabulary_size number of unique chars in training set'
 #' @param epochs number of full iterations over the dataset#
 #' @param verbose TRUE/FALSE
@@ -21,11 +22,12 @@ train_lstm <- function(dat,
                        maxlen = 30,
                        dropout_rate = .3,
                        layer_size = 128,
-                       batch_size = 128,
+                       batch_size = 256,
                        validation_split = 0.05,
                        learning_rate = 0.001,
                        cudnn = FALSE,
                        multiple_gpu = FALSE,
+                       cpu_merge = TRUE,
                        gpu_num = 2,
                        vocabulary_size = 5,
                        epochs = 1,
@@ -64,7 +66,7 @@ train_lstm <- function(dat,
       msg = "'validation_split' must be between 0 and 1",
       argcheck = Check
     )
-  #* Return errors and warnings (if any)
+  n#* Return errors and warnings (if any)
   ArgumentCheck::finishArgCheck(Check)
 
   # initialize model
@@ -102,24 +104,39 @@ train_lstm <- function(dat,
 
   model %>% keras::layer_dense(vocabulary_size) %>%
     keras::layer_activation("softmax")
+  optimizer <- keras::optimizer_rmsprop(lr = learning_rate)
 
   if (multiple_gpu) {
-    model <- keras::multi_gpu_model(model, gpus = gpu_num)
+    parallel_model <- keras::multi_gpu_model(model,
+                                             gpus = gpu_num,
+                                             cpu_merge= cpu_merge)
+    parallel_model %>% keras::compile(loss = "categorical_crossentropy",
+                             optimizer = optimizer)
+    start.time <- Sys.time()
+    history <- parallel_model %>% keras::fit(
+      dat$X,
+      dat$Y,
+      batch_size = batch_size,
+      validation_split = validation_split,
+      epochs = epochs
+    )
+    end.time <- Sys.time()
+  } else {
+    model %>% keras::compile(loss = "categorical_crossentropy",
+                             optimizer = optimizer)
+    start.time <- Sys.time()
+    history <- model %>% keras::fit(
+      dat$X,
+      dat$Y,
+      batch_size = batch_size,
+      validation_split = validation_split,
+      epochs = epochs
+    )
+    end.time <- Sys.time()
   }
 
-  optimizer <- keras::optimizer_rmsprop(lr = learning_rate)
-  model %>% keras::compile(loss = "categorical_crossentropy",
-                           optimizer = optimizer)
+  print(paste("Training time:", end.time - start.time))
 
-  history <- model %>% keras::fit(
-    dat$X,
-    dat$Y,
-    batch_size = batch_size,
-    validation_split = validation_split,
-    epochs = epochs
-  )
-
-  optimizer <- keras::optimizer_adam(lr = learning_rate)
   # save training metadata
   if (verbose) print("save model...")
   Rmodel <- keras::serialize_model(model, include_optimizer = TRUE)
