@@ -36,7 +36,6 @@ get_vocabulary <- function(char, verbose = F) {
 #' @param vocabulary char, should be sorted, if not set char vocabulary will be used
 #' @param verbose TRUE/FALSE
 #' @export
-#'
 preprocess <- function(char, maxlen = 30, vocabulary, verbose=F) {
   require(dplyr)
   Check <- ArgumentCheck::newArgCheck()
@@ -47,7 +46,7 @@ preprocess <- function(char, maxlen = 30, vocabulary, verbose=F) {
       argcheck = Check
     )
 
-  if(!missing(vocabulary)) {
+  if (!missing(vocabulary)) {
     #* Add an error if vocabulary is <1
     if (length(vocabulary) < 1)
       ArgumentCheck::addError(
@@ -98,4 +97,36 @@ preprocess <- function(char, maxlen = 30, vocabulary, verbose=F) {
   }
   results <- list("X" = x, "Y" = y)
   return(results)
+}
+
+#' preprocesses and serializes genomes located in a folder, exports as hdf5
+#'
+#' @param directory input directory where .fasta files are located
+#' @param out output directory wher hdf5 files will be written to
+#' @param format either .txt or .fasta
+#' @export
+serialize_genomes <- function(directory, out, format = "fa"){
+  require(xfun)
+  require(rhdf5)
+  library(Biostrings)
+  directory <- normalize_path(directory)
+  files <- list.files(path = directory, pattern = paste0("*.", format), full.names = TRUE)
+  for (i in seq_along(files)) {
+    file_name <- gsub(pattern = paste0("\\.", format, "$"), "", basename(files[i]))
+   if (format == "fasta" | format == "fa") {
+      fastaFile <- readDNAStringSet(files[i])
+      seq <- paste(fastaFile) # not sure if this is working
+      pre <-  preprocess(seq) # , ...)
+   } else {
+      stop("only .fa and .fasta files are supported")
+    }
+    #save
+    filename <- paste0(out,"/",file_name, ".h5")
+    h5createFile(filename) 
+    h5createGroup(filename, "X")
+    h5createGroup(filename, "Y")
+    h5write(pre$X, filename, "X/data") 
+    h5write(pre$Y, filename, "Y/data") 
+    h5closeAll()
+    }
 }

@@ -2,13 +2,13 @@
 % Please edit documentation in R/train.R
 \name{train_lstm}
 \alias{train_lstm}
-\title{Train standart LSTM model "Training time: 5.21544417142868" (2gpus)}
+\title{Train  LSTM model}
 \usage{
 train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
-  layer_size = 128, batch_size = 256, num_layers = 2,
-  validation_split = 0.05, learning_rate = 0.001, cudnn = FALSE,
-  multiple_gpu = FALSE, cpu_merge = TRUE, gpu_num = 2,
-  vocabulary_size = 5, epochs = 1, verbose = F)
+  layer_size = 128, batch_size = 256, num_layers_lstm = 2,
+  codon_cnn = T, validation_split = 0.05, learning_rate = 0.001,
+  cudnn = FALSE, multiple_gpu = FALSE, cpu_merge = TRUE,
+  gpu_num = 2, vocabulary_size = 5, epochs = 1, verbose = F)
 }
 \arguments{
 \item{dat}{preprocessed input data (semi-redundant chunks)}
@@ -23,7 +23,9 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
 
 \item{batch_size}{how many chunks are trained in parallel}
 
-\item{num_layers}{number of LSTM layers}
+\item{num_layers_lstm}{number of LSTM layers}
+
+\item{codon_cnn}{first layer is a CNN layer with size of 3}
 
 \item{validation_split}{proportion of training set that will be used for validation}
 
@@ -46,5 +48,5 @@ train_lstm(dat, run_name = "run", maxlen = 30, dropout_rate = 0.3,
 \item{layer_size}{number of cells per network layer#'}
 }
 \description{
-Train standart LSTM model "Training time: 5.21544417142868" (2gpus)
+Train  LSTM model
 }
