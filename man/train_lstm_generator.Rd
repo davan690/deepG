@@ -9,7 +9,7 @@ train_lstm_generator(path, run_name = "run", maxlen = 30,
   num_layers_lstm = 2, codon_cnn = T, validation_split = 0.05,
   learning_rate = 0.001, cudnn = FALSE, multiple_gpu = FALSE,
   cpu_merge = TRUE, gpu_num = 2, vocabulary_size = 5, epochs = 1,
-  verbose = F)
+  max_queue_size = 50, steps_per_epoch = 20, verbose = F)
 }
 \arguments{
 \item{path}{path to fasta files}
@@ -42,7 +42,11 @@ train_lstm_generator(path, run_name = "run", maxlen = 30,
 
 \item{vocabulary_size}{number of unique chars in training set'}
 
-\item{epochs}{number of full iterations over the dataset#}
+\item{epochs}{number of full iterations over the dataset}
+
+\item{max_queue_size}{queue on fit_generator()}
+
+\item{steps_per_epoch}{Total number of steps (batches of samples) to yield from generator before declaring one epoch finished and starting the next epoch. It should typically be equal to the number of samples if your dataset divided by the batch size}
 
 \item{verbose}{TRUE/FALSE}
 

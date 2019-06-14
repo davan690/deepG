@@ -16,7 +16,9 @@
 #' @param gpu_num number of GPUs to be used, only relevant if multiple_gpu is true
 #' @param cpu_merge true on default, false recommend for NVlink, only relevant if multiple_gpu is true
 #' @param vocabulary_size number of unique chars in training set'
-#' @param epochs number of full iterations over the dataset#
+#' @param epochs number of full iterations over the dataset
+#' @param max_queue_size queue on fit_generator()
+#' @param steps_per_epoch Total number of steps (batches of samples) to yield from generator before declaring one epoch finished and starting the next epoch. It should typically be equal to the number of samples if your dataset divided by the batch size
 #' @param verbose TRUE/FALSE
 #' @export
 train_lstm_generator <- function(path,
@@ -35,6 +37,8 @@ train_lstm_generator <- function(path,
                        gpu_num = 2,
                        vocabulary_size = 5,
                        epochs = 1,
+                       max_queue_size = 50,
+                       steps_per_epoch = 20,
                        verbose = F) {
   require(dplyr)
   library(magrittr)
@@ -129,7 +133,18 @@ train_lstm_generator <- function(path,
                                              cpu_merge = cpu_merge)
     parallel_model %>% keras::compile(loss = "categorical_crossentropy",
                                       optimizer = optimizer)
+    gen <- fasta_files_generator(path)
+    
     start.time <- Sys.time()
+    
+    # fit using generator
+    history <- model %>% fit_generator(
+      generator = gen,
+      steps_per_epoch = 100, # will auto-reset after see all sample
+      max_queue_size = 50,
+      epochs = epochs
+    )
+    
     history <- parallel_model %>% keras::fit(
       dat$X,
       dat$Y,
@@ -141,15 +156,15 @@ train_lstm_generator <- function(path,
   } else {
     model %>% keras::compile(loss = "categorical_crossentropy",
                              optimizer = optimizer)
-    start.time <- Sys.time()
-    
     # set-up the fasta generator
     gen <- fasta_files_generator(path)
-    
+    start.time <- Sys.time()
+
     # fit using generator
     history <- model %>% fit_generator(
       generator = gen,
       steps_per_epoch = 100, # will auto-reset after see all sample
+      max_queue_size = 50,
       epochs = epochs
     )
     end.time <- Sys.time()

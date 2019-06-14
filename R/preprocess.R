@@ -84,12 +84,11 @@ preprocess <- function(char, maxlen = 30, vocabulary, verbose=F) {
   y <-
     array(0, dim = c(length(dataset$sentece), length(vocabulary)))
   if (verbose) print("vectorization ...")
-  pb <-
-    txtProgressBar(min = 0,
+  if (verbose) pb <-  txtProgressBar(min = 0,
                    max = length(dataset$sentece),
                    style = 3)
   for (i in 1:length(dataset$sentece)) {
-    setTxtProgressBar(pb, i)
+  if (verbose) setTxtProgressBar(pb, i)
     x[i, ,] <- sapply(vocabulary, function(x) {
       as.integer(x == dataset$sentece[[i]])
     })
@@ -131,14 +130,15 @@ serialize_genomes <- function(directory, out, format = "fa"){
     }
 }
 
-#' preprocess of one fasta file
+#' wrapper of the preprocess() function called on the genomic contents of one
+#' fasta file. Multiple entries are combined with newline characters.
 #' @export
 preprocess_fasta <- function(path, maxlen = 30,
                              vocabulary = c("\n", "a", "c", "g", "t"),
                              verbose = F){
   library(Biostrings)
   fastaFile <- readDNAStringSet(path)
-  seq <- paste(fastaFile)
+  seq <- paste0(paste(fastaFile, collapse = "\n"), "\n")
   seq_processed <- preprocess(seq, maxlen = 30, vocabulary, verbose = F)
   return(seq_processed)
 }
@@ -160,7 +160,6 @@ fasta_files_generator <- function(dir, format = "fasta") {
       next_file <<- 1
     # determine the file name
     file <- fasta_files[[next_file]]
-    print(file)
     preprocessed <- preprocess_fasta(file)
     # return the batch
     list(preprocessed$X, preprocessed$Y)

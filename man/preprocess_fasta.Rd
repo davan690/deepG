@@ -2,11 +2,13 @@
 % Please edit documentation in R/preprocess.R
 \name{preprocess_fasta}
 \alias{preprocess_fasta}
-\title{preprocess of one fasta file}
+\title{wrapper of the preprocess() function called on the genomic contents of one
+fasta file. Multiple entries are combined with newline characters.}
 \usage{
 preprocess_fasta(path, maxlen = 30, vocabulary = c("\\n", "a", "c",
   "g", "t"), verbose = F)
 }
 \description{
-preprocess of one fasta file
+wrapper of the preprocess() function called on the genomic contents of one
+fasta file. Multiple entries are combined with newline characters.
 }
