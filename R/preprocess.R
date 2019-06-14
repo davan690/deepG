@@ -130,3 +130,39 @@ serialize_genomes <- function(directory, out, format = "fa"){
     h5closeAll()
     }
 }
+
+#' preprocess of one fasta file
+#' @export
+preprocess_fasta <- function(path, maxlen = 30,
+                             vocabulary = c("\n", "a", "c", "g", "t"),
+                             verbose = F){
+  library(Biostrings)
+  fastaFile <- readDNAStringSet(path)
+  seq <- paste(fastaFile)
+  seq_processed <- preprocess(seq, maxlen = 30, vocabulary, verbose = F)
+  return(seq_processed)
+}
+
+#' custom generator for fasta files
+#'
+#' @param directory input directory where .fasta files are located
+#' @export
+fasta_files_generator <- function(dir, format = "fasta") {
+  library(xfun)
+  fasta_files <- list.files(path = normalize_path(dir), 
+                      pattern = paste0("*.", format), full.names = TRUE)
+  next_file <- 0
+  function() {
+    # move to the next file (note the <<- assignment operator)
+    next_file <<- next_file + 1
+    # start from the beginning
+    if (next_file > length(fasta_files))
+      next_file <<- 1
+    # determine the file name
+    file <- fasta_files[[next_file]]
+    print(file)
+    preprocessed <- preprocess_fasta(file)
+    # return the batch
+    list(preprocessed$X, preprocessed$Y)
+  }
+}
