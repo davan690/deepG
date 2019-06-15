@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/hiddengenome/altum.svg?branch=master)](https://travis-ci.org/hiddengenome/altum) ![Coverage
-Status](https://img.shields.io/codecov/c/github/hiddengenome/altum.svg?token=e2914fef-6e65-4145-b931-03d31277099f)
-
 ## Overview
 
 altum is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets of genomic and human readable languages for testing.
@@ -27,6 +24,14 @@ install_keras(tensorflow = "gpu")
 ```
 
 for computation on CPU you can use `install_keras()`
+
+## Usage
+
+### Build a GenomeNet using `.fasta` files that are located in a directory
+
+```
+history <- train_lstm_generator("input_dir")
+```
 
 ## Datasets
 
