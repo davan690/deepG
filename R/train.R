@@ -133,35 +133,28 @@ train_lstm_generator <- function(path,
                                              cpu_merge = cpu_merge)
     parallel_model %>% keras::compile(loss = "categorical_crossentropy",
                                       optimizer = optimizer)
-    gen <- fasta_files_generator(path)
+    gen <- fasta_files_generator(path, batch_size = batch_size)
     
     start.time <- Sys.time()
     
     # fit using generator
-    history <- model %>% fit_generator(
+    history <- model %>% keras::fit_generator(
       generator = gen,
       steps_per_epoch = 100, # will auto-reset after see all sample
       max_queue_size = 50,
       epochs = epochs
     )
     
-    history <- parallel_model %>% keras::fit(
-      dat$X,
-      dat$Y,
-      batch_size = batch_size,
-      validation_split = validation_split,
-      epochs = epochs
-    )
     end.time <- Sys.time()
   } else {
     model %>% keras::compile(loss = "categorical_crossentropy",
                              optimizer = optimizer)
     # set-up the fasta generator
-    gen <- fasta_files_generator(path)
+    gen <- fasta_files_generator(path, batch_size = batch_size)
     start.time <- Sys.time()
 
     # fit using generator
-    history <- model %>% fit_generator(
+    history <- model %>% keras::fit_generator(
       generator = gen,
       steps_per_epoch = 100, # will auto-reset after see all sample
       max_queue_size = 50,

@@ -143,25 +143,68 @@ preprocess_fasta <- function(path, maxlen = 30,
   return(seq_processed)
 }
 
-#' custom generator for fasta files
+#' custom generator for fasta files, will produce chunks in size of batch_size
+#' by iterating over the input files. If the input file is smaller than the
+#' batch_size, batch size will be reduced to the maximal size. So the last batch
+#' of a file is usually smaller. 
 #'
+#'see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R
 #' @param directory input directory where .fasta files are located
 #' @export
-fasta_files_generator <- function(dir, format = "fasta") {
+fasta_files_generator <- function(dir, format = "fasta", 
+                                  batch_size = 12,
+                                  verbose = F) {
   library(xfun)
   fasta_files <- list.files(path = normalize_path(dir), 
                       pattern = paste0("*.", format), full.names = TRUE)
-  next_file <- 0
+  next_file <- 1
+  batch_num <- 0
+  batch_end <- 0
+  # pre-load the first file
+  file <- fasta_files[[1]]
+  preprocessed <- preprocess_fasta(file)
+  if (verbose) message("initializing")
   function() {
-    # move to the next file (note the <<- assignment operator)
-    next_file <<- next_file + 1
-    # start from the beginning
-    if (next_file > length(fasta_files))
-      next_file <<- 1
-    # determine the file name
-    file <- fasta_files[[next_file]]
-    preprocessed <- preprocess_fasta(file)
-    # return the batch
-    list(preprocessed$X, preprocessed$Y)
+    # move to nexdt file if we cannot process another batch
+    if (((batch_num) * batch_size) > nrow(preprocessed$X)){
+      if (verbose) message("reached end of file")
+      # move to the next file
+      next_file <<- next_file + 1 
+      # reset batch coordinates
+      batch_num <<- 0
+      batch_end <<- 0
+      # at the end of the file list, start from the beginning
+      if (next_file > length(fasta_files)) {
+        message("resetting to first file")
+        # reset file number
+        next_file <<- 1
+        # reset batch coordinates
+        batch_num <<- 0
+        batch_end <<- 0
+      }
+      # read in the new file
+      file <<- fasta_files[[next_file]]
+      preprocessed <- preprocess_fasta(file)
+    }
+    # proceccing a batch
+    batch_num <<- batch_num + 1
+    batch_start <<- batch_end + 1
+    # check if full batch size can be processed, if not temporaly reduce
+    # batch_size to maximum possible
+    if ((batch_start + batch_size) > nrow(preprocessed$X)) {
+      if (verbose) message("reduce batch_size temporarily")
+      batch_end <- nrow(preprocessed$X)
+      # reduced batch size
+    } else {
+      # regular batch_size
+      batch_end <<- batch_start + batch_size  # 12 
+    }
+    if (verbose) message(paste("generating bach number",
+                               batch_num, batch_start, "-", batch_end,
+                               "of file", file, "index", next_file))
+    x_batch <- preprocessed$X[batch_start:batch_end, , ]# dim shoiuld be (batch_size, length, words)
+    y_batch <- preprocessed$Y[batch_start:batch_end,] #  # dim should be (batch_size, words)
+    # return the file
+    list(x_batch, y_batch)
   }
 }
