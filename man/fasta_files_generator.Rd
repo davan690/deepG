@@ -2,13 +2,17 @@
 % Please edit documentation in R/preprocess.R
 \name{fasta_files_generator}
 \alias{fasta_files_generator}
-\title{custom generator for fasta files}
+\title{custom generator for fasta files, will produce chunks in size of batch_size
+by iterating over the input files. If the input file is smaller than the
+batch_size, batch size will be reduced to the maximal size. So the last batch
+of a file is usually smaller.}
 \usage{
-fasta_files_generator(dir, format = "fasta")
+fasta_files_generator(dir, format = "fasta", batch_size = 12,
+  verbose = F)
 }
 \arguments{
 \item{directory}{input directory where .fasta files are located}
 }
 \description{
-custom generator for fasta files
+see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R
 }

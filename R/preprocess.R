@@ -143,6 +143,20 @@ preprocess_fasta <- function(path, maxlen = 30,
   return(seq_processed)
 }
 
+#' do one full preprocessing iteration to figure out what the observed
+#' steps_per_epoch value is
+calculate_steps_per_epoch <- function(dir, batch_size = 12){
+  library(xfun)
+  steps_per_epoch <- 0
+  fasta_files <- list.files(path = normalize_path(dir), 
+                            pattern = paste0("*.", format), full.names = TRUE)
+  for (file in fasta_files){
+    preprocessed <- preprocess_fasta(file)
+    steps_per_epoch <- steps_per_epoch +  ceiling(nrow(preprocessed$X)/batch_size)
+  }
+  return(steps_per_epoch)
+}
+
 #' custom generator for fasta files, will produce chunks in size of batch_size
 #' by iterating over the input files. If the input file is smaller than the
 #' batch_size, batch size will be reduced to the maximal size. So the last batch
@@ -175,7 +189,7 @@ fasta_files_generator <- function(dir, format = "fasta",
       batch_end <<- 0
       # at the end of the file list, start from the beginning
       if (next_file > length(fasta_files)) {
-        message("resetting to first file")
+        if (verbose) message("resetting to first file")
         # reset file number
         next_file <<- 1
         # reset batch coordinates
