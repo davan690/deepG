@@ -1,16 +1,35 @@
+[![Build Status](https://travis-ci.org/hiddengenome/altum.svg?branch=master)](https://travis-ci.org/hiddengenome/altum)
+
 ## Overview
 
 altum is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets of genomic and human readable languages for testing.
 
 ## installation
 
+make sure you have hdf5 library installed on your system, e.g. you can install hdf5-1.10.5 from source 
+
+
+``` bash
+wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz
+tar xvzf hdf5-1.10.5.tar.gz
+cd hdf5-1.10.5
+./configure --prefix=/usr --enable-fortran --enable-cxx
+make
+make check
+sudo make install
+```
+
+and then install `hdf5r` the `h5cc` location
+
 ``` r
-#check for remotes
-if(!require(remotes))
-  install.packages("remotes")
+install.packages("hdf5r", configure.args="--with-hdf5=/usr/bin/h5cc")
+```
+
+``` r
+install.packages("devtools")
 
 # install altum
-remotes::install_github("hiddengenome/altum")
+devtools::install_github("hiddengenome/altum")
 ```
 
 ### GPU support
