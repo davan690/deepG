@@ -4,8 +4,7 @@ Title: altum is a R library that contains a collection of scripts required for m
 Version: 0.1.0
 Author: Philipp C. Münch
 Maintainer: Philipp Münch <pmu15@helmholtz-hzi.de>
-Description: altum is a R library that contains a collection of scripts required
-for model generation and model analysis
+Description: altum is a R library that contains a collection of scripts required for model generation and model analysis
 License: MIT
 Depends:
     R (>= 3.4.3)
