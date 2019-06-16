@@ -6,8 +6,9 @@ altum is a package for generating LSTM models from genomic text and provides scr
 
 ## installation
 
-make sure you have hdf5 library installed on your system, e.g. you can install hdf5-1.10.5 from source 
+### dependencies
 
+For model saving, this package requires the hdf5 library. You can install it from source 
 
 ``` bash
 wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz
@@ -19,53 +20,45 @@ make check
 sudo make install
 ```
 
-and then install `hdf5r` the `h5cc` location
+and then
 
 ``` r
 install.packages("hdf5r", configure.args="--with-hdf5=/usr/bin/h5cc")
 ```
 
+## installation 
+
 ``` r
 install.packages("devtools")
-
-# install altum
 devtools::install_github("hiddengenome/altum")
 ```
 
 ### GPU support
 
-this packaes requires the R interface for keras. 
+Ok default, Keras will be installed without GPU support. To support GPUs reinstall Keras via
 
 ``` r
 install.packages("keras")
-library(keras)
-install_keras(tensorflow = "gpu")
+keras::install_keras(tensorflow = "gpu“)
 ```
 
-for computation on CPU you can use `install_keras()`
+# usage
 
-## Usage
+## model generation via the fasta generator
 
-### Build a GenomeNet using `.fasta` files that are located in a directory
+To build a language model based on a collection of fasta files located in a folder, please run 
 
-```
+``` r
 history <- train_lstm_generator("input_dir")
 ```
 
-## Datasets
+See the `?train_lstm_generator` for further information how to setup file names and network size.
 
-The library comes with three different datasets for testing. 
+## model generation using data held in the RAM
 
-- The set `data(parenthesis)` contains 100k charakters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.  
-- The set `data(crispr_full)` containging all CRISPR loci found in NCBI representative genomes with neighbor nucleotides up and downstream.
-- The set `data(crispr_sample)` containging a subset of `crispr_full` for testing
+#### load a example dataset
 
-## Usage
-
-### generate CrisprNet
-
-#### load dataset
-load dataset named crispr_sample to workspace using `data(crispr_sample)`. Then check if the vocabulary is as exprected, for DNA sequences only {A,C,G,T} and one new-genome character should be there `get_vocabulary(crispr_sample)`
+Load dataset named crispr_sample to workspace using `data(crispr_sample)`. Then check if the vocabulary is as exprected, for DNA sequences only {A,C,G,T} and one new-genome character should be there `get_vocabulary(crispr_sample)`
 
 #### preprocessing
 
@@ -77,41 +70,15 @@ Then we can train the model, will be saved as hdf5 `history <- train_lstm(crispr
 ### batch prediction
 After we trained the CrisprNet we want to use the model and predict some bacterial genomes. For this we can use the `getstates_ncbi()` which takes a list that can be downloaded fomr the NCBI genome browser directly. The hidden state responses to each genome will be saved to the disk and can then be used by uisum for visualization. For example the function call would be `getstates_ncbi("tmp/ncbi.csv", "run_full_model.hdf5")`
 
+## Datasets
 
-### training full CrisprNet
-To train the full _CrisprNet_ model we use `data(crispr_full)` and following prarameter configuration in `train_lstm()` on a V100 GPU.
+The library comes with three different datasets for testing. 
 
-| Parameter        | Value  |
-| ---------------- | ------ |
-| maxlen           | 50     |
-| layer_size       | 512    |
-| batch_size       | 512    |
-| learning_rate    | 0.0005 |
-| validation_split | 0.05   |
-| cudnn            | `TRUE` |
-| epochs           | 50     |
+- The set `data(parenthesis)` contains 100k charakters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.  
+- The set `data(crispr_full)` containging all CRISPR loci found in NCBI representative genomes with neighbor nucleotides up and downstream.
+- The set `data(crispr_sample)` containging a subset of `crispr_full`
 
-Code to train the CrisprNet model:
-
-```
-library(altum)
-data(crispr_full)
-crispr_preprocessed <- preprocess(crispr_full, maxlen = 50) # needs up to 25G RAM
-start_gpu_session() # limit process to one GPU
-history <- train_lstm(crispr_preprocessed, run_name = "CrisprNet", maxlen = 50, layer_size = 512, batch_size = 512, learning_rate = 0.0005, cudnn = TRUE, epochs = 1, validation_split = 0.05) # needs up to 60G RAM
-save(history, file="CrisprNet_history.Rdata")
-end_gpu_session()
-```
-
-Code to get cell states from genomes
-```
-library(altum)
-start_gpu_session(gpus="1") # limit process to one GPU
-getstates_ncbi("ncbi.csv", "CrisprNet_full_model_test.hdf5")
-```
-
-
-### LSTMVis
+### LSTMVis support 
 
 these function produce output that can be used for LSTMVis
 
