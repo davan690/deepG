@@ -26,14 +26,14 @@ and then
 install.packages("hdf5r", configure.args="--with-hdf5=/usr/bin/h5cc")
 ```
 
-## installation 
+## this library 
 
 ``` r
 install.packages("devtools")
 devtools::install_github("hiddengenome/altum")
 ```
 
-### GPU support
+### enable GPU support
 
 Ok default, Keras will be installed without GPU support. To support GPUs reinstall Keras via
 
