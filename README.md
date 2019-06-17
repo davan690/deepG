@@ -35,7 +35,7 @@ devtools::install_github("hiddengenome/altum")
 
 ### enable GPU support
 
-Ok default, Keras will be installed without GPU support. To support GPUs reinstall Keras via
+On default, Keras will be installed without GPU support. To support GPUs reinstall Keras via
 
 ``` r
 install.packages("keras")
