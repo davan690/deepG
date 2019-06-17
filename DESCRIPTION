@@ -21,7 +21,9 @@ Imports:
     dplyr,
     remotes,
     ArgumentCheck,
-    hdf5r
+    hdf5r,
+    xfun,
+    Biostrings
 biocViews:
     Biostrings
 NeedsCompilation: yes
