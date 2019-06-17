@@ -52,6 +52,12 @@ To build a language model based on a collection of fasta files located in a fold
 history <- train_lstm_generator("input_dir")
 ```
 
+and if you are working on a big machine (DGX-1)
+
+``` r
+hist <- train_lstm_generator(path = "input_dir", cudnn = T, multiple_gpu = T, gpu_num = 1:8,  run_name= "GenomeNet", epochs = 100, steps_per_epoch = 10000)
+```
+
 See the `?train_lstm_generator` for further information how to setup file names and network size.
 
 ## model generation using data held in the RAM
