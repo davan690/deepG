@@ -139,7 +139,7 @@ preprocess_fasta <- function(path, maxlen = 80,
   library(Biostrings)
   fastaFile <- readDNAStringSet(path)
   seq <- paste0(paste(fastaFile, collapse = "\n"), "\n")
-  seq_processed <- preprocess(seq, maxlen = 80, vocabulary, verbose = F)
+  seq_processed <- preprocess(seq, maxlen = maxlen, vocabulary, verbose = F)
   return(seq_processed)
 }
 
@@ -171,7 +171,8 @@ calculate_steps_per_epoch <- function(dir, batch_size = 256, format = "fasta"){
 #' @param directory input directory where .fasta files are located
 #' @export
 fasta_files_generator <- function(dir, format = "fasta", 
-                                  batch_size = 12,
+                                  batch_size = 512,
+                                  maxlen = 80,
                                   verbose = F) {
   library(xfun)
   fasta_files <- list.files(path = normalize_path(dir), 
@@ -203,7 +204,7 @@ fasta_files_generator <- function(dir, format = "fasta",
       }
       # read in the new file
       file <<- fasta_files[[next_file]]
-      preprocessed <- preprocess_fasta(file)
+      preprocessed <- preprocess_fasta(file, maxlen = maxlen)
     }
     # proceccing a batch
     batch_num <<- batch_num + 1

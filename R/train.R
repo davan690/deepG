@@ -26,7 +26,7 @@ train_lstm_generator <- function(path,
                        maxlen = 80,
                        dropout_rate = .4,
                        layer_size = 1024,
-                       batch_size = 256,
+                       batch_size = 512,
                        num_layers_lstm = 4,
                        codon_cnn = FALSE,
                        validation_split = 0.05,
@@ -78,7 +78,10 @@ train_lstm_generator <- function(path,
   if (multiple_gpu) {
     # init template model under a CPU device scope
     with(tf$device("/cpu:0"), {
-      model <- keras::keras_model_sequential()
+      #model <- keras::keras_model_sequential()
+      model <- keras::multi_gpu_model(model,
+      gpus = gpu_num,
+      cpu_merge = cpu_merge)
     })
   } else {
     model <- keras::keras_model_sequential()
@@ -145,13 +148,13 @@ train_lstm_generator <- function(path,
   
   if (multiple_gpu) {
     if (verbose) print("setting up multiple GPUs ...")
-    parallel_model <- keras::multi_gpu_model(model,
-                                             gpus = gpu_num,
-                                             cpu_merge = cpu_merge)
-    parallel_model %>% keras::compile(loss = "categorical_crossentropy",
+   # model <- keras::multi_gpu_model(model,
+    #                                         gpus = gpu_num,
+     #                                        cpu_merge = cpu_merge)
+    model %>% keras::compile(loss = "categorical_crossentropy",
                                       optimizer = optimizer)
     if (verbose) print("set-up fasta generator")
-    gen <- fasta_files_generator(path, batch_size = batch_size)
+    gen <- fasta_files_generator(path, batch_size = batch_size, maxlen = maxlen)
     # calculate the number of steps after one epoch is finished (full iteration)
    # if (verbose) print("calculate steps per epoch")
     #steps_per_epoch <- calculate_steps_per_epoch(path, batch_size = batch_size)
@@ -163,7 +166,7 @@ train_lstm_generator <- function(path,
     history <- model %>% keras::fit_generator(
       generator = gen,
       steps_per_epoch = steps_per_epoch,
-      max_queue_size = 100,
+      max_queue_size = max_queue_size,
       epochs = epochs
     )
     
@@ -185,7 +188,7 @@ train_lstm_generator <- function(path,
     history <- model %>% keras::fit_generator(
       generator = gen,
       steps_per_epoch = steps_per_epoch, # will auto-reset after see all sample
-      max_queue_size = 100,
+      max_queue_size = max_queue_size,
       epochs = epochs
     )
     end.time <- Sys.time()
@@ -335,13 +338,13 @@ train_lstm <- function(dat,
   optimizer <- keras::optimizer_rmsprop(lr = learning_rate)
   
   if (multiple_gpu) {
-    parallel_model <- keras::multi_gpu_model(model,
+    model <- keras::multi_gpu_model(model,
                                              gpus = gpu_num,
                                              cpu_merge = cpu_merge)
-    parallel_model %>% keras::compile(loss = "categorical_crossentropy",
+    model %>% keras::compile(loss = "categorical_crossentropy",
                                       optimizer = optimizer)
     start.time <- Sys.time()
-    history <- parallel_model %>% keras::fit(
+    history <- model %>% keras::fit(
       dat$X,
       dat$Y,
       batch_size = batch_size,
