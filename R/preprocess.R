@@ -36,7 +36,7 @@ get_vocabulary <- function(char, verbose = F) {
 #' @param vocabulary char, should be sorted, if not set char vocabulary will be used
 #' @param verbose TRUE/FALSE
 #' @export
-preprocess <- function(char, maxlen = 30, vocabulary, verbose=F) {
+preprocess <- function(char, maxlen = 80, vocabulary, verbose=F) {
   require(dplyr)
   Check <- ArgumentCheck::newArgCheck()
   #* Add an error if maxlen <1
@@ -133,26 +133,31 @@ serialize_genomes <- function(directory, out, format = "fa"){
 #' wrapper of the preprocess() function called on the genomic contents of one
 #' fasta file. Multiple entries are combined with newline characters.
 #' @export
-preprocess_fasta <- function(path, maxlen = 30,
+preprocess_fasta <- function(path, maxlen = 80,
                              vocabulary = c("\n", "a", "c", "g", "t"),
                              verbose = F){
   library(Biostrings)
   fastaFile <- readDNAStringSet(path)
   seq <- paste0(paste(fastaFile, collapse = "\n"), "\n")
-  seq_processed <- preprocess(seq, maxlen = 30, vocabulary, verbose = F)
+  seq_processed <- preprocess(seq, maxlen = 80, vocabulary, verbose = F)
   return(seq_processed)
 }
 
 #' do one full preprocessing iteration to figure out what the observed
 #' steps_per_epoch value is
-calculate_steps_per_epoch <- function(dir, batch_size = 12){
+#' @export
+calculate_steps_per_epoch <- function(dir, batch_size = 256, format = "fasta"){
   library(xfun)
   steps_per_epoch <- 0
   fasta_files <- list.files(path = normalize_path(dir), 
                             pattern = paste0("*.", format), full.names = TRUE)
+  i <- 1
   for (file in fasta_files){
+    print(i)
     preprocessed <- preprocess_fasta(file)
+    print(ceiling(nrow(preprocessed$X)/batch_size))
     steps_per_epoch <- steps_per_epoch +  ceiling(nrow(preprocessed$X)/batch_size)
+  i <- i + 1
   }
   return(steps_per_epoch)
 }

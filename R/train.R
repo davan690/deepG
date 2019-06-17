@@ -23,12 +23,12 @@
 #' @export
 train_lstm_generator <- function(path,
                        run_name = "run",
-                       maxlen = 30,
-                       dropout_rate = .3,
-                       layer_size = 128,
+                       maxlen = 80,
+                       dropout_rate = .4,
+                       layer_size = 1024,
                        batch_size = 256,
-                       num_layers_lstm = 2,
-                       codon_cnn = T,
+                       num_layers_lstm = 4,
+                       codon_cnn = FALSE,
                        validation_split = 0.05,
                        learning_rate = 0.001,
                        cudnn = FALSE,
@@ -36,12 +36,13 @@ train_lstm_generator <- function(path,
                        cpu_merge = TRUE,
                        gpu_num = 2,
                        vocabulary_size = 5,
-                       epochs = 1,
-                       max_queue_size = 50,
-                       steps_per_epoch = 20,
-                       verbose = F) {
+                       epochs = 10,
+                       max_queue_size = 100,
+                       steps_per_epoch = 1000,
+                       verbose = T) {
   require(dplyr)
-  library(magrittr)
+  require(keras)
+  require(magrittr)
   require(tensorflow)
   
   Check <- ArgumentCheck::newArgCheck()
@@ -69,10 +70,11 @@ train_lstm_generator <- function(path,
   if (validation_split > 1 |  validation_split < 0)
     ArgumentCheck::addError(msg = "'validation_split' must be between 0 and 1",
                             argcheck = Check)
-  n#* Return errors and warnings (if any)
+  #* Return errors and warnings (if any)
   ArgumentCheck::finishArgCheck(Check)
   
   # initialize model
+  if (verbose) print("initialize model ...")
   if (multiple_gpu) {
     # init template model under a CPU device scope
     with(tf$device("/cpu:0"), {
@@ -83,6 +85,19 @@ train_lstm_generator <- function(path,
   }
   
   if (cudnn) {
+    if (codon_cnn) {
+      if (verbose) print("setting codon layer ...")
+      model %<>% 
+        keras::layer_conv_1d(kernel_size = 3, # 3 aa are a codon
+                             padding = "same",
+                             activation = "relu",
+                             filters = 81,
+                             input_shape = c(maxlen, vocabulary_size))  %>%
+        layer_max_pooling_1d(pool_size = 3)  %>%
+        layer_batch_normalization(momentum = .8)
+    }
+  
+    if (verbose) print("using cudnn ...")
     for (i in 1:(num_layers_lstm - 1)) {
       model %>%
         keras::layer_cudnn_lstm(
@@ -99,6 +114,7 @@ train_lstm_generator <- function(path,
     
   } else {
     if (codon_cnn) {
+      if (verbose) print("setting codon layer ...")
       model %<>% 
         keras::layer_conv_1d(kernel_size = 3, # 3 aa are a codon
                              padding = "same",
@@ -125,25 +141,29 @@ train_lstm_generator <- function(path,
   
   model %>% keras::layer_dense(vocabulary_size) %>%
     keras::layer_activation("softmax")
-  optimizer <- keras::optimizer_rmsprop(lr = learning_rate)
+  optimizer <- keras::optimizer_adam(lr = learning_rate)
   
   if (multiple_gpu) {
+    if (verbose) print("setting up multiple GPUs ...")
     parallel_model <- keras::multi_gpu_model(model,
                                              gpus = gpu_num,
                                              cpu_merge = cpu_merge)
     parallel_model %>% keras::compile(loss = "categorical_crossentropy",
                                       optimizer = optimizer)
-   
+    if (verbose) print("set-up fasta generator")
     gen <- fasta_files_generator(path, batch_size = batch_size)
     # calculate the number of steps after one epoch is finished (full iteration)
-    steps_per_epoch <- calculate_steps_per_epoch(path, batch_size = batch_size)
+   # if (verbose) print("calculate steps per epoch")
+    #steps_per_epoch <- calculate_steps_per_epoch(path, batch_size = batch_size)
     start.time <- Sys.time()
     
     # fit using generator
+    summary(model)
+    if (verbose) print("run generator")
     history <- model %>% keras::fit_generator(
       generator = gen,
       steps_per_epoch = steps_per_epoch,
-      max_queue_size = 50,
+      max_queue_size = 100,
       epochs = epochs
     )
     
@@ -152,17 +172,20 @@ train_lstm_generator <- function(path,
     model %>% keras::compile(loss = "categorical_crossentropy",
                              optimizer = optimizer)
     # set-up the fasta generator
+    if (verbose) print("set-up fasta generator")
     gen <- fasta_files_generator(path, batch_size = batch_size)
     start.time <- Sys.time()
 
     # calculate the number of steps after one epoch is finished (full iteration)
-    steps_per_epoch <- calculate_steps_per_epoch(path, batch_size = batch_size)
-    
+  #  if (verbose) print("calculate steps per epoch")
+   # steps_per_epoch <- calculate_steps_per_epoch(path, batch_size = batch_size)
+    if (verbose) print("fit generator ...")
     # fit using generator
+    summary(model)
     history <- model %>% keras::fit_generator(
       generator = gen,
       steps_per_epoch = steps_per_epoch, # will auto-reset after see all sample
-      max_queue_size = 50,
+      max_queue_size = 100,
       epochs = epochs
     )
     end.time <- Sys.time()
@@ -170,7 +193,7 @@ train_lstm_generator <- function(path,
   
   print(paste("Training time:", end.time - start.time))
   
-  # save training metadata
+  # save model
   if (verbose)
     print("save model...")
   Rmodel <- keras::serialize_model(model, include_optimizer = TRUE)
@@ -224,7 +247,8 @@ train_lstm <- function(dat,
                        epochs = 1,
                        verbose = F) {
   require(dplyr)
-  library(magrittr)
+  require(keras)
+  require(magrittr)
   require(tensorflow)
   
   Check <- ArgumentCheck::newArgCheck()
