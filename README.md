@@ -39,7 +39,7 @@ Ok default, Keras will be installed without GPU support. To support GPUs reinsta
 
 ``` r
 install.packages("keras")
-keras::install_keras(tensorflow = "gpu“)
+keras::install_keras(tensorflow = "gpu")
 ```
 
 # usage
