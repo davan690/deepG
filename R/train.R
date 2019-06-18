@@ -1,8 +1,10 @@
 #' Train LSTM model via fasta generator which feeds one or multiple GPU instances with batches.
-#' 
+#'
 #' Trains a language model on fasta files from a folder. Can be run in parallel on multiple GPU instances.
+#' Reduce learning rate when a metric has stopped improving.
 #'
 #' @param path path to folder where individual or multiple fasta files are located
+#' @param model resume a model
 #' @param run_name name of the run (without file ending)
 #' @param maxlen time steps to unroll for (e.g. length of semi-redundant chunks)
 #' @param dropout_rate dropout rate for LSTM cells
@@ -23,6 +25,7 @@
 #' @param verbose true will print more output to the console
 #' @export
 train_lstm_generator <- function(path,
+                                 model = NULL,
                                  run_name = "run",
                                  maxlen = 80,
                                  dropout_rate = .4,
@@ -150,7 +153,8 @@ train_lstm_generator <- function(path,
   
   model %>% keras::layer_dense(vocabulary_size) %>%
     keras::layer_activation("softmax")
-  optimizer <- keras::optimizer_adam(lr = learning_rate)
+  optimizer <-
+    keras::optimizer_adam(lr = learning_rate)
   
   if (multiple_gpu) {
     if (verbose)
@@ -166,12 +170,13 @@ train_lstm_generator <- function(path,
     # start the fasta file generator, usually takes a few seconds
     gen <-
       fasta_files_generator(path, batch_size = batch_size, maxlen = maxlen)
-
+    
     # calculate the number of steps after one epoch is finished (full iteration)
     if (steps_per_epoch == "auto") {
       if (verbose)
         print("calculate steps per epoch")
-      steps_per_epoch <- calculate_steps_per_epoch(path, batch_size = batch_size)
+      steps_per_epoch <-
+        calculate_steps_per_epoch(path, batch_size = batch_size)
       print(paste("steps_per_epoch has been set to", steps_per_epoch))
     }
     
@@ -179,48 +184,102 @@ train_lstm_generator <- function(path,
     summary(model)
     if (verbose)
       print("run generator")
-    history <- model %>% keras::fit_generator(
-      generator = gen,
-      steps_per_epoch = steps_per_epoch,
-      max_queue_size = max_queue_size,
-      epochs = epochs
-    )
-  
+    history <-
+      model %>% keras::fit_generator(
+        generator = gen,
+        steps_per_epoch = steps_per_epoch,
+        max_queue_size = max_queue_size,
+        epochs = epochs,
+        callbacks = list(
+          callback_model_checkpoint(paste0(run_name, "_checkpoints.h5"), period = 5),
+          callback_reduce_lr_on_plateau(
+            monitor = "loss",
+            factor = 0.1,
+            patience = 5,
+            cooldown = 5
+          ),
+          callback_csv_logger(
+            paste0(run_name, "_log.csv"),
+            separator = ";",
+            append = TRUE
+          )
+        )
+      )
+    
   } else {
     model %>% keras::compile(loss = "categorical_crossentropy",
                              optimizer = optimizer)
     # set-up the fasta generator
     if (verbose)
       print("set-up fasta generator")
-    gen <- fasta_files_generator(path, batch_size = batch_size)
-
+    gen <-
+      fasta_files_generator(path, batch_size = batch_size)
+    
     # calculate the number of steps after one epoch is finished (full iteration)
     if (steps_per_epoch == "auto") {
       if (verbose)
         print("calculate steps per epoch")
-      steps_per_epoch <- calculate_steps_per_epoch(path, batch_size = batch_size)
+      steps_per_epoch <-
+        calculate_steps_per_epoch(path, batch_size = batch_size)
       print(paste("steps_per_epoch has been set to", steps_per_epoch))
     }
     
-    steps_per_epoch <-
-      calculate_steps_per_epoch(path, batch_size = batch_size)
     if (verbose)
       print("fit generator ...")
     # fit using generator
     summary(model)
-    history <- model %>% keras::fit_generator(
-      generator = gen,
-      steps_per_epoch = steps_per_epoch,
-      # will auto-reset after see all sample
-      max_queue_size = max_queue_size,
-      epochs = epochs
-    )
+    
+    save_full_model_callback <-
+      callback_lambda(
+        on_epoch_end = function(epoch) {
+          if (epoch %% 10 == 0) {
+            # every 10 epochs
+            # save model
+            if (verbose)
+              print("save model...")
+            Rmodel <-
+              keras::serialize_model(model, include_optimizer = TRUE)
+            save(Rmodel,
+                 file = paste0(run_name, "_epoch_" , epoch, "_full_model.Rdata"))
+            keras::save_model_hdf5(
+              model,
+              paste0(run_name, "_epoch_" , epoch, "_full_model.hdf5"),
+              overwrite = TRUE,
+              include_optimizer = TRUE
+            )
+          }
+        }
+      )
+    
+    history <-
+      model %>% keras::fit_generator(
+        generator = gen,
+        steps_per_epoch = steps_per_epoch,
+        # will auto-reset after see all sample
+        max_queue_size = max_queue_size,
+        epochs = epochs,
+        callbacks = list(
+          callback_model_checkpoint(paste0(run_name, "_checkpoints.h5"), period = 5),
+          callback_reduce_lr_on_plateau(
+            monitor = "loss",
+            factor = 0.1,
+            patience = 5,
+            cooldown = 5
+          ),
+          callback_csv_logger(
+            paste0(run_name, "_log.csv"),
+            separator = ";",
+            append = TRUE
+          )
+        )
+      )
   }
   
   # save model
   if (verbose)
     print("save model...")
-  Rmodel <- keras::serialize_model(model, include_optimizer = TRUE)
+  Rmodel <-
+    keras::serialize_model(model, include_optimizer = TRUE)
   save(Rmodel, file = paste0(run_name, "_full_model.Rdata"))
   keras::save_model_hdf5(
     model,
