@@ -1,35 +1,38 @@
 language: r
 sudo: required
 cache: packages
+dist: trusty
 
 addons:
   apt:
     packages:
       - build-essential
       - libxml2-dev
+      - autoconf
+      - libtool
+      - subversion
+      - libmagick++-dev
 env:
   global:
+  - PKG_CFLAGS="-pedantic"
+  - _R_CHECK_CRAN_INCOMING_=FALSE
+  - ASAN="-fsanitize=address -fno-omit-frame-pointer"
+  - HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/releases"
+  - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
   - CODECOV_TOKEN="e2914fef-6e65-4145-b931-03d31277099f"
+  matrix:
+  - HDF5_VERSION=1.10.1
+
+matrix:
+  exclude:
+    - os: osx
+  include:
+    - os: osx
+      env: HDF5_VERSION=1.10.1
+  fast_finish: true
 
 before_install:
-  - wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz -O /tmp/hdf5-1.10.2.tar.gz
-  - tar -zxvf /tmp/hdf5-1.10.2.tar.gz
-  - cd `pwd`/hdf5-1.10.2
-  - ./configure --prefix=`pwd`/dist --enable-shared=yes --enable-static=no --enable-parallel=no --enable-hl --enable-build-mode=production --without-szlib
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then make -j2 2>&1 &> hdf5_screen.txt ; else export HUH ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then make install ; else export HUH ; fi
-  - which g++
-  - g++ --version
-  - cd ..
-  - export HDF5_HOME=`pwd`/hdf5-1.10.2/dist
-  - export HDF5_HOME_MAC=`pwd`/hdf5-1.10.2/dist
-  - export HDF5_HOME_LINUX=/usr/lib/x86_64-linux-gnu/hdf5/serial
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then echo ${HDF5_HOME} ; else eval "${GCC_VERSION}" ; fi
-  - export PATH=`pwd`/node_modules/.bin:${PATH}
-  - export LD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${LD_LIBRARY_PATH}
-  - export DYLD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${DYLD_LIBRARY_PATH}
-  - R -e "install.packages(c('devtools','pkgload', 'pkgdown', 'covr'))"
-  - R -e "install.packages('hdf5r', configure.args='--with-hdf5=/usr/bin/h5cc')"
+  - R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr'))"
 
 before_script:
   - R --no-save <<< 'pkgload::load_all(); devtools::document()'
