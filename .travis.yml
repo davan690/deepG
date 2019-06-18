@@ -2,6 +2,10 @@ language: R
 sudo: required
 cache: packages
 
+env:
+  global:
+  - CODECOV_TOKEN="e2914fef-6e65-4145-b931-03d31277099f"
+
 before_install:
   - wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz -O /tmp/hdf5-1.10.2.tar.gz
   - tar -zxvf /tmp/hdf5-1.10.2.tar.gz
