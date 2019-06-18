@@ -25,16 +25,14 @@ before_install:
   - export HDF5_HOME_MAC=`pwd`/hdf5-1.10.2/dist
   - export HDF5_HOME_LINUX=/usr/lib/x86_64-linux-gnu/hdf5/serial
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then echo ${HDF5_HOME} ; else eval "${GCC_VERSION}" ; fi
+  - export PATH=`pwd`/node_modules/.bin:${PATH}
+  - export LD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${LD_LIBRARY_PATH}
+  - export DYLD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${DYLD_LIBRARY_PATH}
   - R -e "install.packages(c('devtools','pkgload', 'pkgdown', 'covr'))"
   - R -e "install.packages('hdf5r', configure.args='--with-hdf5=/usr/bin/h5cc')"
 
 before_script:
   - R --no-save <<< 'pkgload::load_all(); devtools::document()'
-
-script:
-  - export PATH=`pwd`/node_modules/.bin:${PATH}
-  - export LD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${LD_LIBRARY_PATH}
-  - export DYLD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${DYLD_LIBRARY_PATH}
 
 after_success:
   - R --no-save <<< "devtools::install(); pkgdown::build_site()";'
