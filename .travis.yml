@@ -24,6 +24,12 @@ script:
   - export LD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${LD_LIBRARY_PATH}
   - export DYLD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${DYLD_LIBRARY_PATH}
 
+r_github_packages:
+  - r-lib/covr
+
+after_success:
+  - Rscript -e 'covr::codecov()'
+
 addons:
   apt:
     packages:
