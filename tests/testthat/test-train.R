@@ -2,6 +2,13 @@ context("training")
 
 test_that("training successful", {
   data("parenthesis")
-  preprocessed <- altum::preprocess(substr(parenthesis, 1, 100))
-  expect_type(train_lstm(dat = preprocessed, vocabulary_size = 7), "list")
+  maxlen <- 30
+  preprocessed <- altum::preprocessSemiRedundant(substr(parenthesis, 1, 100), 
+                                                 maxlen = maxlen)
+  expect_type(trainNetwork(dataset = preprocessed, 
+                           vocabulary.size = 7, 
+                           batch.size = 10,
+                           maxlen = maxlen,
+                           layers.lstm = 2,
+                           layer.size = 10,), "list")
 })

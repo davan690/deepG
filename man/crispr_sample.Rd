@@ -17,9 +17,6 @@ Filtered for unambigous characters and contains only characters in the vocabular
 }
 Can be loaded to workspace via data(crispr_sample)
 }
-\examples{
-head(crispr_sample)
-}
 \references{
 \url{http://github.com/philippmuench}
 }

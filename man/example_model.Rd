@@ -10,9 +10,6 @@ example_model(object)
 \description{
 Trained LSTM model (only for testing)
 }
-\examples{
-head(example_model)
-}
 \references{
 \url{http://github.com/philippmuench}
 }

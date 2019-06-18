@@ -19,9 +19,6 @@ Filtered for unambigous characters and contains only characters in the vocabular
 contain all CRISPR loci found in NCBI representative genomes using CRT
 Can be loaded to workspace via data(crispr_full)
 }
-\examples{
-head(crispr_full)
-}
 \references{
 \url{http://github.com/philippmuench}
 }

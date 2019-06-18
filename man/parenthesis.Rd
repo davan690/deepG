@@ -13,9 +13,6 @@ parenthesis
 Training dataset of synthetic parenthesis language
 Can be loaded to workspace via data(parenthesis)
 }
-\examples{
-head(parenthesis)
-}
 \references{
 \url{http://github.com/philippmuench}
 }
