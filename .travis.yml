@@ -1,7 +1,8 @@
-language: r
+lianguage: r
 sudo: required
 cache: packages
 dist: trusty
+warnings_are_errors: false
 
 addons:
   apt:
