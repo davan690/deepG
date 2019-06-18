@@ -6,15 +6,6 @@ env:
   global:
   - CODECOV_TOKEN="e2914fef-6e65-4145-b931-03d31277099f"
 
-r_packages:
-  - covr
-
-r_github_packages:
-  - codecov/example-r
-
-after_success:
-  - Rscript -e 'library(covr);codecov()'
-
 before_install:
   - wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz -O /tmp/hdf5-1.10.2.tar.gz
   - tar -zxvf /tmp/hdf5-1.10.2.tar.gz
@@ -41,6 +32,12 @@ addons:
   apt:
     packages:
       - build-essential
+
+r_github_packages:
+  - r-lib/covr
+
+after_success:
+  - Rscript -e 'library(covr);codecov()'
 
 notifications:
   email: philipp.muench@helmholtz-hzi.de
