@@ -2,8 +2,7 @@
 #'
 #' @param gpus GPU ids
 #' @export
-#'
-start_gpu_session <- function(gpus = "0"){
+startGPUSession <- function(gpus = "0"){
   require(tensorflow)
   tf$reset_default_graph()
   sess_config <- list()

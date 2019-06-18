@@ -5,7 +5,7 @@
 #' @param char a character string of text, length of one
 #' @param verbose TRUE/FALSE
 #' @export
-get_vocabulary <- function(char, verbose = F) {
+getVocabulary <- function(char, verbose = F) {
   library(dplyr)
   stopifnot(!is.null(char))
   stopifnot(nchar(char) > 0)
@@ -37,7 +37,7 @@ get_vocabulary <- function(char, verbose = F) {
 #' @param vocabulary char, should be sorted, if not set char vocabulary will be used
 #' @param verbose TRUE/FALSE
 #' @export
-preprocess <- function(char,
+preprocessSemiRedundant <- function(char,
                        maxlen = 80,
                        vocabulary,
                        verbose = F) {
@@ -63,7 +63,7 @@ preprocess <- function(char,
     stringr::str_c(collapse = "\n") %>%
     tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
   if (verbose)
-    print(sprintf("corpus length: %d", length(text)))
+    print(sprintf("corpus length: %d", xt))
   
   if (missing(vocabulary)) {
     vocabulary <- text %>%
@@ -104,168 +104,130 @@ preprocess <- function(char,
   return(results)
 }
 
-#' preprocesses and serializes genomes located in a folder, exports as hdf5
-#'
-#' @param directory input directory where .fasta files are located
-#' @param out output directory wher hdf5 files will be written to
-#' @param format either .txt or .fasta
-#' @export
-serialize_genomes <- function(directory, out, format = "fa") {
-  require(xfun)
-  require(rhdf5)
-  library(Biostrings)
-  directory <- normalize_path(directory)
-  files <-
-    list.files(
-      path = directory,
-      pattern = paste0("*.", format),
-      full.names = TRUE
-    )
-  for (i in seq_along(files)) {
-    file_name <-
-      gsub(pattern = paste0("\\.", format, "$"), "", basename(files[i]))
-    if (format == "fasta" | format == "fa") {
-      fastaFile <- readDNAStringSet(files[i])
-      seq <- paste(fastaFile) # not sure if this is working
-      pre <-  preprocess(seq) # , ...)
-    } else {
-      stop("only .fa and .fasta files are supported")
-    }
-    #save
-    filename <- paste0(out, "/", file_name, ".h5")
-    h5createFile(filename)
-    h5createGroup(filename, "X")
-    h5createGroup(filename, "Y")
-    h5write(pre$X, filename, "X/data")
-    h5write(pre$Y, filename, "Y/data")
-    h5closeAll()
-  }
-}
-
-#' wrapper of the preprocess() function called on the genomic contents of one
+#' wrapper of the preprocessSemiRedundant() function called on the genomic contents of one
 #' fasta file. Multiple entries are combined with newline characters.
 #' @export
-preprocess_fasta <- function(path,
+preprocessFasta <- function(path,
                              maxlen = 80,
                              vocabulary = c("\n", "a", "c", "g", "t"),
                              verbose = F) {
   library(Biostrings)
-  fastaFile <- readDNAStringSet(path)
-  seq <- paste0(paste(fastaFile, collapse = "\n"), "\n")
-  seq_processed <-
-    preprocess(seq, maxlen = maxlen, vocabulary, verbose = F)
-  return(seq_processed)
+  fasta.file <- readDNAStringSet(path)
+  seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
+  seq.processed <-
+    preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary, verbose = F)
+  return(seq.processed)
 }
 
 #' do one full preprocessing iteration to figure out what the observed
 #' steps_per_epoch value is
 #' @export
-calculate_steps_per_epoch <-
+calculateStepsPerEpoch <-
   function(dir,
-           batch_size = 256,
+           batch.size = 256,
            maxlen = 80,
            format = "fasta") {
     library(xfun)
     library(Biostrings)
-    steps_per_epoch <- 0
-    fasta_files <- list.files(
+    steps.per.epoch <- 0
+    fasta.files <- list.files(
       path = normalize_path(dir),
       pattern = paste0("*.", format),
       full.names = TRUE
     )
-    for (file in fasta_files) {
-      fastaFile <- readDNAStringSet(file)
-      seq <- paste0(paste(fastaFile, collapse = "\n"), "\n")
-      steps_per_epoch <-
-        steps_per_epoch + ceiling((nchar(seq) - maxlen - 1) / batch_size)
+    for (file in fasta.files) {
+      fasta.file <- readDNAStringSet(file)
+      seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
+      steps.per.epoch <-
+        steps.per.epoch + ceiling((nchar(seq) - maxlen - 1) / batch.size)
     }
-    return(steps_per_epoch)
+    return(steps.per.epoch)
   }
 
-#' custom generator for fasta files, will produce chunks in size of batch_size
+#' custom generator for fasta files, will produce chunks in size of batch.size
 #' by iterating over the input files. If the input file is smaller than the
-#' batch_size, batch size will be reduced to the maximal size. So the last batch
+#' batch.size, batch size will be reduced to the maximal size. So the last batch
 #' of a file is usually smaller.
 #'
 #'see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R
 #' @param directory input directory where .fasta files are located
 #' @export
-fasta_files_generator <- function(dir,
+fastaFilesFenerator <- function(dir,
                                   format = "fasta",
-                                  batch_size = 512,
+                                  batch.size = 512,
                                   maxlen = 80,
                                   verbose = F) {
   library(xfun)
-  fasta_files <- list.files(
+  fasta.files <- list.files(
     path = normalize_path(dir),
     pattern = paste0("*.", format),
     full.names = TRUE
   )
-  next_file <- 1
-  batch_num <- 0
-  batch_end <- 0
+  next.file <- 1
+  batch.num <- 0
+  batch.end <- 0
   # pre-load the first file
-  file <- fasta_files[[1]]
-  preprocessed <- preprocess_fasta(file)
+  file <- fasta.files[[1]]
+  preprocessed <- preprocessFasta(file)
   if (verbose)
     message("initializing")
   function() {
     # move to nexdt file if we cannot process another batch
-    if (((batch_num) * batch_size) > nrow(preprocessed$X)) {
+    if (((batch.num) * batch.size) > nrow(preprocessed$X)) {
       if (verbose)
         message("reached end of file")
       # move to the next file
-      next_file <<- next_file + 1
+      next.file <<- next.file + 1
       # reset batch coordinates
-      batch_num <<- 0
-      batch_end <<- 0
+      batch.num <<- 0
+      batch.end <<- 0
       # at the end of the file list, start from the beginning
-      if (next_file > length(fasta_files)) {
+      if (next.file > length(fasta.files)) {
         if (verbose)
           message("resetting to first file")
         # reset file number
-        next_file <<- 1
+        next.file <<- 1
         # reset batch coordinates
-        batch_num <<- 0
-        batch_end <<- 0
+        batch.num <<- 0
+        batch.end <<- 0
       }
       # read in the new file
-      file <<- fasta_files[[next_file]]
-      preprocessed <- preprocess_fasta(file, maxlen = maxlen)
+      file <<- fasta_files[[next.file]]
+      preprocessed <- preprocessFasta(file, maxlen = maxlen)
     }
     # proceccing a batch
-    batch_num <<- batch_num + 1
-    batch_start <<- batch_end + 1
+    batch.num <<- batch.num + 1
+    batch.start <<- batch.end + 1
     # check if full batch size can be processed, if not temporaly reduce
     # batch_size to maximum possible
-    if ((batch_start + batch_size) > nrow(preprocessed$X)) {
+    if ((batch.start + batch.size) > nrow(preprocessed$X)) {
       if (verbose)
-        message("reduce batch_size temporarily")
-      batch_end <- nrow(preprocessed$X)
+        message("reduce batch.size temporarily")
+      batch.end <- nrow(preprocessed$X)
       # reduced batch size
     } else {
-      # regular batch_size
-      batch_end <<- batch_start + batch_size  # 12
+      # regular batch.size
+      batch.end <<- batch.start + batch.size  # 12
     }
     if (verbose)
       message(
         paste(
           "generating bach number",
-          batch_num,
-          batch_start,
+          batch.num,
+          batch.start,
           "-",
-          batch_end,
+          batch.end,
           "of file",
           file,
           "index",
-          next_file
+          next.file
         )
       )
-    x_batch <-
-      preprocessed$X[batch_start:batch_end, ,]# dim shoiuld be (batch_size, length, words)
-    y_batch <-
-      preprocessed$Y[batch_start:batch_end, ] #  # dim should be (batch_size, words)
+    x.batch <-
+      preprocessed$X[batch.start:batch.end, ,]# dim shoiuld be (batch_size, length, words)
+    y.batch <-
+      preprocessed$Y[batch.start:batch.end, ] #  # dim should be (batch_size, words)
     # return the file
-    list(x_batch, y_batch)
+    list(x.batch, y.batch)
   }
 }

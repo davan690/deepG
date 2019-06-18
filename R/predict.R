@@ -1,12 +1,12 @@
 #' Predict next nucleotides in sequence output as S4 class
 #'
 #' @param sequence input sequence, length should be in sync with the model
-#' if length exceeds input_shape of model then only the right side of the
+#' if length exceeds input.shape of model then only the right side of the
 #' sequence will be used
 #' @param model trained lstm
 #' @param vocabulary ordered vocabulary of input sequence
 #' @export
-predict_next_nucleotide <- function(sequence,
+predictNextNucleotide <- function(sequence,
                                     model,
                                     vocabulary = c("\n", "a", "c", "g", "t")){
   Check <- ArgumentCheck::newArgCheck()
@@ -67,7 +67,7 @@ predict_next_nucleotide <- function(sequence,
 #' @param char character that will be replaced
 #' @param vocabulary ordered vocabulary of input sequence
 #' @export
-replace_char <- function(sequence,
+replaceChar <- function(sequence,
                          model,
                          char = "X",
                          vocabulary = c("\n", "a", "c", "g", "t")){
@@ -101,22 +101,4 @@ replace_char <- function(sequence,
                               nchar(sequence)))
   }
   return(sequence)
-}
-
-#' One beam
-#' @param sequence input sequence
-#' @param model trained lstm
-#' @param vocabulary ordered vocabulary of input sequence
-#' @param num_alternatives number of best solutions
-#' @export
-one_beam <- function(sequence, model, vocabulary, num_alternatives = 2){
-  # getting num_alternative best indexes in vocabulary
-  solutions <- list()
-  confidences <- list()
-  prediction <- predict_next_nucleotide(sequence, model, vocabulary)
-  for (nth_best in 1:num_alternatives){
-    solutions[[nth_best]] <- paste0(sequence, vocabulary[Rfast::nth(prediction@alternative_probabilty, nth_best, descending = T, index.return = T)])
-    confidences[[nth_best]] <- Rfast::nth(prediction@alternative_probabilty, nth_best, descending = T)
-  }
-  return(list(solutions, confidences))
 }

@@ -4,7 +4,7 @@
 #' @param filename filename where hdf5 file is written to
 #' @param verbose TRUE/FALSE
 #' @export
-writehdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
+writeHdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
 	require(dplyr)
 	require(plyr)
 	require(hdf5r)
@@ -35,7 +35,7 @@ writehdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
 #' @param dat character
 #' @param dat filename where dict file is written to
 #' @export
-writedict <- function(dat, filename = "train.dict") {
+writeDict <- function(dat, filename = "train.dict") {
 	require(dplyr)
 	require(plyr)
 
@@ -49,4 +49,12 @@ writedict <- function(dat, filename = "train.dict") {
 										 index = 1:length(charset))
 	write.table(dict, file = filename, quote = F, row.names = F,
 							col.names = F, sep = " ")
+}
+
+#' wrapper for message(sprintf)
+#'
+#' @export
+messagef <- function (..., .newline = TRUE) 
+{
+  message(sprintf(...), appendLF = .newline)
 }
