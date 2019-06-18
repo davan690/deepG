@@ -22,6 +22,7 @@ install:
   - export HDF5_HOME_MAC=`pwd`/hdf5-1.10.2/dist
   - export HDF5_HOME_LINUX=/usr/lib/x86_64-linux-gnu/hdf5/serial
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then echo ${HDF5_HOME} ; else eval "${GCC_VERSION}" ; fi
+  - R -e 'install_packages("covr")'
 
 script:
   - export PATH=`pwd`/node_modules/.bin:${PATH}
