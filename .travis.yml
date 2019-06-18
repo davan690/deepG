@@ -6,6 +6,15 @@ env:
   global:
   - CODECOV_TOKEN="e2914fef-6e65-4145-b931-03d31277099f"
 
+r_packages:
+  - covr
+
+r_github_packages:
+  - codecov/example-r
+
+after_success:
+  - Rscript -e 'library(covr);codecov()'
+
 before_install:
   - wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz -O /tmp/hdf5-1.10.2.tar.gz
   - tar -zxvf /tmp/hdf5-1.10.2.tar.gz
@@ -27,12 +36,6 @@ script:
   - export PATH=`pwd`/node_modules/.bin:${PATH}
   - export LD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${LD_LIBRARY_PATH}
   - export DYLD_LIBRARY_PATH=`pwd`/hdf5-1.10.2/dist/lib:${DYLD_LIBRARY_PATH}
-
-r_github_packages:
-  - r-lib/covr
-
-after_success:
-  - Rscript -e 'covr::codecov()'
 
 addons:
   apt:
