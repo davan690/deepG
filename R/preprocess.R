@@ -152,7 +152,7 @@ calculateStepsPerEpoch <-
 #'see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R
 #' @param directory input directory where .fasta files are located
 #' @export
-fastaFilesGenerator <- function(dir,
+fastaFileGenerator <- function(dir,
                                   format = "fasta",
                                   batch.size = 512,
                                   maxlen = 80,
