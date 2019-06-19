@@ -20,8 +20,3 @@
 #' @format Large character of 4.9 Mb
 #' @references \url{http://github.com/philippmuench}
 "parenthesis"
-
-#' Trained LSTM model (only for testing)
-#' @format keras model
-#' @references \url{http://github.com/philippmuench}
-"example_model"
