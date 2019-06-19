@@ -5,8 +5,8 @@
 \title{wrapper of the preprocessSemiRedundant() function called on the genomic contents of one
 fasta file. Multiple entries are combined with newline characters.}
 \usage{
-preprocessFasta(path, maxlen = 80, vocabulary = c("\\n", "a", "c", "g",
-  "t"), verbose = F)
+preprocessFasta(path, maxlen = 250, vocabulary = c("\\n", "a", "c",
+  "g", "t"), verbose = F)
 }
 \description{
 wrapper of the preprocessSemiRedundant() function called on the genomic contents of one

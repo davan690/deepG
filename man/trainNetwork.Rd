@@ -5,7 +5,7 @@
 \title{Trains a (mostly) LSTM model on genomic data. Designed for developing genome based language models (GenomeNet)}
 \usage{
 trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
-  maxlen = 80, dropout.rate = 0.3, layer.size = 2048,
+  maxlen = 250, dropout.rate = 0.3, layer.size = 2048,
   batch.size = 512, layers.lstm = 4, solver = "adam",
   use.codon.cnn = FALSE, learning.rate = 0.001, use.cudnn = FALSE,
   use.multiple.gpus = FALSE, merge.on.cpu = TRUE, gpu.num = 2,

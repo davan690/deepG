@@ -4,7 +4,7 @@
 \alias{preprocessSemiRedundant}
 \title{Preprocess string to semi redundant one-hot vector}
 \usage{
-preprocessSemiRedundant(char, maxlen = 80, vocabulary, verbose = F)
+preprocessSemiRedundant(char, maxlen = 250, vocabulary, verbose = F)
 }
 \arguments{
 \item{char}{a character string of text, length of one}

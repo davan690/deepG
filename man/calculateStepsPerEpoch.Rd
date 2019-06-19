@@ -5,7 +5,7 @@
 \title{do one full preprocessing iteration to figure out what the observed
 steps_per_epoch value is}
 \usage{
-calculateStepsPerEpoch(dir, batch.size = 256, maxlen = 80,
+calculateStepsPerEpoch(dir, batch.size = 256, maxlen = 250,
   format = "fasta")
 }
 \description{
