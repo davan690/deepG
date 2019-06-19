@@ -1,0 +1,8 @@
+url: https://hiddengenome.github.io/altum/
+
+template:
+  params:
+    bootswatch: cosmo
+
+development:
+  mode: auto
