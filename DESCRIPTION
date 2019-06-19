@@ -2,8 +2,9 @@ Package: altum
 Type: Package
 Title: altum is a R library that contains a collection of scripts required for model generation and model analysis
 Version: 0.2.0
-Author: Philipp C. Münch
-Maintainer: Philipp Münch <pmu15@helmholtz-hzi.de>
+Encoding: UTF-8
+Author: Philipp C. Muench
+Maintainer: Philipp Muench <pmu15@helmholtz-hzi.de>
 Description: Altum is a R library that contains a collection of scripts required for model generation and model analysis.
 License: MIT
 Depends:
