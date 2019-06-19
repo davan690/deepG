@@ -14,23 +14,23 @@ trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
   steps.per.epoch = "auto")
 }
 \arguments{
-\item{path}{path to folder where individual or multiple fasta files are located}
+\item{path}{Path to folder where individual or multiple fasta files are located}
 
-\item{dataset}{[\code{data.frame}]\cr a dataframe holding training samples. If set, no generator will be used. Instead the dataset will hold in RAM during training.}
+\item{dataset}{Dataframe holding training samples in RAM instead of using generator.}
 
-\item{validation.split}{only relevant when using dataset as input method. Defines the fraction of the batches that will be used for validation}
+\item{validation.split}{Defines the fraction of the batches that will be used for validation.}
 
 \item{run.name}{name of the run (without file ending)}
 
-\item{maxlen}{time steps to unroll for (e.g. length of semi-redundant chunks).}
+\item{maxlen}{Time steps to unroll for (e.g. length of semi-redundant chunks).}
 
-\item{dropout.rate}{dropout rate for LSTM cells}
+\item{dropout.rate}{Dropout rate for LSTM cells}
 
-\item{layer.size}{number of cells per network layer}
+\item{layer.size}{Number of cells per network layer}
 
-\item{batch.size}{how many chunks are trained in parallel, depends on GPU memory}
+\item{batch.size}{Number of samples that are used for one network update}
 
-\item{layers.lstm}{number of LSTM layers}
+\item{layers.lstm}{Number of LSTM layers}
 
 \item{solver}{optimizer (on default Adam)}
 
