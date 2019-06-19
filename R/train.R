@@ -35,7 +35,7 @@ trainNetwork <- function(path,
                          dataset,
                          validation.split = .05,
                          run.name = "run",
-                         maxlen = 80,
+                         maxlen = 250,
                          dropout.rate = .3,
                          layer.size = 2048,
                          batch.size = 512,
@@ -163,7 +163,7 @@ trainNetwork <- function(path,
   if (missing(dataset)) {
     messagef("Starting fasta generator.")
     gen <-
-      fastaFileGenerator(path, batch.size = batch.size, maxlen = maxlen)
+      fastaFileGenerator(path, batch.size = batch.size, maxlen = maxlen, verbose = F)
     
     # calculate the number of steps after one epoch is finished (full iteration)
     if (steps.per.epoch == "auto") {

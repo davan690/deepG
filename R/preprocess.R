@@ -38,7 +38,7 @@ getVocabulary <- function(char, verbose = F) {
 #' @param verbose TRUE/FALSE
 #' @export
 preprocessSemiRedundant <- function(char,
-                       maxlen = 80,
+                       maxlen = 250,
                        vocabulary,
                        verbose = F) {
   require(dplyr)
@@ -108,7 +108,7 @@ preprocessSemiRedundant <- function(char,
 #' fasta file. Multiple entries are combined with newline characters.
 #' @export
 preprocessFasta <- function(path,
-                             maxlen = 80,
+                             maxlen = 250,
                              vocabulary = c("\n", "a", "c", "g", "t"),
                              verbose = F) {
   library(Biostrings)
@@ -125,7 +125,7 @@ preprocessFasta <- function(path,
 calculateStepsPerEpoch <-
   function(dir,
            batch.size = 256,
-           maxlen = 80,
+           maxlen = 250,
            format = "fasta") {
     library(xfun)
     library(Biostrings)
@@ -155,7 +155,7 @@ calculateStepsPerEpoch <-
 fastaFileGenerator <- function(dir,
                                   format = "fasta",
                                   batch.size = 512,
-                                  maxlen = 80,
+                                  maxlen = 250,
                                   verbose = F) {
   library(xfun)
   fasta.files <- list.files(
@@ -168,7 +168,7 @@ fastaFileGenerator <- function(dir,
   batch.end <- 0
   # pre-load the first file
   file <- fasta.files[[1]]
-  preprocessed <- preprocessFasta(file)
+  preprocessed <- preprocessFasta(file, maxlen = maxlen)
   if (verbose)
     message("initializing")
   function() {

@@ -1,4 +1,4 @@
-#' Set # of GPUs to be used in TensorFlow backend.
+#' Limit Tensorflow proccess to one or multiple GPUs.
 #'
 #' @param gpus GPU ids
 #' @export
@@ -13,6 +13,9 @@ startGPUSession <- function(gpus = "0"){
   sess$run(tf$global_variables_initializer())
 }
 
+#' Ends the GPU sesstion
+#'
+#' @export
 end_gpu_session <- function(){
   sess$close()
 }
