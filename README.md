@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/hiddengenome/altum.svg?branch=master)](https://travis-ci.org/hiddengenome/altum)
 [![codecov](https://codecov.io/gh/hiddengenome/altum/branch/master/graph/badge.svg)](https://codecov.io/gh/hiddengenome/altum)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ## Overview
 
@@ -75,3 +76,8 @@ The library comes with three different datasets for testing.
 - The set `data(parenthesis)` contains 100k charakters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.  
 - The set `data(crispr_full)` containging all CRISPR loci found in NCBI representative genomes with neighbor nucleotides up and downstream.
 - The set `data(crispr_sample)` containging a subset of `crispr_full`
+
+## License and copyright
+Copyright 2019 Philipp Münch
+
+Source code to altum is made available under the terms of the [GNU Affero General Public License](LICENSE.txt) (AGPL). altum is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
