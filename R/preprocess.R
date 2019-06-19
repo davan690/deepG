@@ -192,7 +192,7 @@ fastaFileGenerator <- function(dir,
         batch.end <<- 0
       }
       # read in the new file
-      file <<- fasta_files[[next.file]]
+      file <<- fasta.files[[next.file]]
       preprocessed <- preprocessFasta(file, maxlen = maxlen)
     }
     # proceccing a batch
