@@ -2,7 +2,7 @@
 % Please edit documentation in R/gpu-management.R
 \name{startGPUSession}
 \alias{startGPUSession}
-\title{Limit Tensorflow proccess to one or multiple GPUs.}
+\title{Set # of GPUs to be used in TensorFlow backend.}
 \usage{
 startGPUSession(gpus = "0")
 }
@@ -10,5 +10,5 @@ startGPUSession(gpus = "0")
 \item{gpus}{GPU ids}
 }
 \description{
-Limit Tensorflow proccess to one or multiple GPUs.
+Set # of GPUs to be used in TensorFlow backend.
 }
