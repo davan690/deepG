@@ -46,7 +46,9 @@ on AWS instances the GPU version can be installed via `conda create -y --name r-
 
 # Usage
 
-## Generate a genomic language model from a collection of FASTA files
+## generating of GenomeNet 
+
+### Generate a genomic language model from a collection of FASTA files
 
 ``` r
 history <- trainNetwork(path = "input_dir")
@@ -60,7 +62,19 @@ history <- trainNetwork(path = "input_dir", cudnn = T, multiple_gpu = T, gpu_num
 
 See the `?trainNetwork` for further information how to setup file names and network size.
 
-## Train a network for multiclass prediction
+### Generate a genomic language model using data held in the RAM
+
+``` r
+# load example dataset
+data(crispr_sample)
+
+# generate one-hot encoding of 30-nucleotide sized chunks
+crispr_preprocessed <- preprocessSemiRedundant(crispr_sample)
+history <- trainNetwork(dataset = crispr_preprocessed)
+```
+
+
+## Train a deep network for multiclass prediction
 
 here the FASTA files are located as individual files in `input_dir/` and labels are defined in `fasta-like` files in `fasta_label_dir/` with a `.txt` ending.
 
@@ -80,17 +94,6 @@ AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC
 
 ``` r
 history <- trainNetwork(path = "input_dir", labels = "fasta_label_dir/", label.vocabulary.size = 3)
-```
-
-## Generate a genomic language model using data held in the RAM
-
-``` r
-# load example dataset
-data(crispr_sample)
-
-# generate one-hot encoding of 30-nucleotide sized chunks
-crispr_preprocessed <- preprocessSemiRedundant(crispr_sample)
-history <- trainNetwork(dataset = crispr_preprocessed)
 ```
 
 ## Datasets
