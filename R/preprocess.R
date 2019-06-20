@@ -33,14 +33,16 @@ getVocabulary <- function(char, verbose = F) {
 #' ...
 #'
 #' @param char a character string of text, length of one
+#' @param labels a character string of same length as char with character as labels
 #' @param maxlen length of semi-redundant sequences of maxlen characters
 #' @param vocabulary char, should be sorted, if not set char vocabulary will be used
 #' @param verbose TRUE/FALSE
 #' @export
 preprocessSemiRedundant <- function(char,
-                       maxlen = 250,
-                       vocabulary,
-                       verbose = F) {
+                                    labels = NULL,
+                                    maxlen = 250,
+                                    vocabulary,
+                                    verbose = F) {
   require(dplyr)
   Check <- ArgumentCheck::newArgCheck()
   #* Add an error if maxlen <1
@@ -62,6 +64,16 @@ preprocessSemiRedundant <- function(char,
     stringr::str_to_lower() %>%
     stringr::str_c(collapse = "\n") %>%
     tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
+  
+  if (!is.null(labels)) {
+    text.labels <- labels %>%
+      stringr::str_c(collapse = "\n") %>%
+      tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
+    text.labels.vocabulary <- text.labels %>%
+      unique() %>%
+      sort()
+  }
+  
   if (verbose)
     print(sprintf("corpus length: %d", xt))
   
@@ -76,30 +88,57 @@ preprocessSemiRedundant <- function(char,
   # Cut the text in semi-redundant sequences of maxlen characters
   if (verbose)
     print("generation of semi-redundant sequences ...")
-  dataset <- purrr::map(seq(1, length(text) - maxlen - 1, by = 1),
-                        ~ list(sentece = text[.x:(.x + maxlen - 1)],
-                               next_char = text[.x + maxlen]))
-  dataset <- purrr::transpose(dataset)
-  
-  # Vectorization
-  x <-
-    array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
-  y <-
-    array(0, dim = c(length(dataset$sentece), length(vocabulary)))
-  if (verbose)
-    print("vectorization ...")
-  if (verbose)
-    pb <-  txtProgressBar(min = 0,
-                          max = length(dataset$sentece),
-                          style = 3)
-  for (i in 1:length(dataset$sentece)) {
+  if (is.null(labels)) {
+    dataset <- purrr::map(seq(1, length(text) - maxlen - 1, by = 1),
+                          ~ list(sentece = text[.x:(.x + maxlen - 1)],
+                                 next_char = text[.x + maxlen]))
+    dataset <- purrr::transpose(dataset)
+    x <-
+      array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
+    y <- array(0, dim = c(length(dataset$sentece), length(vocabulary)))
+    # Vectorization
     if (verbose)
-      setTxtProgressBar(pb, i)
-    x[i, , ] <- sapply(vocabulary, function(x) {
-      as.integer(x == dataset$sentece[[i]])
-    })
-    y[i, ] <- as.integer(vocabulary == dataset$next_char[[i]])
-  }
+      print("vectorization ...")
+    if (verbose)
+      pb <-  txtProgressBar(min = 0,
+                            max = length(dataset$sentece),
+                            style = 3)
+    for (i in 1:length(dataset$sentece)) {
+      if (verbose)
+        setTxtProgressBar(pb, i)
+      x[i, ,] <- sapply(vocabulary, function(x) {
+        as.integer(x == dataset$sentece[[i]])
+      })
+      y[i,] <- as.integer(vocabulary == dataset$next_char[[i]])
+    }
+    } else {
+      # use labels
+      dataset <- purrr::map(seq(1, length(text) - maxlen - 1, by = 1),
+                            ~ list(sentece = text[.x:(.x + maxlen - 1)],
+                                   label = text.labels[.x + maxlen]))
+      dataset <- purrr::transpose(dataset)
+      
+      x <-
+        array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
+      y <- array(0, dim = c(length(dataset$sentece), length(text.labels.vocabulary)))
+      
+      # Vectorization
+      if (verbose)
+        print("vectorization ...")
+      if (verbose)
+        pb <-  txtProgressBar(min = 0,
+                              max = length(dataset$sentece),
+                              style = 3)
+      for (i in 1:length(dataset$sentece)) {
+        if (verbose)
+          setTxtProgressBar(pb, i)
+        x[i, ,] <- sapply(vocabulary, function(x) {
+          as.integer(x == dataset$sentece[[i]])
+        })
+        y[i,] <- as.integer(text.labels.vocabulary == dataset$label[[i]])
+      }
+    }
+
   results <- list("X" = x, "Y" = y)
   return(results)
 }
@@ -108,14 +147,27 @@ preprocessSemiRedundant <- function(char,
 #' fasta file. Multiple entries are combined with newline characters.
 #' @export
 preprocessFasta <- function(path,
-                             maxlen = 250,
-                             vocabulary = c("\n", "a", "c", "g", "t"),
-                             verbose = F) {
-  library(Biostrings)
-  fasta.file <- readDNAStringSet(path)
+                            labels = NULL,
+                            maxlen = 250,
+                            vocabulary = c("\n", "a", "c", "g", "t"),
+                            verbose = F) {
+  # process labels
+  if (!is.null(labels)){
+    fasta.file.labels <- Biostrings::readDNAStringSet(labels)
+    seq.labels <- paste0(paste(fasta.file.labels, collapse = "\n"), "\n")
+  } 
+  
+  # process corpus
+  fasta.file <- Biostrings::readDNAStringSet(path)
   seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
+  
+  if (is.null(labels)){
   seq.processed <-
-    preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary, verbose = F)
+    preprocessSemiRedundant(char = seq, maxlen = maxlen, vocabulary, verbose = F) 
+  } else {
+    seq.processed <-
+      preprocessSemiRedundant(char = seq, labels = seq.labels, maxlen = maxlen, vocabulary, verbose = F) 
+  }
   return(seq.processed)
 }
 
@@ -131,12 +183,12 @@ calculateStepsPerEpoch <-
     library(Biostrings)
     steps.per.epoch <- 0
     fasta.files <- list.files(
-      path = normalize_path(dir),
+      path = xfun::normalize_path(dir),
       pattern = paste0("*.", format),
       full.names = TRUE
     )
     for (file in fasta.files) {
-      fasta.file <- readDNAStringSet(file)
+      fasta.file <- Biostrings::readDNAStringSet(file)
       seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
       steps.per.epoch <-
         steps.per.epoch + ceiling((nchar(seq) - maxlen - 1) / batch.size)
@@ -152,23 +204,34 @@ calculateStepsPerEpoch <-
 #'see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R
 #' @param directory input directory where .fasta files are located
 #' @export
-fastaFileGenerator <- function(dir,
-                                  format = "fasta",
-                                  batch.size = 512,
-                                  maxlen = 250,
-                                  verbose = F) {
-  library(xfun)
+fastaFileGenerator <- function(corpus.dir,
+                               labels.dir,
+                               format = "fasta",
+                               batch.size = 512,
+                               maxlen = 250,
+                               verbose = F) {
   fasta.files <- list.files(
-    path = normalize_path(dir),
+    path = xfun::normalize_path(corpus.dir),
     pattern = paste0("*.", format),
     full.names = TRUE
   )
+  
+  if (!missing(labels.dir)){
+    label.files <- paste0(labels.dir, gsub(pattern = paste0("\\.",format,"$"), "", basename(fasta.files)),".txt")
+  }
+  
   next.file <- 1
   batch.num <- 0
   batch.end <- 0
   # pre-load the first file
   file <- fasta.files[[1]]
-  preprocessed <- preprocessFasta(file, maxlen = maxlen)
+  if (!missing(labels.dir)) {
+    label <- label.files[[1]]
+    use_labels <- TRUE
+    preprocessed <- preprocessFasta(path = file, labels = label, maxlen = maxlen)
+  } else {
+    preprocessed <- preprocessFasta(path = file, maxlen = maxlen)
+  }
   if (verbose)
     message("initializing")
   function() {
@@ -193,7 +256,11 @@ fastaFileGenerator <- function(dir,
       }
       # read in the new file
       file <<- fasta.files[[next.file]]
-      preprocessed <- preprocessFasta(file, maxlen = maxlen)
+      if (use_labels) {
+        preprocessed <- preprocessFasta(path = file, labels = label, maxlen = maxlen)
+      } else {
+        preprocessed <- preprocessFasta(path = file, maxlen = maxlen)
+      }
     }
     # proceccing a batch
     batch.num <<- batch.num + 1
@@ -224,9 +291,9 @@ fastaFileGenerator <- function(dir,
         )
       )
     x.batch <-
-      preprocessed$X[batch.start:batch.end, ,]# dim shoiuld be (batch_size, length, words)
+      preprocessed$X[batch.start:batch.end, , ]# dim shoiuld be (batch_size, length, words)
     y.batch <-
-      preprocessed$Y[batch.start:batch.end, ] #  # dim should be (batch_size, words)
+      preprocessed$Y[batch.start:batch.end,] #  # dim should be (batch_size, words)
     # return the file
     list(x.batch, y.batch)
   }

@@ -4,19 +4,21 @@
 \alias{trainNetwork}
 \title{Trains a (mostly) LSTM model on genomic data. Designed for developing genome based language models (GenomeNet)}
 \usage{
-trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
-  maxlen = 80, dropout.rate = 0.3, layer.size = 2048,
-  batch.size = 512, layers.lstm = 4, solver = "adam",
-  use.codon.cnn = FALSE, learning.rate = 0.001, use.cudnn = FALSE,
-  use.multiple.gpus = FALSE, merge.on.cpu = TRUE, gpu.num = 2,
-  vocabulary.size = 5, epochs = 10, max.queue.size = 100,
-  lr.plateau.factor = 0.1, patience = 5, cooldown = 5,
-  steps.per.epoch = "auto")
+trainNetwork(path, dataset, labels, validation.split = 0.05,
+  run.name = "run", maxlen = 250, dropout.rate = 0.3,
+  layer.size = 2048, batch.size = 512, layers.lstm = 4,
+  solver = "adam", use.codon.cnn = FALSE, learning.rate = 0.001,
+  use.cudnn = FALSE, use.multiple.gpus = FALSE, merge.on.cpu = TRUE,
+  gpu.num = 2, vocabulary.size = 5, label.vocabulary.size = 3,
+  epochs = 10, max.queue.size = 100, lr.plateau.factor = 0.1,
+  patience = 5, cooldown = 5, steps.per.epoch = "auto")
 }
 \arguments{
 \item{path}{Path to folder where individual or multiple fasta files are located}
 
 \item{dataset}{Dataframe holding training samples in RAM instead of using generator.}
+
+\item{labels}{path to folder where labels are located}
 
 \item{validation.split}{Defines the fraction of the batches that will be used for validation.}
 
