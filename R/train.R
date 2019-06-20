@@ -8,6 +8,7 @@
 #'
 #' @param path Path to folder where individual or multiple fasta files are located
 #' @param dataset Dataframe holding training samples in RAM instead of using generator. 
+#' @param type glm or multiclass
 #' @param validation.split Defines the fraction of the batches that will be used for validation.
 #' @param run.name name of the run (without file ending)
 #' @param maxlen Time steps to unroll for (e.g. length of semi-redundant chunks).
@@ -33,6 +34,7 @@
 #' @export
 trainNetwork <- function(path,
                          dataset,
+                         type = "glm",
                          validation.split = .05,
                          run.name = "run",
                          maxlen = 250,
@@ -162,8 +164,14 @@ trainNetwork <- function(path,
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
     messagef("Starting fasta generator.")
-    gen <-
-      fastaFileGenerator(path, batch.size = batch.size, maxlen = maxlen, verbose = F)
+    if (type == "glm") {
+      gen <-
+        fastaFileGenerator(corpus, batch.size = batch.size, maxlen = maxlen)
+    } else {
+      gen <- fastaFileGenerator(corpus, labels, batch.size = batch.size, maxlen = maxlen)
+      
+    }
+    
     
     # calculate the number of steps after one epoch is finished (full iteration)
     if (steps.per.epoch == "auto") {
@@ -220,3 +228,4 @@ trainNetwork <- function(path,
   )
   return(history)
 }
+
