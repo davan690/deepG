@@ -4,10 +4,14 @@
 \alias{preprocessSemiRedundant}
 \title{Preprocess string to semi redundant one-hot vector}
 \usage{
-preprocessSemiRedundant(char, maxlen = 250, vocabulary, verbose = F)
+preprocessSemiRedundant(char, labels = NULL, maxlen = 250, vocabulary,
+  verbose = F)
+
 }
 \arguments{
 \item{char}{a character string of text, length of one}
+
+\item{labels}{a character string of same length as char with character as labels}
 
 \item{maxlen}{length of semi-redundant sequences of maxlen characters}
 

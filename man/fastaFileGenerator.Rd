@@ -7,8 +7,8 @@ by iterating over the input files. If the input file is smaller than the
 batch.size, batch size will be reduced to the maximal size. So the last batch
 of a file is usually smaller.}
 \usage{
-fastaFileGenerator(dir, format = "fasta", batch.size = 512,
-  maxlen = 250, verbose = F)
+fastaFileGenerator(corpus.dir, labels.dir, format = "fasta",
+  batch.size = 512, maxlen = 250, verbose = F)
 }
 \arguments{
 \item{directory}{input directory where .fasta files are located}
