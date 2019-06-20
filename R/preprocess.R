@@ -218,7 +218,6 @@ fastaFileGenerator <- function(corpus.dir,
   
   if (!missing(labels.dir)){
     label.files <- paste0(labels.dir, gsub(pattern = paste0("\\.",format,"$"), "", basename(fasta.files)),".txt")
-    print(label.files)
   }
   
   next.file <- 1
