@@ -8,7 +8,7 @@
 #'
 #' @param path Path to folder where individual or multiple fasta files are located
 #' @param dataset Dataframe holding training samples in RAM instead of using generator. 
-#' @param type glm or multiclass
+#' @param labels path to folder where labels are located
 #' @param validation.split Defines the fraction of the batches that will be used for validation.
 #' @param run.name name of the run (without file ending)
 #' @param maxlen Time steps to unroll for (e.g. length of semi-redundant chunks).
@@ -34,7 +34,7 @@
 #' @export
 trainNetwork <- function(path,
                          dataset,
-                         type = "glm",
+                         labels,
                          validation.split = .05,
                          run.name = "run",
                          maxlen = 250,
@@ -50,6 +50,7 @@ trainNetwork <- function(path,
                          merge.on.cpu = TRUE,
                          gpu.num = 2,
                          vocabulary.size = 5,
+                         label.vocabulary.size = 3,
                          epochs = 10,
                          max.queue.size = 100,
                          lr.plateau.factor = .1,
@@ -141,9 +142,15 @@ trainNetwork <- function(path,
       keras::layer_dropout(rate = dropout.rate)
   }
   
-  # last dense layer
-  model %>% keras::layer_dense(vocabulary.size) %>%
-    keras::layer_activation("softmax")
+  if (is.null(labels)) {
+    # last dense layer
+    model %>% keras::layer_dense(vocabulary.size) %>%
+      keras::layer_activation("softmax")
+  } else {
+    # last dense layer with label vocabulary
+    model %>% keras::layer_dense(label.vocabulary.size) %>%
+      keras::layer_activation("softmax")
+  } 
   
   # print model layout to screen, should be done before multi_gpu_model
   summary(model)
@@ -164,11 +171,11 @@ trainNetwork <- function(path,
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
     messagef("Starting fasta generator.")
-    if (type == "glm") {
+    if (missing(labels)) {
       gen <-
-        fastaFileGenerator(corpus, batch.size = batch.size, maxlen = maxlen)
+        fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
     } else {
-      gen <- fastaFileGenerator(corpus, labels, batch.size = batch.size, maxlen = maxlen)
+      gen <- fastaFileGenerator(corpus.dir = path, labels.dir= labels, batch.size = batch.size, maxlen = maxlen)
       
     }
     

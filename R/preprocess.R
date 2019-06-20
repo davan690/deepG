@@ -69,6 +69,9 @@ preprocessSemiRedundant <- function(char,
     text.labels <- labels %>%
       stringr::str_c(collapse = "\n") %>%
       tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
+    text.labels.vocabulary <- text.labels %>%
+      unique() %>%
+      sort()
   }
   
   if (verbose)
@@ -90,33 +93,52 @@ preprocessSemiRedundant <- function(char,
                           ~ list(sentece = text[.x:(.x + maxlen - 1)],
                                  next_char = text[.x + maxlen]))
     dataset <- purrr::transpose(dataset)
+    x <-
+      array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
+    y <- array(0, dim = c(length(dataset$sentece), length(vocabulary)))
+    # Vectorization
+    if (verbose)
+      print("vectorization ...")
+    if (verbose)
+      pb <-  txtProgressBar(min = 0,
+                            max = length(dataset$sentece),
+                            style = 3)
+    for (i in 1:length(dataset$sentece)) {
+      if (verbose)
+        setTxtProgressBar(pb, i)
+      x[i, ,] <- sapply(vocabulary, function(x) {
+        as.integer(x == dataset$sentece[[i]])
+      })
+      y[i,] <- as.integer(vocabulary == dataset$next_char[[i]])
+    }
     } else {
       # use labels
       dataset <- purrr::map(seq(1, length(text) - maxlen - 1, by = 1),
                             ~ list(sentece = text[.x:(.x + maxlen - 1)],
                                    label = text.labels[.x + maxlen]))
       dataset <- purrr::transpose(dataset)
+      
+      x <-
+        array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
+      y <- array(0, dim = c(length(dataset$sentece), length(text.labels.vocabulary)))
+      
+      # Vectorization
+      if (verbose)
+        print("vectorization ...")
+      if (verbose)
+        pb <-  txtProgressBar(min = 0,
+                              max = length(dataset$sentece),
+                              style = 3)
+      for (i in 1:length(dataset$sentece)) {
+        if (verbose)
+          setTxtProgressBar(pb, i)
+        x[i, ,] <- sapply(vocabulary, function(x) {
+          as.integer(x == dataset$sentece[[i]])
+        })
+        y[i,] <- as.integer(text.labels.vocabulary == dataset$label[[i]])
+      }
     }
-  
-  # Vectorization
-  x <-
-    array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
-  y <- array(0, dim = c(length(dataset$sentece), length(vocabulary)))
-  
-  if (verbose)
-    print("vectorization ...")
-  if (verbose)
-    pb <-  txtProgressBar(min = 0,
-                          max = length(dataset$sentece),
-                          style = 3)
-  for (i in 1:length(dataset$sentece)) {
-    if (verbose)
-      setTxtProgressBar(pb, i)
-    x[i, ,] <- sapply(vocabulary, function(x) {
-      as.integer(x == dataset$sentece[[i]])
-    })
-    y[i,] <- as.integer(vocabulary == dataset$next_char[[i]])
-  }
+
   results <- list("X" = x, "Y" = y)
   return(results)
 }
@@ -148,7 +170,6 @@ preprocessFasta <- function(path,
   }
   return(seq.processed)
 }
-
 
 #' do one full preprocessing iteration to figure out what the observed
 #' steps_per_epoch value is
@@ -196,7 +217,8 @@ fastaFileGenerator <- function(corpus.dir,
   )
   
   if (!missing(labels.dir)){
-    label.files <- paste0(gsub(pattern = paste0("\\.",format,"$"), "", basename(fasta.files)),".txt")
+    label.files <- paste0(labels.dir, gsub(pattern = paste0("\\.",format,"$"), "", basename(fasta.files)),".txt")
+    print(label.files)
   }
   
   next.file <- 1
@@ -206,7 +228,10 @@ fastaFileGenerator <- function(corpus.dir,
   file <- fasta.files[[1]]
   if (!missing(labels.dir)) {
     label <- label.files[[1]]
-    preprocessed <- preprocessFastaLabel(fasta, label, maxlen = maxlen)
+    use_labels <- TRUE
+    preprocessed <- preprocessFasta(path = file, labels = label, maxlen = maxlen)
+  } else {
+    preprocessed <- preprocessFasta(path = file, maxlen = maxlen)
   }
   if (verbose)
     message("initializing")
@@ -232,7 +257,11 @@ fastaFileGenerator <- function(corpus.dir,
       }
       # read in the new file
       file <<- fasta.files[[next.file]]
-      preprocessed <- preprocessFasta(file, maxlen = maxlen)
+      if (use_labels) {
+        preprocessed <- preprocessFasta(path = file, labels = label, maxlen = maxlen)
+      } else {
+        preprocessed <- preprocessFasta(path = file, maxlen = maxlen)
+      }
     }
     # proceccing a batch
     batch.num <<- batch.num + 1
