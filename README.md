@@ -42,6 +42,8 @@ install.packages("keras")
 keras::install_keras(tensorflow = "gpu")
 ```
 
+on AWS instances the GPU version can be installed via `conda create -y --name r-tensorflow tensorflow-gpu python=3.6.8` 
+
 # Usage
 
 ## Generate a genomic language model from a collection of FASTA files
@@ -57,6 +59,28 @@ history <- trainNetwork(path = "input_dir", cudnn = T, multiple_gpu = T, gpu_num
 ```
 
 See the `?trainNetwork` for further information how to setup file names and network size.
+
+## Train a network for multiclass prediction
+
+here the FASTA files are located as individual files in `input_dir/` and labels are defined in `fasta-like` files in `input_dir/` with a `.txt` ending.
+
+example file `file1.fasta` in `input_dir/`:
+
+```
+>fasta_header
+ACGTGAGAGAGAGACAGAGATAGACAGAGATTATAA
+```
+
+example label file `file1.txt` in `fasta_label_dir/`, where {A,B,C} are the class labels.
+
+```
+>fasta_header
+AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC
+```
+
+``` r
+history <- trainNetwork(path = "input_dir", labels = "~/test_files/fasta_label_dir/", label.vocabulary.size = 3)
+```
 
 ## Generate a genomic language model using data held in the RAM
 
