@@ -92,6 +92,7 @@
 <p>On default, Keras will be installed without GPU support. To support GPUs reinstall Keras via</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"keras"</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2">keras<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/keras/topics/install_keras">install_keras</a></span>(<span class="dt">tensorflow =</span> <span class="st">"gpu"</span>)</a></code></pre></div>
+<p>on AWS instances the GPU version can be installed via <code>conda create -y --name r-tensorflow tensorflow-gpu python=3.6.8</code></p>
 </div>
 </div>
 <div id="usage" class="section level1">
@@ -105,15 +106,27 @@
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">path =</span> <span class="st">"input_dir"</span>, <span class="dt">cudnn =</span> T, <span class="dt">multiple_gpu =</span> T, <span class="dt">gpu_num =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, <span class="dt">run_name=</span> <span class="st">"GenomeNet"</span>, <span class="dt">epochs =</span> <span class="dv">100</span>, <span class="dt">steps_per_epoch =</span> <span class="dv">10000</span>)</a></code></pre></div>
 <p>See the <code><a href="reference/trainNetwork.html">?trainNetwork</a></code> for further information how to setup file names and network size.</p>
 </div>
+<div id="train-a-network-for-multiclass-prediction" class="section level2">
+<h2 class="hasAnchor">
+<a href="#train-a-network-for-multiclass-prediction" class="anchor"></a>Train a network for multiclass prediction</h2>
+<p>here the FASTA files are located as individual files in <code>input_dir/</code> and labels are defined in <code>fasta-like</code> files in <code>input_dir/</code> with a <code>.txt</code> ending.</p>
+<p>example file <code>file1.fasta</code> in <code>input_dir/</code>:</p>
+<pre><code>&gt;fasta_header
+ACGTGAGAGAGAGACAGAGATAGACAGAGATTATAA</code></pre>
+<p>example label file <code>file1.txt</code> in <code>fasta_label_dir/</code>, where {A,B,C} are the class labels.</p>
+<pre><code>&gt;fasta_header
+AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">path =</span> <span class="st">"input_dir"</span>, <span class="dt">labels =</span> <span class="st">"fasta_label_dir/"</span>, <span class="dt">label.vocabulary.size =</span> <span class="dv">3</span>)</a></code></pre></div>
+</div>
 <div id="generate-a-genomic-language-model-using-data-held-in-the-ram" class="section level2">
 <h2 class="hasAnchor">
 <a href="#generate-a-genomic-language-model-using-data-held-in-the-ram" class="anchor"></a>Generate a genomic language model using data held in the RAM</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># load example dataset</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(crispr_sample)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co"># generate one-hot encoding of 30-nucleotide sized chunks</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">crispr_preprocessed &lt;-<span class="st"> </span><span class="kw"><a href="reference/preprocessSemiRedundant.html">preprocessSemiRedundant</a></span>(crispr_sample)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">dataset =</span> crispr_preprocessed)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># load example dataset</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(crispr_sample)</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co"># generate one-hot encoding of 30-nucleotide sized chunks</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">crispr_preprocessed &lt;-<span class="st"> </span><span class="kw"><a href="reference/preprocessSemiRedundant.html">preprocessSemiRedundant</a></span>(crispr_sample)</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">dataset =</span> crispr_preprocessed)</a></code></pre></div>
 </div>
 <div id="datasets" class="section level2">
 <h2 class="hasAnchor">
