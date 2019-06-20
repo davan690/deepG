@@ -142,7 +142,7 @@ trainNetwork <- function(path,
       keras::layer_dropout(rate = dropout.rate)
   }
   
-  if (is.null(labels)) {
+  if (missing(labels)) {
     # last dense layer
     model %>% keras::layer_dense(vocabulary.size) %>%
       keras::layer_activation("softmax")
@@ -168,6 +168,12 @@ trainNetwork <- function(path,
   if (solver == "adagrad")
     optimizer <-
     keras::optimizer_adagrad(lr = learning.rate)
+  if (solver == "rmsprop")
+    optimizer <-
+    keras::optimizer_rmsprop(lr = learning.rate)
+  if (solver == "sgd")
+    optimizer <-
+    keras::optimizer_sgd(lr = learning.rate)
   
   model %>% keras::compile(loss = "categorical_crossentropy",
                            optimizer = optimizer)

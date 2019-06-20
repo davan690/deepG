@@ -183,12 +183,12 @@ calculateStepsPerEpoch <-
     library(Biostrings)
     steps.per.epoch <- 0
     fasta.files <- list.files(
-      path = normalize_path(dir),
+      path = xfun::normalize_path(dir),
       pattern = paste0("*.", format),
       full.names = TRUE
     )
     for (file in fasta.files) {
-      fasta.file <- readDNAStringSet(file)
+      fasta.file <- Biostrings::readDNAStringSet(file)
       seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
       steps.per.epoch <-
         steps.per.epoch + ceiling((nchar(seq) - maxlen - 1) / batch.size)
