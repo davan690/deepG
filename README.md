@@ -62,7 +62,7 @@ See the `?trainNetwork` for further information how to setup file names and netw
 
 ## Train a network for multiclass prediction
 
-here the FASTA files are located as individual files in `input_dir/` and labels are defined in `fasta-like` files in `input_dir/` with a `.txt` ending.
+here the FASTA files are located as individual files in `input_dir/` and labels are defined in `fasta-like` files in `fasta_label_dir/` with a `.txt` ending.
 
 example file `file1.fasta` in `input_dir/`:
 
