@@ -79,7 +79,7 @@ AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC
 ```
 
 ``` r
-history <- trainNetwork(path = "input_dir", labels = "~/test_files/fasta_label_dir/", label.vocabulary.size = 3)
+history <- trainNetwork(path = "input_dir", labels = "fasta_label_dir/", label.vocabulary.size = 3)
 ```
 
 ## Generate a genomic language model using data held in the RAM
