@@ -165,6 +165,10 @@ trainNetwork <- function(path,
   if (solver == "adam")
     optimizer <-
     keras::optimizer_adam(lr = learning.rate)
+  if (solver == "adagrad")
+    optimizer <-
+    keras::optimizer_adagrad(lr = learning.rate)
+  
   model %>% keras::compile(loss = "categorical_crossentropy",
                            optimizer = optimizer)
   
