@@ -12,7 +12,7 @@ test_that("correct vocabulary extraction", {
 })
 
 test_that("generating semi-redundant chunks", {
-  expect_equivalent(lengths(preprocessSemiRedundant("abcd", maxlen = 2))[1], 8)
-  expect_equivalent(lengths(preprocessSemiRedundant("abcd", maxlen = 2))[2], 4)
-  expect_equivalent(preprocessSemiRedundant("abcd", maxlen = 2)$Y, c(0,0,1,0))
+  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[1], 8)
+  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[2], 4)
+  expect_equivalent(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y, c(0,0,1,0))
 })
