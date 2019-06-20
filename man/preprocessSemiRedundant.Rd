@@ -6,7 +6,6 @@
 \usage{
 preprocessSemiRedundant(char, labels = NULL, maxlen = 250, vocabulary,
   verbose = F)
-
 }
 \arguments{
 \item{char}{a character string of text, length of one}
