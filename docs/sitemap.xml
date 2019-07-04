@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hiddengenome.github.io/altum//index.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//index.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/calculateStepsPerEpoch.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/calculateStepsPerEpoch.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/crispr_full.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/crispr_full.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/crispr_sample.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/crispr_sample.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/end_gpu_session.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/end_gpu_session.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/fastaFileGenerator.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/fastaFileGenerator.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/getVocabulary.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/getVocabulary.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/messagef.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/messagef.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/parenthesis.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/parenthesis.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/predictNextNucleotide.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/predictNextNucleotide.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/preprocessFasta.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/preprocessFasta.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/preprocessSemiRedundant.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/preprocessSemiRedundant.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/replaceChar.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/replaceChar.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/startGPUSession.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/startGPUSession.html</loc>
   </url>
   <url>
-    <loc>https://hiddengenome.github.io/altum//reference/trainNetwork.html</loc>
+    <loc>https://hiddengenome.github.io/deepG//reference/trainNetwork.html</loc>
   </url>
 </urlset>
