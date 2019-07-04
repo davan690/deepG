@@ -1,4 +1,4 @@
 library(testthat)
-library(altum)
+library(deepG)
 
-test_check("altum")
+test_check("deepG")
