@@ -49,4 +49,4 @@ after_success:
   || true; git push; fi;
 - Rscript -e 'covr::codecov()'
 notifications:
-  email: philipp.muench@helmholtz-hzi.de
+  slack: bifo-hzi:LlCI7DQETUjGybPppKUfGJCA
