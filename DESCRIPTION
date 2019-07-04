@@ -1,13 +1,13 @@
-Package: altum
+Package: deepG
 Type: Package
-Title: altum is a R library that contains a collection of scripts required for model generation and model analysis
+Title: deepG is a R library that contains a collection of scripts required for model generation and model analysis
 Version: 0.2.0
 Encoding: UTF-8
 Author: Philipp C. Muench
 Authors@R: c(
     person("Philipp", "Muench" , "pmu15@helmholtz-hzi.de", c("aut", "cre")))
 Maintainer: Philipp Muench <pmu15@helmholtz-hzi.de>
-Description: Altum is a R library that contains a collection of scripts required for model generation and model analysis.
+Description: deepG is a R library that contains a collection of scripts required for model generation and model analysis.
 License: AGPL_3 + file LICENSE
 Depends:
     R (>= 3.4.0)

@@ -1,10 +1,10 @@
-[![Build Status](https://travis-ci.org/hiddengenome/altum.svg?branch=master)](https://travis-ci.org/hiddengenome/altum)
-[![codecov](https://codecov.io/gh/hiddengenome/altum/branch/master/graph/badge.svg)](https://codecov.io/gh/hiddengenome/altum)
+[![Build Status](https://travis-ci.org/hiddengenome/deepG.svg?branch=master)](https://travis-ci.org/hiddengenome/deepG)
+[![codecov](https://codecov.io/gh/hiddengenome/deepG/branch/master/graph/badge.svg)](https://codecov.io/gh/hiddengenome/deepG)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ## Overview
 
-Altum is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets of genomic and human readable languages for testing.
+deepG is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets of genomic and human readable languages for testing.
 
 ## Installation
 
@@ -30,7 +30,7 @@ install.packages("hdf5r", configure.args="--with-hdf5=/usr/bin/h5cc")
 
 ``` r
 install.packages("devtools")
-devtools::install_github("hiddengenome/altum")
+devtools::install_github("hiddengenome/deepG")
 ```
 
 ### Enable GPU support
@@ -107,4 +107,4 @@ The library comes with three different datasets for testing.
 ## License and copyright
 Copyright 2019 Philipp Münch
 
-Source code to altum is made available under the terms of the [GNU Affero General Public License](LICENSE.txt) (AGPL). altum is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+Source code to deepG is made available under the terms of the [GNU Affero General Public License](LICENSE.txt) (AGPL). deepG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
