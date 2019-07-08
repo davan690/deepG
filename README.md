@@ -112,8 +112,8 @@ Source code to deepG is made available under the terms of the [GNU Affero Genera
 ## Supported by
 
 <p float="left">
-  <img src="man/figures/hzi.jpg" width="100" />
-  <img src="man/figures/dfg.jpg" width="100" />
+  <img src="man/figures/hzi.jpg" width="200" />
+  <img src="man/figures/dfg.jpg" width="200" />
   <img src="man/figures/bmbf.jpeg" width="100" /> 
   <img src="man/figures/aws.png" width="100" /> 
 </p>
