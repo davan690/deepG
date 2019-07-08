@@ -108,3 +108,10 @@ The library comes with three different datasets for testing.
 Copyright 2019 Philipp Münch
 
 Source code to deepG is made available under the terms of the [GNU Affero General Public License](LICENSE.txt) (AGPL). deepG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+## Supported by
+
+<p float="left">
+  <img src="man/figures/dfg.png" width="100" />
+  <img src="man/figures/bmbf.jpeg" width="100" /> 
+</p>
