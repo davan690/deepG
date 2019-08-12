@@ -59,7 +59,7 @@ preprocessSemiRedundant <- function(char,
   #* Return errors and warnings (if any)
   ArgumentCheck::finishArgCheck(Check)
   
-  # Load, collapse, and tokenize text
+  # Load, collapse, and tokenize text ("ACGT" -> "a" "c" "g" "t")
   text <- char %>%
     stringr::str_to_lower() %>%
     stringr::str_c(collapse = "\n") %>%
@@ -106,9 +106,11 @@ preprocessSemiRedundant <- function(char,
     for (i in 1:length(dataset$sentece)) {
       if (verbose)
         setTxtProgressBar(pb, i)
+      # generate one-hot encoding for one subset
       x[i, ,] <- sapply(vocabulary, function(x) {
         as.integer(x == dataset$sentece[[i]])
       })
+      # target (next nucleotide in sequence)
       y[i,] <- as.integer(vocabulary == dataset$next_char[[i]])
     }
     } else {
@@ -163,10 +165,12 @@ preprocessFasta <- function(path,
   
   if (is.null(labels)){
   seq.processed <-
-    preprocessSemiRedundant(char = seq, maxlen = maxlen, vocabulary, verbose = F) 
+    preprocessSemiRedundant(char = seq, maxlen = maxlen, vocabulary = vocabulary,
+                            verbose = F) 
   } else {
     seq.processed <-
-      preprocessSemiRedundant(char = seq, labels = seq.labels, maxlen = maxlen, vocabulary, verbose = F) 
+      preprocessSemiRedundant(char = seq, labels = seq.labels, maxlen = maxlen,
+                              vocabulary = vocabulary, verbose = F) 
   }
   return(seq.processed)
 }
