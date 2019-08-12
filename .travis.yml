@@ -50,3 +50,5 @@ after_success:
 - Rscript -e 'covr::codecov()'
 notifications:
   slack: bifo-hzi:LlCI7DQETUjGybPppKUfGJCA
+  on_success: never
+  on_failure: always
