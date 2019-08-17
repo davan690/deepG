@@ -231,9 +231,10 @@ fastaFileGenerator <- function(corpus.dir,
   file <- fasta.files[[1]]
   if (!missing(labels.dir)) {
     label <- label.files[[1]]
-    use_labels <- TRUE
+    use_labels <<- TRUE
     preprocessed <- preprocessFasta(path = file, labels = label, maxlen = maxlen)
   } else {
+    use_labels <<- FALSE
     preprocessed <- preprocessFasta(path = file, maxlen = maxlen)
   }
   if (verbose)
