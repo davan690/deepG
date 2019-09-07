@@ -3,7 +3,7 @@
 export(calculateStepsPerEpoch)
 export(end_gpu_session)
 export(fastaFileGenerator)
-export(generateStatesromFolder)
+export(generateStatesFromFolder)
 export(getStates)
 export(getStatesFromFasta)
 export(getVocabulary)
