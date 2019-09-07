@@ -60,3 +60,60 @@ getStates <- function(model.path,
   }
   return(states.final)
 }
+
+#' Get cell states from a fasta file
+#'
+#' @param model.path path to keras model in hdf5 format
+#' @param fasta.path path to fasta file
+#' @param maxlen time steps to unroll for
+#' @param batch.size how many subsequences are predicted in parallel
+#' @param verbose print output
+#' @export
+getStatesFromFasta <- function(model.path = "example_files/dummy_model_cpu.hdf5",
+                      fasta.path = "example_files/fasta/a.fasta",
+                      maxlen = 80,
+                      batch.size = 100,
+                      verbose = T){
+  if (verbose)
+    message("load model...")
+  # prepare model    
+  model <- keras::load_model_hdf5(model.path)
+  # Remove the last 2 layers
+  keras::pop_layer(model)
+  keras::pop_layer(model)
+  if (verbose)
+    message("preprocess...")  
+  # prepare fasta
+  preprocessed <- deepG::preprocessFasta(fasta.path,
+                           maxlen = maxlen,
+                           vocabulary = c("\n", "a", "c", "g", "t"))
+  batch.num <- 1
+  batch.start <- 1
+  batch.end <- batch.start + batch.size
+  states <- NULL
+  while (batch.start < nrow(preprocessed$X)) {
+    if ((batch.start + batch.size) > nrow(preprocessed$X)) {
+      if (verbose)
+        message("reduce batch.size temporarily")
+      batch.end <- nrow(preprocessed$X)
+      # reduced batch size
+    }
+    if (verbose)
+      message(
+        paste(
+          "generating bach number",
+          batch.num,
+          batch.start,
+          "-",
+          batch.end
+        ))
+    x.batch <-
+      preprocessed$X[batch.start:batch.end, , ] # dim shoiuld be (batch_size, length, words)
+    states <- rbind(states, keras::predict_on_batch(model, x.batch))
+    # update batch index
+    batch.num <- batch.num + 1 
+    batch.start <- batch.end + 1
+    batch.end <- batch.start + batch.size
+  }
+  return(states)
+}
