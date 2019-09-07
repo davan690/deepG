@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>deepG is a R library that contains a collection of scripts required for model generation and model analysis • deepG</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="deepG is a R library that contains a collection of scripts required for model generation and model analysis">
 <meta property="og:description" content="deepG is a R library that contains a collection of scripts required for model generation and model analysis.">
 <meta name="twitter:card" content="summary">
@@ -38,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -55,6 +56,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="contents col-md-9">
 
@@ -78,20 +80,20 @@
 <a class="sourceLine" id="cb1-5" data-line-number="5"><span class="fu">make</span></a>
 <a class="sourceLine" id="cb1-6" data-line-number="6"><span class="fu">make</span> check</a>
 <a class="sourceLine" id="cb1-7" data-line-number="7"><span class="fu">sudo</span> make install</a></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"hdf5r"</span>, <span class="dt">configure.args=</span><span class="st">"--with-hdf5=/usr/bin/h5cc"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"hdf5r"</span>, <span class="dt">configure.args=</span><span class="st">"--with-hdf5=/usr/bin/h5cc"</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="library" class="section level2">
 <h2 class="hasAnchor">
 <a href="#library" class="anchor"></a>Library</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"devtools"</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"hiddengenome/deepG"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/reexports.html">install_github</a></span>(<span class="st">"hiddengenome/deepG"</span>)</a></code></pre></div>
 <div id="enable-gpu-support" class="section level3">
 <h3 class="hasAnchor">
 <a href="#enable-gpu-support" class="anchor"></a>Enable GPU support</h3>
 <p>On default, Keras will be installed without GPU support. To support GPUs reinstall Keras via</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"keras"</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">keras<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/keras/topics/install_keras">install_keras</a></span>(<span class="dt">tensorflow =</span> <span class="st">"gpu"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"keras"</span>)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">keras<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/keras/man/install_keras.html">install_keras</a></span>(<span class="dt">tensorflow =</span> <span class="st">"gpu"</span>)</a></code></pre></div>
 <p>on AWS instances the GPU version can be installed via <code>conda create -y --name r-tensorflow tensorflow-gpu python=3.6.8</code></p>
 </div>
 </div>
@@ -113,7 +115,7 @@
 <h3 class="hasAnchor">
 <a href="#generate-a-genomic-language-model-using-data-held-in-the-ram" class="anchor"></a>Generate a genomic language model using data held in the RAM</h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># load example dataset</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(crispr_sample)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(crispr_sample)</a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co"># generate one-hot encoding of 30-nucleotide sized chunks</span></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5">crispr_preprocessed &lt;-<span class="st"> </span><span class="kw"><a href="reference/preprocessSemiRedundant.html">preprocessSemiRedundant</a></span>(crispr_sample)</a>
@@ -137,10 +139,10 @@ AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC</code></pre>
 <a href="#datasets" class="anchor"></a>Datasets</h2>
 <p>The library comes with three different datasets for testing.</p>
 <ul>
-<li>The set <code><a href="https://www.rdocumentation.org/packages/utils/topics/data">data(parenthesis)</a></code> contains 100k charakters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.<br>
+<li>The set <code><a href="https://rdrr.io/r/utils/data.html">data(parenthesis)</a></code> contains 100k charakters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.<br>
 </li>
-<li>The set <code><a href="https://www.rdocumentation.org/packages/utils/topics/data">data(crispr_full)</a></code> containging all CRISPR loci found in NCBI representative genomes with neighbor nucleotides up and downstream.</li>
-<li>The set <code><a href="https://www.rdocumentation.org/packages/utils/topics/data">data(crispr_sample)</a></code> containging a subset of <code>crispr_full</code>
+<li>The set <code><a href="https://rdrr.io/r/utils/data.html">data(crispr_full)</a></code> containging all CRISPR loci found in NCBI representative genomes with neighbor nucleotides up and downstream.</li>
+<li>The set <code><a href="https://rdrr.io/r/utils/data.html">data(crispr_sample)</a></code> containging a subset of <code>crispr_full</code>
 </li>
 </ul>
 </div>
@@ -186,17 +188,20 @@ AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC</code></pre>
 </div>
 </div>
 
+
       <footer><div class="copyright">
   <p>Developed by .</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
