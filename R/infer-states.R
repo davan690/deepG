@@ -101,7 +101,7 @@ getStatesFromFasta <- function(model.path = "example_files/dummy_model_cpu.hdf5"
     if (verbose)
       message(
         paste(
-          "generating bach number",
+          "generating batch number",
           batch.num,
           batch.start,
           "-",
