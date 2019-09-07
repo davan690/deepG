@@ -19,6 +19,9 @@
     <loc>https://hiddengenome.github.io/deepG//reference/fastaFileGenerator.html</loc>
   </url>
   <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/generateStatesromFolder.html</loc>
+  </url>
+  <url>
     <loc>https://hiddengenome.github.io/deepG//reference/getStates.html</loc>
   </url>
   <url>
@@ -32,6 +35,9 @@
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/parenthesis.html</loc>
+  </url>
+  <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/plotTsne.html</loc>
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/predictNextNucleotide.html</loc>
@@ -50,6 +56,9 @@
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/trainNetwork.html</loc>
+  </url>
+  <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/tsneFromStates.html</loc>
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/writeDict.html</loc>
