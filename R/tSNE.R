@@ -3,16 +3,15 @@
 #'
 #' @param fasta.folder path to fasta folder
 #' @param model.path path to model file
-#' @param cell.numer number of cell to be extracted
-#' @param flatten if ture, all cell number will be used
+#' @param use.names save id of fasta header
 #' @export
-generateStatesromFolder <- function(fasta.folder = "example_files/fasta",
+generateStatesFromFolder <- function(fasta.folder = "example_files/fasta",
                                     model.path = "example_files/dummy_model_cpu.hdf5"){
   files <- list.files(fasta.folder, full.names = T)
   states.list <- list()
   for (file in files) {
     message(paste("processing: ", file))
-    states.list[[file]] <-  deepG::getStatesFromFasta(fasta.path = file, 
+    states.list[[tools::file_path_sans_ext(basename(file))]] <-  deepG::getStatesFromFasta(fasta.path = file, 
                                                       model.path = model.path,
                                                       verbose = F)
   }
