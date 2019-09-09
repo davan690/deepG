@@ -27,7 +27,8 @@ Imports:
     ArgumentCheck,
     hdf5r,
     xfun,
-    Biostrings
+    Biostrings,
+    Rtsne
 biocViews:
     Biostrings
 NeedsCompilation: yes
