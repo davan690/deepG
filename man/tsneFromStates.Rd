@@ -2,7 +2,7 @@
 % Please edit documentation in R/tSNE.R
 \name{tsneFromStates}
 \alias{tsneFromStates}
-\title{run the tSNE on a cell from the states.list, return a deepTsne S4 object which contains the output of the Rtsne::Rtsne and the sample ids}
+\title{run the tSNE on a cell from the states.list, return list which contains the output of the Rtsne and the sample ids}
 \usage{
 tsneFromStates(states.list, cell.number = 2, flatten = FALSE,
   perplexity = 1, pca = TRUE, max_iter = 1000)
@@ -15,5 +15,5 @@ tsneFromStates(states.list, cell.number = 2, flatten = FALSE,
 \item{flatten}{if true, all cells will be used}
 }
 \description{
-run the tSNE on a cell from the states.list, return a deepTsne S4 object which contains the output of the Rtsne::Rtsne and the sample ids
+run the tSNE on a cell from the states.list, return list which contains the output of the Rtsne and the sample ids
 }
