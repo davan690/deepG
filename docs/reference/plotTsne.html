@@ -109,14 +109,23 @@
     <p>plot tSNE</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotTsne</span>(<span class='no'>tsne</span>)</pre>
+    <pre class="usage"><span class='fu'>plotTsne</span>(<span class='no'>tsne</span>, <span class='kw'>path.metadata</span> <span class='kw'>=</span> <span class='st'>"example_files/example_metadata.csv"</span>,
+  <span class='kw'>sample.name.column</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>label.name.column</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>color.column</span> <span class='kw'>=</span> <span class='fl'>3</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>tsne</th>
-      <td><p>tsne from tsneFromStates (or Rtsne::Rtsne)</p></td>
+      <td><p>deepTsne S4 from tsneFromStates</p></td>
+    </tr>
+    <tr>
+      <th>path.metadata</th>
+      <td><p>file used for coloring</p></td>
+    </tr>
+    <tr>
+      <th>sample.name.column</th>
+      <td><p>colun in metadata file that holds the sample name</p></td>
     </tr>
     </table>
 

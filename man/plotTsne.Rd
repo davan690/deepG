@@ -4,10 +4,15 @@
 \alias{plotTsne}
 \title{plot tSNE}
 \usage{
-plotTsne(tsne)
+plotTsne(tsne, path.metadata = "example_files/example_metadata.csv",
+  sample.name.column = 1, label.name.column = 2, color.column = 3)
 }
 \arguments{
-\item{tsne}{tsne from tsneFromStates (or Rtsne::Rtsne)}
+\item{tsne}{deepTsne S4 from tsneFromStates}
+
+\item{path.metadata}{file used for coloring}
+
+\item{sample.name.column}{colun in metadata file that holds the sample name}
 }
 \description{
 plot tSNE
