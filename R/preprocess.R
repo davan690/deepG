@@ -296,7 +296,7 @@ fastaFileGenerator <- function(corpus.dir,
         )
       )
     x.batch <-
-      preprocessed$X[batch.start:batch.end, , ]# dim shoiuld be (batch_size, length, words)
+      preprocessed$X[batch.start:batch.end, , ]# dim should be (batch_size, length, words)
     y.batch <-
       preprocessed$Y[batch.start:batch.end,] #  # dim should be (batch_size, words)
     # return the file
