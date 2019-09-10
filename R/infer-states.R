@@ -91,6 +91,7 @@ getStatesFromFasta <- function(model.path = "example_files/dummy_model_cpu.hdf5"
   batch.start <- 1
   batch.end <- batch.start + batch.size
   states <- NULL
+  states <- list()
   while (batch.start < nrow(preprocessed$X)) {
     if ((batch.start + batch.size) > nrow(preprocessed$X)) {
       if (verbose)
@@ -109,11 +110,12 @@ getStatesFromFasta <- function(model.path = "example_files/dummy_model_cpu.hdf5"
         ))
     x.batch <-
       preprocessed$X[batch.start:batch.end, , ] # dim shoiuld be (batch_size, length, words)
-    states <- rbind(states, keras::predict_on_batch(model, x.batch))
+    states[[batch.num]] <- keras::predict_on_batch(model, x.batch)
     # update batch index
     batch.num <- batch.num + 1 
     batch.start <- batch.end + 1
     batch.end <- batch.start + batch.size
   }
-  return(states)
+  states.matrix <- do.call(rbind, states)
+  return(states.matrix)
 }
