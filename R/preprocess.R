@@ -74,8 +74,8 @@ preprocessSemiRedundant <- function(char,
       sort()
   }
   
-  if (verbose)
-    print(sprintf("corpus length: %d", xt))
+  #if (verbose)
+  #  print(sprintf("corpus length: %d", xt))
   
   if (missing(vocabulary)) {
     vocabulary <- text %>%
@@ -296,9 +296,9 @@ fastaFileGenerator <- function(corpus.dir,
         )
       )
     x.batch <-
-      preprocessed$X[batch.start:batch.end, , ]# dim should be (batch_size, length, words)
+      preprocessed$X[batch.start:batch.end, , ]# dim should be (batch_size, maxlen, words)
     y.batch <-
-      preprocessed$Y[batch.start:batch.end,] #  # dim should be (batch_size, words)
+      preprocessed$Y[batch.start:batch.end,]   # dim should be (batch_size, words)
     # return the file
     list(x.batch, y.batch)
   }
