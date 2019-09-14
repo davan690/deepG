@@ -63,24 +63,17 @@ getStates <- function(model.path,
 
 #' Get cell states from a fasta file
 #'
-#' @param model.path path to keras model in hdf5 format
+#' @param model keras model
 #' @param fasta.path path to fasta file
 #' @param maxlen time steps to unroll for
 #' @param batch.size how many subsequences are predicted in parallel
 #' @param verbose print output
 #' @export
-getStatesFromFasta <- function(model.path = "example_files/dummy_model_cpu.hdf5",
-                      fasta.path = "example_files/fasta/a.fasta",
+getStatesFromFasta <- function(model = NULL,
+                               fasta.path = "example_files/fasta/a.fasta",
                       maxlen = 80,
                       batch.size = 100,
                       verbose = T){
-  if (verbose)
-    message("load model...")
-  # prepare model    
-  model <- keras::load_model_hdf5(model.path)
-  # Remove the last 2 layers
-  keras::pop_layer(model)
-  keras::pop_layer(model)
   if (verbose)
     message("preprocess...")  
   # prepare fasta
