@@ -4,8 +4,8 @@
 \alias{plotTsne}
 \title{plot tSNE}
 \usage{
-plotTsne(tsne, path.metadata = "example_files/example_metadata.csv",
-  sample.name.column = 1, label.name.column = 2, color.column = 3)
+plotTsne(tsne, path.metadata = NULL, sample.name.column = 1,
+  label.name.column = 2, color.column = 3)
 }
 \arguments{
 \item{tsne}{deepTsne S4 from tsneFromStates}
@@ -13,6 +13,10 @@ plotTsne(tsne, path.metadata = "example_files/example_metadata.csv",
 \item{path.metadata}{file used for coloring}
 
 \item{sample.name.column}{colun in metadata file that holds the sample name}
+
+\item{label.name.column}{column that holds the label name in path.metadata}
+
+\item{color.column}{column that holds the color information in path.metadata}
 }
 \description{
 plot tSNE

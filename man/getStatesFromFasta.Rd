@@ -4,12 +4,12 @@
 \alias{getStatesFromFasta}
 \title{Get cell states from a fasta file}
 \usage{
-getStatesFromFasta(model.path = "example_files/dummy_model_cpu.hdf5",
+getStatesFromFasta(model = NULL,
   fasta.path = "example_files/fasta/a.fasta", maxlen = 80,
   batch.size = 100, verbose = T)
 }
 \arguments{
-\item{model.path}{path to keras model in hdf5 format}
+\item{model}{keras model}
 
 \item{fasta.path}{path to fasta file}
 

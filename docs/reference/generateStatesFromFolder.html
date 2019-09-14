@@ -115,7 +115,9 @@ it is expected that the length of each fasta file is equal</p>
     </div>
 
     <pre class="usage"><span class='fu'>generateStatesFromFolder</span>(<span class='kw'>fasta.folder</span> <span class='kw'>=</span> <span class='st'>"example_files/fasta"</span>,
-  <span class='kw'>model.path</span> <span class='kw'>=</span> <span class='st'>"example_files/dummy_model_cpu.hdf5"</span>)</pre>
+  <span class='kw'>model.path</span> <span class='kw'>=</span> <span class='st'>"example_files/dummy_model_cpu.hdf5"</span>, <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>80</span>,
+  <span class='kw'>batch.size</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>F</span>, <span class='kw'>save.path</span> <span class='kw'>=</span> <span class='st'>"states.csv"</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>T</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -129,8 +131,24 @@ it is expected that the length of each fasta file is equal</p>
       <td><p>path to model file</p></td>
     </tr>
     <tr>
-      <th>use.names</th>
-      <td><p>save id of fasta header</p></td>
+      <th>maxlen</th>
+      <td><p>length of semi-redundant chunks</p></td>
+    </tr>
+    <tr>
+      <th>batch.size</th>
+      <td><p>how many chunks are predicted in parallel</p></td>
+    </tr>
+    <tr>
+      <th>save</th>
+      <td><p>if TRUE, output will be written to file</p></td>
+    </tr>
+    <tr>
+      <th>save.path</th>
+      <td><p>if save is TRUE, specifies output file path where states will be appended to</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>write outut to screen</p></td>
     </tr>
     </table>
 

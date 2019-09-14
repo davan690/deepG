@@ -109,8 +109,8 @@
     <p>plot tSNE</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotTsne</span>(<span class='no'>tsne</span>, <span class='kw'>path.metadata</span> <span class='kw'>=</span> <span class='st'>"example_files/example_metadata.csv"</span>,
-  <span class='kw'>sample.name.column</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>label.name.column</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>color.column</span> <span class='kw'>=</span> <span class='fl'>3</span>)</pre>
+    <pre class="usage"><span class='fu'>plotTsne</span>(<span class='no'>tsne</span>, <span class='kw'>path.metadata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>sample.name.column</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>label.name.column</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>color.column</span> <span class='kw'>=</span> <span class='fl'>3</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -126,6 +126,14 @@
     <tr>
       <th>sample.name.column</th>
       <td><p>colun in metadata file that holds the sample name</p></td>
+    </tr>
+    <tr>
+      <th>label.name.column</th>
+      <td><p>column that holds the label name in path.metadata</p></td>
+    </tr>
+    <tr>
+      <th>color.column</th>
+      <td><p>column that holds the color information in path.metadata</p></td>
     </tr>
     </table>
 
