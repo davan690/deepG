@@ -25,7 +25,7 @@ generateStatesFromFolder <- function(fasta.folder = "example_files/fasta",
   
   for (file in files) {
     message(paste("processing: ", file))
-    states <- getStatesFromFasta(model = model,
+    states <- deepG::getStatesFromFasta(model = model,
                                  fasta.path = file, 
                               batch.size = batch.size,
                               maxlen = maxlen,
