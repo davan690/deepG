@@ -6,14 +6,28 @@
 #' @param use.names save id of fasta header
 #' @export
 generateStatesFromFolder <- function(fasta.folder = "example_files/fasta",
-                                    model.path = "example_files/dummy_model_cpu.hdf5"){
+                                    model.path = "example_files/dummy_model_cpu.hdf5",
+                                    maxlen = 80,
+                                    save = F,
+                                    save.path = "states.csv",
+                                    verbose = T){
   files <- list.files(fasta.folder, full.names = T)
   states.list <- list()
   for (file in files) {
     message(paste("processing: ", file))
-    states.list[[tools::file_path_sans_ext(basename(file))]] <-  deepG::getStatesFromFasta(fasta.path = file, 
-                                                      model.path = model.path,
-                                                      verbose = F)
+    states <- deepG::getStatesFromFasta(fasta.path = file, 
+                              model.path = model.path,
+                              batch.size = 500,
+                              maxlen = 100,
+                              verbose = T)
+
+    if (save) {
+      write.table(states, file = save.path, append = T, quote = F, col.names = F)
+      message(paste("saved states to", save.path))
+    } else {
+      # keep in memory
+      states.list[[tools::file_path_sans_ext(basename(file))]] <- states
+    }
   }
   return(states.list)
 }
@@ -57,21 +71,31 @@ tsneFromStates <- function(states.list,
 #' @param tsne deepTsne S4 from tsneFromStates
 #' @param path.metadata file used for coloring
 #' @param sample.name.column colun in metadata file that holds the sample name
+#' @param label.name.column column that holds the label name in path.metadata
+#' @param color.column column that holds the color information in path.metadata
 #' @param 
 #' @export
 plotTsne <- function(tsne,
-                     path.metadata = "example_files/example_metadata.csv",
+                     path.metadata = NULL,
                      sample.name.column = 1,
                      label.name.column = 2,
                      color.column = 3){
-  meta <- read.csv2(path.metadata, header = F, stringsAsFactors = F)
-  colors <- meta[match(tsne$ids, meta[,sample.name.column]),][,color.column]
-  labels <- meta[match(tsne$ids, meta[,sample.name.column]),][,label.name.column]
-  tsne.df <- data.frame(x = tsne$tsne$Y[,1],
-                        y = tsne$tsne$Y[,2],
-                        labels = labels,
-                        col = colors, stringsAsFactors = F)
-  p <- ggplot2::ggplot(tsne.df, ggplot2::aes(x = x, y = y, color = labels)) + ggplot2::geom_point()
+  if (!is.null(path.metadata)) {
+    meta <- read.csv2(path.metadata, header = F, stringsAsFactors = F)
+    colors <- meta[match(tsne$ids, meta[,sample.name.column]),][,color.column]
+    labels <- meta[match(tsne$ids, meta[,sample.name.column]),][,label.name.column]
+    tsne.df <- data.frame(x = tsne$tsne$Y[,1],
+                          y = tsne$tsne$Y[,2],
+                          labels = labels,
+                          col = colors, stringsAsFactors = F)
+    p <- ggplot2::ggplot(tsne.df, ggplot2::aes(x = x, y = y, color = labels))
+  } else {
+    tsne.df <- data.frame(x = tsne$tsne$Y[,1],
+                          y = tsne$tsne$Y[,2],
+                          stringsAsFactors = F)
+    p <- ggplot2::ggplot(tsne.df, ggplot2::aes(x = x, y = y)) 
+  }
+  p <- p + ggplot2::geom_point()
   p <- p + ggplot2::theme_bw()
   return(p)
 }
