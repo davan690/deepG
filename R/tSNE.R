@@ -6,41 +6,60 @@
 #' @param maxlen length of semi-redundant chunks
 #' @param batch.size how many chunks are predicted in parallel
 #' @param save if TRUE, output will be written to file
-#' @param save.path if save is TRUE, specifies output file path where states will be appended to
+#' @param output.folder path to output folder with tailing "/"
 #' @param verbose write outut to screen
+#' @param exact keep exact values and dont round
 #' @export
-generateStatesFromFolder <- function(fasta.folder = "example_files/fasta",
-                                    model.path = "example_files/dummy_model_cpu.hdf5",
-                                    maxlen = 80,
-                                    batch.size = 500,
-                                    save = F,
-                                    save.path = "states.csv",
-                                    verbose = T){
-  files <- list.files(fasta.folder, full.names = T)
-  states.list <- list()
-  model <- keras::load_model_hdf5(model.path)
-  # Remove the last 2 layers
-  keras::pop_layer(model)
-  keras::pop_layer(model)
-  
-  for (file in files) {
-    message(paste("processing: ", file))
-    states <- deepG::getStatesFromFasta(model = model,
-                                 fasta.path = file, 
-                              batch.size = batch.size,
-                              maxlen = maxlen,
-                              verbose = T)
-
-    if (save) {
-      write.table(states, file = save.path, append = T, quote = F, col.names = F)
-      message(paste("saved states to", save.path))
-    } else {
-      # keep in memory
-      states.list[[tools::file_path_sans_ext(basename(file))]] <- states
-      return(states.list)
+generateStatesFromFolder <-
+  function(fasta.folder = "example_files/fasta",
+           model.path = "example_files/dummy_model_cpu.hdf5",
+           maxlen = 80,
+           batch.size = 500,
+           save = F,
+           output.folder = "example_files/states/",
+           verbose = T,
+           exact = F) {
+    files <- list.files(fasta.folder, full.names = T)
+    states.list <- list()
+    model <- keras::load_model_hdf5(model.path)
+    # Remove the last 2 layers
+    keras::pop_layer(model)
+    keras::pop_layer(model)
+    for (file in files) {
+      message(paste("processing: ", file))
+      states <- deepG::getStatesFromFasta(
+        model = model,
+        fasta.path = file,
+        batch.size = batch.size,
+        maxlen = maxlen,
+        verbose = T
+      )
+      states <- round(states, digits = 3)
+      if (save) {
+        write.table(
+          states,
+          file = paste0(
+            output.folder,
+            basename(tools::file_path_sans_ext(file)),
+            ".csv"
+          ),
+          quote = F,
+          col.names = F
+        )
+        message(paste("saved states to", paste0(
+          output.folder,
+          basename(tools::file_path_sans_ext(file)),
+          ".csv"
+        )))
+        states.list <- NULL
+      } else {
+        # keep in memory
+        states.list[[tools::file_path_sans_ext(basename(file))]] <-
+          states
+      }
     }
+    return(states.list)
   }
-}
 
 #' run the tSNE on a cell from the states.list, return list which contains the output of the Rtsne and the sample ids
 #'
@@ -59,51 +78,65 @@ tsneFromStates <- function(states.list,
                            max_iter = 1000) {
   dim <- c(dim(data.frame(states.list[[1]]))[1],
            dim(data.frame(states.list[[1]]))[2],
-           length(states.list)) # should be 920 512 6 on example  
+           length(states.list)) # should be 920 512 6 on example
   states.array <- array(as.numeric(unlist(states.list)),
                         dim = dim)
   if (flatten) {
-    states <- t(do.call('rbind',lapply(1:dim(states.array)[3],
-                                       function(x) cbind(states.array[x,,], t = x)))) # bring 3dim array to 2D
+    states <- t(do.call('rbind', lapply(1:dim(states.array)[3],
+                                        function(x)
+                                          cbind(states.array[x, , ], t = x)))) # bring 3dim array to 2D
   } else {
-    states <- t(states.array[,cell.number,])
+    states <- t(states.array[, cell.number, ])
   }
-  tsne <- Rtsne::Rtsne(states, dims = 2,
-                       perplexity = perplexity,
-                       check_duplicates = FALSE,
-                       pca = pca,
-                       max_iter = max_iter)
+  tsne <- Rtsne::Rtsne(
+    states,
+    dims = 2,
+    perplexity = perplexity,
+    check_duplicates = FALSE,
+    pca = pca,
+    max_iter = max_iter
+  )
   return(list("ids" =  names(states.list), "tsne" = tsne))
 }
 
 #' plot tSNE
-#' 
+#'
 #' @param tsne deepTsne S4 from tsneFromStates
 #' @param path.metadata file used for coloring
 #' @param sample.name.column colun in metadata file that holds the sample name
 #' @param label.name.column column that holds the label name in path.metadata
 #' @param color.column column that holds the color information in path.metadata
-#' @param 
+#' @param
 #' @export
 plotTsne <- function(tsne,
                      path.metadata = NULL,
                      sample.name.column = 1,
                      label.name.column = 2,
-                     color.column = 3){
+                     color.column = 3) {
   if (!is.null(path.metadata)) {
-    meta <- read.csv2(path.metadata, header = F, stringsAsFactors = F)
-    colors <- meta[match(tsne$ids, meta[,sample.name.column]),][,color.column]
-    labels <- meta[match(tsne$ids, meta[,sample.name.column]),][,label.name.column]
-    tsne.df <- data.frame(x = tsne$tsne$Y[,1],
-                          y = tsne$tsne$Y[,2],
-                          labels = labels,
-                          col = colors, stringsAsFactors = F)
-    p <- ggplot2::ggplot(tsne.df, ggplot2::aes(x = x, y = y, color = labels))
+    meta <- read.csv2(path.metadata,
+                      header = F,
+                      stringsAsFactors = F)
+    colors <-
+      meta[match(tsne$ids, meta[, sample.name.column]), ][, color.column]
+    labels <-
+      meta[match(tsne$ids, meta[, sample.name.column]), ][, label.name.column]
+    tsne.df <- data.frame(
+      x = tsne$tsne$Y[, 1],
+      y = tsne$tsne$Y[, 2],
+      labels = labels,
+      col = colors,
+      stringsAsFactors = F
+    )
+    p <-
+      ggplot2::ggplot(tsne.df, ggplot2::aes(x = x, y = y, color = labels))
   } else {
-    tsne.df <- data.frame(x = tsne$tsne$Y[,1],
-                          y = tsne$tsne$Y[,2],
-                          stringsAsFactors = F)
-    p <- ggplot2::ggplot(tsne.df, ggplot2::aes(x = x, y = y)) 
+    tsne.df <- data.frame(
+      x = tsne$tsne$Y[, 1],
+      y = tsne$tsne$Y[, 2],
+      stringsAsFactors = F
+    )
+    p <- ggplot2::ggplot(tsne.df, ggplot2::aes(x = x, y = y))
   }
   p <- p + ggplot2::geom_point()
   p <- p + ggplot2::theme_bw()
