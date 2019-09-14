@@ -3,22 +3,32 @@
 #'
 #' @param fasta.folder path to fasta folder
 #' @param model.path path to model file
-#' @param use.names save id of fasta header
+#' @param maxlen length of semi-redundant chunks
+#' @param batch.size how many chunks are predicted in parallel
+#' @param save if TRUE, output will be written to file
+#' @param save.path if save is TRUE, specifies output file path where states will be appended to
+#' @param verbose write outut to screen
 #' @export
 generateStatesFromFolder <- function(fasta.folder = "example_files/fasta",
                                     model.path = "example_files/dummy_model_cpu.hdf5",
                                     maxlen = 80,
+                                    batch.size = 500,
                                     save = F,
                                     save.path = "states.csv",
                                     verbose = T){
   files <- list.files(fasta.folder, full.names = T)
   states.list <- list()
+  model <- keras::load_model_hdf5(model.path)
+  # Remove the last 2 layers
+  keras::pop_layer(model)
+  keras::pop_layer(model)
+  
   for (file in files) {
     message(paste("processing: ", file))
-    states <- deepG::getStatesFromFasta(fasta.path = file, 
-                              model.path = model.path,
-                              batch.size = 500,
-                              maxlen = 100,
+    states <- getStatesFromFasta(model = model,
+                                 fasta.path = file, 
+                              batch.size = batch.size,
+                              maxlen = maxlen,
                               verbose = T)
 
     if (save) {
@@ -27,9 +37,9 @@ generateStatesFromFolder <- function(fasta.folder = "example_files/fasta",
     } else {
       # keep in memory
       states.list[[tools::file_path_sans_ext(basename(file))]] <- states
+      return(states.list)
     }
   }
-  return(states.list)
 }
 
 #' run the tSNE on a cell from the states.list, return list which contains the output of the Rtsne and the sample ids
