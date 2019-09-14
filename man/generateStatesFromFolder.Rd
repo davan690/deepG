@@ -7,8 +7,8 @@ it is expected that the length of each fasta file is equal}
 \usage{
 generateStatesFromFolder(fasta.folder = "example_files/fasta",
   model.path = "example_files/dummy_model_cpu.hdf5", maxlen = 80,
-  batch.size = 500, save = F, save.path = "states.csv",
-  verbose = T)
+  batch.size = 500, save = F,
+  output.folder = "example_files/states/", verbose = T, exact = F)
 }
 \arguments{
 \item{fasta.folder}{path to fasta folder}
@@ -21,9 +21,11 @@ generateStatesFromFolder(fasta.folder = "example_files/fasta",
 
 \item{save}{if TRUE, output will be written to file}
 
-\item{save.path}{if save is TRUE, specifies output file path where states will be appended to}
+\item{output.folder}{path to output folder with tailing "/"}
 
 \item{verbose}{write outut to screen}
+
+\item{exact}{keep exact values and dont round}
 }
 \description{
 generate states list for tSNE from a fasta folder
