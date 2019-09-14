@@ -7,7 +7,7 @@ it is expected that the length of each fasta file is equal}
 \usage{
 generateStatesFromFolder(fasta.folder = "example_files/fasta",
   model.path = "example_files/dummy_model_cpu.hdf5", maxlen = 80,
-  batch.size = 500, save = F,
+  batch.size = 500, save = T,
   output.folder = "example_files/states/", verbose = T, exact = F)
 }
 \arguments{
