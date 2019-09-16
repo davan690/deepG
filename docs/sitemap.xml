@@ -16,6 +16,9 @@
     <loc>https://hiddengenome.github.io/deepG//reference/end_gpu_session.html</loc>
   </url>
   <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/extractCellFromStates.html</loc>
+  </url>
+  <url>
     <loc>https://hiddengenome.github.io/deepG//reference/fastaFileGenerator.html</loc>
   </url>
   <url>
@@ -56,9 +59,6 @@
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/trainNetwork.html</loc>
-  </url>
-  <url>
-    <loc>https://hiddengenome.github.io/deepG//reference/tsneFromStates.html</loc>
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/writeDict.html</loc>
