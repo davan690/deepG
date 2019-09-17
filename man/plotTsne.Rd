@@ -4,7 +4,7 @@
 \alias{plotTsne}
 \title{generate and plot tSNE}
 \usage{
-plotTsne(states, perplexity = c(0.1, 1), pca = TRUE, max_iter = 1000,
+plotTsne(states, perplexity = c(0.5, 1), pca = TRUE, max_iter = 1000,
   path.metadata = NULL, sample.name.column = 1,
   label.name.column = 2, color.column = 3, out.path = "tsne.pdf")
 }
