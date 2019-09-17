@@ -69,30 +69,40 @@ generateStatesFromFolder <-
 #' @param flatten if true, all cells will be used
 #' @export
 extractCellFromStates <- function(states.list = NULL,
-                           states.folder = "example_files/states",
-                           cell.number = 2,
-                           flatten = FALSE,
-                           perplexity = 1,
-                           pca = TRUE,
-                           max_iter = 1000) {
+                                  states.folder = "example_files/states",
+                                  cell.number = 2,
+                                  flatten = FALSE) {
   # if states.folder is set, no flatten option is implemented currently
   if (!is.null(states.folder)) {
-    message("extracting cell number from state files")
+    message(paste("extracting cell number from", length(list.files(states.folder, full.names = TRUE)), "state files"))
     # read in the individual files and join them together, keep track of file names for later reference
     states.list <- list()
     files <- list.files(states.folder, full.names = TRUE)
-    for (file in files) {
-      # reads in file, extracts one column form that (neuron) and saves this to the list
-    dat <- read.table(file, sep = " ", header = F)
-    states.list[[tools::file_path_sans_ext(basename(file))]] <- dat[, cell.number]
-    dim <- c(dim(data.frame(states.list[[1]]))[1],
-             length(states.list)) # should be 920 6 on example dataset
-    states.array <- array(as.numeric(unlist(states.list)),
-                          dim = dim)
-    states <- t(states.array)
+    if (!flatten) {
+      for (file in files) {
+        # reads in file, extracts one column form that (neuron) and saves this to the list
+        dat <- read.table(file, sep = " ", header = F)
+        dat$V1 <- NULL # first column is the position
+        states.list[[tools::file_path_sans_ext(basename(file))]] <- dat[, cell.number]
+      }
+      dim <- c(dim(data.frame(states.list[[1]]))[1],
+               length(states.list)) # should be 920 6 on example dataset
+      states.array <- array(as.numeric(unlist(states.list)),
+                            dim = dim)
+      states <- t(states.array)
+    } else {
+      for (file in files) {
+        # flatten, so use all cells
+        dat <- read.table(file, sep = " ", header = F)
+        dat$V1 <- NULL # first column is the position
+        states.list[[tools::file_path_sans_ext(basename(file))]] <- as.vector(t(dat)) # bring 2dim array to 1D vector
+      }
+      dim <- c(dim(data.frame(states.list[[1]]))[1],
+               length(states.list)) # should be 920 6 on example dataset
+      states.array <- array(as.numeric(unlist(states.list)),
+                            dim = dim)
+      states <- t(states.array)
     }
-    if (flatten) stop("flatten ist not supported if states are supplied as states.folder")
-    
   } else { 
     dim <- c(dim(data.frame(states.list[[1]]))[1],
              dim(data.frame(states.list[[1]]))[2],
@@ -125,7 +135,7 @@ extractCellFromStates <- function(states.list = NULL,
 #' @param
 #' @export
 plotTsne <- function(states,
-                     perplexity = c(0.1, 1),
+                     perplexity = c(0.5, 1),
                      pca = TRUE,
                      max_iter = 1000,
                      path.metadata = NULL,
@@ -140,7 +150,7 @@ plotTsne <- function(states,
     tsne <- Rtsne::Rtsne(
       states$states,
       dims = 2,
-      perplexity = perplexity,
+      perplexity = perplexity[i],
       check_duplicates = FALSE,
       pca = pca,
       max_iter = max_iter
@@ -173,6 +183,7 @@ plotTsne <- function(states,
     }
     p <- p + ggplot2::geom_point()
     p <- p + ggplot2::theme_bw()
+    p <- p + ggplot2::ggtitle(paste("perplexity:", perplexity[i]))
     print(p)
   }
   dev.off()
