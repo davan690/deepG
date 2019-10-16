@@ -89,7 +89,7 @@ preprocessSemiRedundant <- function(char,
   if (verbose)
     print("generation of semi-redundant sequences ...")
   if (is.null(labels)) {
-    dataset <- purrr::map(seq(1, length(text) - maxlen - 1, by = 1),
+    dataset <- purrr::map(seq(1, length(text) - maxlen , by = 1),
                           ~ list(sentece = text[.x:(.x + maxlen - 1)],
                                  next_char = text[.x + maxlen]))
     dataset <- purrr::transpose(dataset)
@@ -115,7 +115,7 @@ preprocessSemiRedundant <- function(char,
     }
     } else {
       # use labels
-      dataset <- purrr::map(seq(1, length(text) - maxlen - 1, by = 1),
+      dataset <- purrr::map(seq(1, length(text) - maxlen , by = 1),
                             ~ list(sentece = text[.x:(.x + maxlen - 1)],
                                    label = text.labels[.x + maxlen]))
       dataset <- purrr::transpose(dataset)
