@@ -29,9 +29,9 @@ test_that("generating semi-redundant chunks", {
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2)$X,"array")
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y,"matrix")
   
-  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[1], 8)
-  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[2], 4)
-  expect_equivalent(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y, c(0,0,1,0))
+  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[1], 16)
+  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[2], 8)
+  expect_equivalent(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y, matrix(c(0,0,1,0,0,0,0,1), byrow = TRUE, nrow = 2))           
   expect_equivalent(length(preprocessSemiRedundant(char="abcd", maxlen = 2)),2)
   
   expect_error(preprocessSemiRedundant(char = "abcd", maxlen = ""))
