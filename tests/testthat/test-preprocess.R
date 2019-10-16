@@ -18,8 +18,7 @@ test_that("correct vocabulary extraction", {
   
   expect_is(getVocabulary("abc"),"character")
   
-  expect_output(getVocabulary("abc", verbose = T))
-  
+  expect_message(getVocabulary("abc", verbose = T))
   expect_silent(getVocabulary("abc"))
 })
 
@@ -30,6 +29,7 @@ test_that("generating semi-redundant chunks", {
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y,"matrix")
   
   expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[1], 16)
+  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2, vocabulary = c("a","b","c","d")))[1], 16)
   expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[2], 8)
   expect_equivalent(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y, matrix(c(0,0,1,0,0,0,0,1), byrow = TRUE, nrow = 2))           
   expect_equivalent(length(preprocessSemiRedundant(char="abcd", maxlen = 2)),2)
@@ -39,8 +39,7 @@ test_that("generating semi-redundant chunks", {
   expect_error(preprocessSemiRedundant(char = "abcd", vocabulary = ""))
   expect_error(preprocessSemiRedundant(char = "abcd", vocabulary = 0))
   
-  expect_output(preprocessSemiRedundant(char = "abcd", maxlen = 2, verbose = T))
-  
+  expect_message(preprocessSemiRedundant(char = "abcd", maxlen = 2, verbose = T))
   expect_silent(preprocessSemiRedundant(char = "abcd", maxlen = 2))
 
   expect_type(preprocessSemiRedundant(char = "abcd", maxlen = 2)$X, "double")
@@ -97,7 +96,6 @@ test_that("checking the generator for the Fasta files", {
   expect_is(gen()[[2]],"matrix")
   
   expect_message(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen,verbose = T))
-  
   expect_silent(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen))
   
   expect_type(gen()[[1]], "double")
