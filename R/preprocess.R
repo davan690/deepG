@@ -347,7 +347,7 @@ fastaFileGenerator_2 <- function(corpus.dir,
   function() {
     iter <- 1
     batch_row <- 1
-    while(batch_row < batch.size) {  
+    while(batch_row <= batch.size) {  
       
       # loop through files until sequence of suitable length is found   
       while(end_index > length_current_seq){
