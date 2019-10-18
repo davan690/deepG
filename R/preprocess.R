@@ -303,3 +303,86 @@ fastaFileGenerator <- function(corpus.dir,
     list(x.batch, y.batch)
   }
 }
+
+
+#' custom generator for fasta files, will produce chunks in size of batch.size
+#' by iterating over the input files. 
+#' @param corpus.dir input directory where .fasta files are located
+#' @param format file format
+#' @param batch.size number of samples  
+#' @param maxlen length of one sample 
+#' @param step how often to take a new sample 
+#' @param random_range range of random step sizes
+#' @param random whether to take random steps
+#' @param max_iter stop after max_iter number of iterations failed to produce new sample 
+#' @export
+
+fastaFileGenerator_2 <- function(corpus.dir,
+                                 format = "fasta",
+                                 batch.size = 50,
+                                 maxlen = 250,
+                                 step = 1,
+                                 random_range = c(1:10),
+                                 random = FALSE,
+                                 max_iter = 100){
+  fasta.files <- list.files(
+    path = xfun::normalize_path(corpus.dir),
+    pattern = paste0("*.", format),
+    full.names = TRUE
+  )
+  
+  next.file <- 1
+  start_index <- 1
+  end_index <- start_index + maxlen
+  random_step <- 0
+  X<-array(0, dim = c(batch.size, maxlen, 5)) # TODO: last dimension
+  Y<-array(0, dim = c(batch.size, 5))         # should not be hard coded (?)
+  
+  # pre-load the first file
+  file <- fasta.files[[1]]
+  fasta.file <- Biostrings::readDNAStringSet(file)
+  seq <- paste0(paste(fasta.file, collapse = "\n"),"\n")  # TODO: ask Philipp: should seq end with \n
+  length_current_seq <- nchar(seq)
+  
+  function() {
+    iter <- 1
+    batch_row <- 1
+    while(batch_row < batch.size) {  
+      
+      # loop through files until sequence of suitable length is found   
+      while(end_index > length_current_seq){
+        next.file <<- next.file + 1 
+        if (next.file > length(fasta.files)){next.file <<- 1}
+        file <- fasta.files[[next.file]]
+        fasta.file <- Biostrings::readDNAStringSet(path)
+        seq <- paste0(paste(fasta.file, collapse = "\n"),"\n") 
+        length_current_seq <- nchar(seq)
+        if (random) random_step <- sample(random_range, 1)
+        start_index <- 1 + random_step
+        end_index <- start_index + maxlen
+        if(iter > max_iter){
+          stop('exceeded max_iter value, try reducing maxlen parameter')
+          break
+        }
+        iter <- iter + 1
+      }
+      
+      sub_seq <- strsplit(seq,"")[[1]][start_index:end_index]
+      prePro <- preprocessSemiRedundant(stringr::str_c(sub_seq, collapse=""), maxlen = maxlen, vocabulary = c("\n", "a", "c", "g", "t"))
+      X[batch_row, ,] <- prePro[[1]]
+      Y[batch_row,] <- prePro[[2]]
+      batch_row <- batch_row + 1
+      
+      if (random){
+        random_step <- sample(random_range, 1)
+        start_index <- start_index + random_step 
+        end_index <- start_index + maxlen 
+      } else {
+        start_index <-start_index + step 
+        end_index <- start_index + maxlen 
+      }
+    }
+    list(X, Y)
+  }
+}
+
