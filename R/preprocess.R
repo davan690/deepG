@@ -348,13 +348,13 @@ fastaFileGenerator_2 <- function(corpus.dir,
     iter <- 1
     batch_row <- 1
     while(batch_row <= batch.size) {  
-      
+      end_index <- start_index + maxlen 
       # loop through files until sequence of suitable length is found   
       while(end_index > length_current_seq){
         next.file <<- next.file + 1 
         if (next.file > length(fasta.files)){next.file <<- 1}
-        file <- fasta.files[[next.file]]
-        fasta.file <- Biostrings::readDNAStringSet(path)
+        file <<- fasta.files[[next.file]]
+        fasta.file <- Biostrings::readDNAStringSet(file)
         seq <- paste0(paste(fasta.file, collapse = "\n"),"\n") 
         length_current_seq <- nchar(seq)
         if (random) random_step <- sample(random_range, 1)
@@ -375,11 +375,9 @@ fastaFileGenerator_2 <- function(corpus.dir,
       
       if (random){
         random_step <- sample(random_range, 1)
-        start_index <- start_index + random_step 
-        end_index <- start_index + maxlen 
+        start_index <<- start_index + random_step 
       } else {
-        start_index <-start_index + step 
-        end_index <- start_index + maxlen 
+        start_index <<-start_index + step 
       }
     }
     list(X, Y)
