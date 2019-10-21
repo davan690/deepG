@@ -1,20 +1,18 @@
 #' Returns the vocabulary from character string
 #'
-#' Use this function with a character string
+#' Use this function with a character string.
 #'
-#' @param char a character string of text with the length of one
+#' @param char Character string of text with the length of one
 #' @param verbose TRUE/FALSE
 #' @export
 getVocabulary <- function(char, verbose = F) {
-  library(dplyr)
+  
   stopifnot(!is.null(char))
   stopifnot(nchar(char) > 0)
   
-  vocabulary <-  char %>%  stringr::str_to_lower() %>%
-    stringr::str_c(collapse = "\n") %>%
-    tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE) %>%
-    unique() %>%
-    sort()
+  vocabulary <- sort(unique(tokenizers::tokenize_characters(
+    stringr::str_c(stringr::str_to_lower(char),collapse = "\n"), strip_non_alphanum = FALSE, simplify = TRUE)))
+
   if (verbose)
     message("The vocabulary:", vocabulary)
   return(vocabulary)
@@ -31,10 +29,10 @@ getVocabulary <- function(char, verbose = F) {
 #' X(3): CDEFG and Y(3): H;
 #' X(4): DEFGH and Y(4): I
 #' 
-#' @param char a character input string of text with the length of one
-#' @param labels a character string of same length as char with character as labels
-#' @param maxlen length of the semi-redundant sequences
-#' @param vocabulary char contains the vocabulary from the input char, it should be sorted
+#' @param char Character input string of text with the length of one
+#' @param labels Character string of same length as char with character as labels
+#' @param maxlen Length of the semi-redundant sequences
+#' @param vocabulary Char contains the vocabulary from the input char, it should be sorted.
 #' If no vocabulary exists, it is generated from the input char
 #' @param verbose TRUE/FALSE
 #' @example preprocessSemiRedudant("abcd",labels=NULL,maxlen=2,verbose=F)
@@ -44,34 +42,27 @@ preprocessSemiRedundant <- function(char,
                                     maxlen = 250,
                                     vocabulary,
                                     verbose = F) {
-  require(dplyr)
   
   stopifnot(!is.null(char))
   stopifnot(nchar(char) > 0)
   stopifnot(maxlen > 0)
   
   # Load, collapse, and tokenize text ("ACGT" -> "a" "c" "g" "t")
-  text <- char %>%
-    stringr::str_to_lower() %>%
-    stringr::str_c(collapse = "\n") %>%
-    tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
+  text <- tokenizers::tokenize_characters(stringr::str_c(stringr::str_to_lower(char), collapse = "\n"), strip_non_alphanum = FALSE, simplify = TRUE)
   
   if (!is.null(labels)) {
-    text.labels <- labels %>%
-      stringr::str_c(collapse = "\n") %>%
-      tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
-    text.labels.vocabulary <- text.labels %>%
-      unique() %>%
-      sort()
+    text.labels <-
+      tokenizers::tokenize_characters(stringr::str_c(labels, collapse = "\n"), strip_non_alphanum = FALSE, simplify = TRUE)
+    text.labels.vocabulary <- sort(unique(text.labels))
   }
-  
-  if (verbose)
-    message("Finding the vocabulary ...")
   
   # Generating vocabulary from input char with the function getVocabulary()
   if (missing(vocabulary)) {
+    if (verbose)
+      message("Finding the vocabulary ...")
     vocabulary <- getVocabulary(char)
   }
+  
   if(verbose)
     message("Vocabulary size:", length(vocabulary))
   # Cut the text in semi-redundant sequences of maxlen characters
@@ -139,9 +130,10 @@ preprocessSemiRedundant <- function(char,
 #' 
 #' It called on the genomic contents of one
 #' FASTA file. Multiple entries are combined with newline characters.
-#' @param path path to the FASTA file
-#' @param maxlen length of the semi-redundant sequences
-#' @param vocabulary char contains the vocabulary
+#' @param path Path to the FASTA file
+#' @param maxlen Length of the semi-redundant sequences
+#' @param vocabulary Char contains the vocabulary from the input char, it should be sorted.
+#' If no vocabulary exists, it is generated from the input char
 #' @param verbose TRUE/FALSE
 #' @export
 preprocessFasta <- function(path,
@@ -159,6 +151,8 @@ preprocessFasta <- function(path,
   fasta.file <- Biostrings::readDNAStringSet(path)
   seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
   
+  if(verbose)
+    message("Preprocessing the data ...")
   if (is.null(labels)){
   seq.processed <-
     preprocessSemiRedundant(char = seq, maxlen = maxlen, vocabulary = vocabulary,
@@ -175,16 +169,18 @@ preprocessFasta <- function(path,
 #' 
 #' Do one full preprocessing iteration to the FASTA file to figure out what the observed
 #' steps_per_epoch value is.
-#' @param dir 
-#' @param batch.size
-#' @param maxlen
-#' @param format
+#' @param dir Input directory where .fasta files are located
+#' @param batch.size Number of samples  
+#' @param maxlen Length of the semi-redundant sequences
+#' @param format File format
+#' @param verbose TRUE/FALSE
 #' @export
 calculateStepsPerEpoch <-
   function(dir,
            batch.size = 256,
            maxlen = 250,
-           format = "fasta") {
+           format = "fasta",
+           verbose = F) {
     library(xfun)
     library(Biostrings)
     steps.per.epoch <- 0
@@ -209,11 +205,11 @@ calculateStepsPerEpoch <-
 #' batch.size, batch size will be reduced to the maximal size. So the last batch
 #' of a file is usually smaller.
 #' See <https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R>
-#' @param corpus.dir input directory where .fasta files are located
-#' @param labels.dir
-#' @param format
-#' @param batch.size
-#' @param maxlen
+#' @param corpus.dir Input directory where .fasta files are located
+#' @param labels.dir Input directory where .fasta files with the labels are located
+#' @param format File format
+#' @param batch.size Number of samples  
+#' @param maxlen Length of the semi-redundant sequences
 #' @param verbose TRUE/FALSE
 #' @export
 fastaFileGenerator <- function(corpus.dir,

@@ -1,6 +1,6 @@
 context("preprocess")
 
-test_that("correct vocabulary extraction", {
+test_that("Correct vocabulary extraction", {
   
   expect_equal(getVocabulary("ABC"), c("a", "b", "c"))
   expect_equal(getVocabulary("CBA"), c("a", "b", "c"))
@@ -22,7 +22,7 @@ test_that("correct vocabulary extraction", {
   expect_silent(getVocabulary("abc"))
 })
 
-test_that("generating semi-redundant chunks", {
+test_that("Generating semi-redundant chunks", {
   
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2),"list")
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2)$X,"array")
@@ -46,9 +46,9 @@ test_that("generating semi-redundant chunks", {
   expect_type(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y, "double")
 })
 
-test_that("generating semi-redundant chunks from Fasta files", {
+test_that("Generating semi-redundant chunks from Fasta files", {
   
-  file = file.path("fasta/a.fasta")
+  file <- file.path("fasta/a.fasta")
   
   expect_is(preprocessFasta(file),"list")
   expect_is(preprocessFasta(file)$X,"array")
@@ -66,13 +66,13 @@ test_that("generating semi-redundant chunks from Fasta files", {
   expect_type(preprocessFasta(file)$Y, "double")
 })
 
-test_that("calculating steps per epoch", {
+test_that("Calculating steps per epoch", {
   
   expect_error(calculateStepsPerEpoch())
 
 })
 
-test_that("checking the generator for the Fasta files", {
+test_that("Checking the generator for the Fasta files", {
   
   testpath <- file.path("fasta/")
   batch.size = 80
@@ -101,3 +101,33 @@ test_that("checking the generator for the Fasta files", {
   expect_type(gen()[[1]], "double")
   expect_type(gen()[[2]], "double")
 })
+
+# test_that("Checking the generator for the Fasta files_2", {
+#   
+#   testpath <- file.path("fasta/")
+#   batch.size = 80
+#   maxlen = 50
+#   words = 5
+#   gen <- fastaFileGenerator_2(testpath, batch.size = batch.size, maxlen = maxlen)
+#   
+#   expect_equivalent(dim(gen()[[1]])[1], batch.size)
+#   expect_equivalent(dim(gen()[[1]])[2], maxlen)
+#   expect_equivalent(dim(gen()[[1]])[3], words)
+#   expect_equivalent(dim(gen()[[2]])[1], batch.size)
+#   expect_equivalent(dim(gen()[[2]])[2], words)
+#   expect_equivalent(length(gen()),2)
+#   
+#   expect_error(fastaFileGenerator_2())
+#   expect_error(fastaFileGenerator_2(""))
+#   
+#   expect_is(fastaFileGenerator_2(testpath),"function")
+#   expect_is(gen(),"list")
+#   expect_is(gen()[[1]], "array")
+#   expect_is(gen()[[2]],"matrix")
+#   
+#   #expect_message(fastaFileGenerator_2(testpath, batch.size = batch.size, maxlen = maxlen,verbose = T))
+#   expect_silent(fastaFileGenerator_2(testpath, batch.size = batch.size, maxlen = maxlen))
+#   
+#   expect_type(gen()[[1]], "double")
+#   expect_type(gen()[[2]], "double")
+# })
