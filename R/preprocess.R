@@ -304,6 +304,33 @@ fastaFileGenerator <- function(corpus.dir,
   }
 }
 
+#' Helper function to fastaFileGenerator_2
+#' @param sequence_vector vector containing character sequences of the same length 
+#' @param maxlen must be length of a character sequence in sequence_vector -1
+#' @export
+#' 
+#' Returns one hot encoding for every sequence  
+#' For example: sequence_vector[1]=c("acatg") leads to
+#' X[1,,] = (0 1 0 0 0  
+#'           0 0 1 0 0
+#'           0 1 0 0 0
+#'           0 0 0 0 1)
+#' Y[1,] =  (0 0 0 1 0)            
+
+sequencesToOneHot <- function(sequence_vector, vocabulary = c("\n", "a", "c", "g", "t"), maxlen){
+  x <- array(0, dim = c(length(sequence_vector) , maxlen, length(vocabulary)))
+  y <- array(0, dim = c(length(sequence_vector) , length(vocabulary)))
+  tokenizer <- keras::text_tokenizer(char_level = TRUE, lower = TRUE) %>%  fit_text_tokenizer(vocabulary) 
+  sequences <- keras::texts_to_sequences(tokenizer, sequence_vector) 
+  adjustment_vector <- c((0:(maxlen-1))*length(vocabulary))
+  for (i in 1:length(sequences)) {
+    v <- rep(0, maxlen*length(vocabulary))
+    v[sequences[[i]][1:maxlen] + adjustment_vector] <- 1L 
+    x[i, ,] <- matrix(v, nrow =  maxlen, byrow = TRUE)  
+    y[i, sequences[[i]][maxlen+1]] <- 1L
+  }
+  list(X = x ,Y = y)
+}
 
 #' custom generator for fasta files, will produce chunks in size of batch.size
 #' by iterating over the input files. 
@@ -319,7 +346,7 @@ fastaFileGenerator <- function(corpus.dir,
 
 fastaFileGenerator_2 <- function(corpus.dir,
                                  format = "fasta",
-                                 batch.size = 50,
+                                 batch.size = 512,
                                  maxlen = 250,
                                  step = 1,
                                  random_range = c(1:10),
@@ -335,14 +362,14 @@ fastaFileGenerator_2 <- function(corpus.dir,
   start_index <- 1
   end_index <- start_index + maxlen
   random_step <- 0
-  X<-array(0, dim = c(batch.size, maxlen, 5)) # TODO: last dimension
-  Y<-array(0, dim = c(batch.size, 5))         # should not be hard coded (?)
+  sequence_vector <- vector("character", length = batch.size)
   
   # pre-load the first file
   file <- fasta.files[[1]]
   fasta.file <- Biostrings::readDNAStringSet(file)
-  seq <- paste0(paste(fasta.file, collapse = "\n"),"\n")  # TODO: ask Philipp: should seq end with \n
+  seq <- paste0(paste(fasta.file, collapse = "\n"),"\n")  
   length_current_seq <- nchar(seq)
+  seq_split <- strsplit(seq,"")[[1]]
   
   function() {
     iter <- 1
@@ -356,9 +383,10 @@ fastaFileGenerator_2 <- function(corpus.dir,
         file <<- fasta.files[[next.file]]
         fasta.file <- Biostrings::readDNAStringSet(file)
         seq <- paste0(paste(fasta.file, collapse = "\n"),"\n") 
+        seq_split <<- strsplit(seq,"")[[1]]
         length_current_seq <- nchar(seq)
-        if (random) random_step <- sample(random_range, 1)
-        start_index <- 1 + random_step
+        if (random) random_step <<- sample(random_range, 1)
+        start_index <<- 1 + random_step
         end_index <- start_index + maxlen
         if(iter > max_iter){
           stop('exceeded max_iter value, try reducing maxlen parameter')
@@ -367,20 +395,17 @@ fastaFileGenerator_2 <- function(corpus.dir,
         iter <- iter + 1
       }
       
-      sub_seq <- strsplit(seq,"")[[1]][start_index:end_index]
-      prePro <- preprocessSemiRedundant(stringr::str_c(sub_seq, collapse=""), maxlen = maxlen, vocabulary = c("\n", "a", "c", "g", "t"))
-      X[batch_row, ,] <- prePro[[1]]
-      Y[batch_row,] <- prePro[[2]]
+      sub_seq <- seq_split[start_index:end_index]
+      sequence_vector[batch_row] <- stringr::str_c(sub_seq, collapse="")
       batch_row <- batch_row + 1
       
       if (random){
-        random_step <- sample(random_range, 1)
+        random_step <<- sample(random_range, 1)
         start_index <<- start_index + random_step 
       } else {
         start_index <<-start_index + step 
       }
     }
-    list(X, Y)
+    sequencesToOneHot(sequence_vector, maxlen = maxlen)
   }
 }
-
