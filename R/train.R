@@ -30,10 +30,6 @@
 #' @param patience Number of epochs waiting for decrease in loss before reducing learningrate
 #' @param cooldown Number of epochs without changing learningrate
 #' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
-#' @examples 
-#' data("parenthesis")
-#' preprocessed <- deepG::preprocessSemiRedundant(substr(parenthesis, 1, 100), maxlen = 30)
-#' hello <- trainNetwork(dataset = preprocessed, vocabulary.size = 7, batch.size = 10, maxlen = maxlen, layers.lstm = 2, layer.size = 10)
 #' @export
 trainNetwork <- function(path,
                          dataset,
