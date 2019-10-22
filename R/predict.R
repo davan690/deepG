@@ -95,7 +95,7 @@ replaceChar <- function(sequence,
     seed <- substr(sequence,
                    next_position - model$input_shape[[2]] - 1,
                    next_position - 1)
-    prediction <- predict_next_nucleotide(seed, model, vocabulary)
+    prediction <- predictNextNucleotide(seed, model, vocabulary)
     sequence <- paste0(prediction@solution,
                        substr(sequence, next_position + 1,
                               nchar(sequence)))
