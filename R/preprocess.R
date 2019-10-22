@@ -318,6 +318,7 @@ fastaFileGenerator <- function(corpus.dir,
 #' Y[1,] =  (0 0 0 1 0)            
 
 sequencesToOneHot <- function(sequence_vector, vocabulary = c("\n", "a", "c", "g", "t"), maxlen){
+  library(keras)
   x <- array(0, dim = c(length(sequence_vector) , maxlen, length(vocabulary)))
   y <- array(0, dim = c(length(sequence_vector) , length(vocabulary)))
   tokenizer <- keras::text_tokenizer(char_level = TRUE, lower = TRUE) %>%  keras::fit_text_tokenizer(vocabulary) 
