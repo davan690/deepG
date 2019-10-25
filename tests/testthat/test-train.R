@@ -1,6 +1,6 @@
 context("training")
 
-test_that("Sucessful training", {
+test_that("Sucessful training from a dummy model", {
  data("parenthesis")
  maxlen <- 30
  batch.size <- 10
@@ -21,14 +21,13 @@ test_that("Sucessful training", {
  expect_error(trainNetwork(dataset = preprocessed, batch.size  = 1))
  expect_error(trainNetwork(dataset = "", path = ""))
 
- 
  trainedNetwork <- trainNetwork(dataset = preprocessed,
                                 vocabulary.size = 7,
                                 batch.size = batch.size,
                                 maxlen = maxlen,
                                 layers.lstm = 2,
                                 layer.size = 10,
-                                epochs = 10)
+                                epochs = 1)
 
  expect_type(trainedNetwork, "list")
  expect_equal(length(trainedNetwork),2)
@@ -40,7 +39,7 @@ test_that("Sucessful training", {
  expect_type(trainedNetwork[[1]][["batch_size"]],"integer")
  expect_equal(trainedNetwork[[1]][["batch_size"]],10)
  expect_type(trainedNetwork[[1]][["epochs"]],"integer")
- expect_equal(trainedNetwork[[1]][["epochs"]],10)
+ expect_equal(trainedNetwork[[1]][["epochs"]],1)
  expect_type(trainedNetwork[[1]][["metrics"]],"character")
  expect_equal(trainedNetwork[[1]][["metrics"]],c("loss","val_loss"))
 
