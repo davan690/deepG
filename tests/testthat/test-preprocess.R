@@ -81,10 +81,10 @@ test_that("checking the generator for the Fasta files", {
   words = 5
   gen <- fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen)
   
-  expect_equivalent(dim(gen()[[1]])[1], batch.size+1)
+  expect_equivalent(dim(gen()[[1]])[1], batch.size)
   expect_equivalent(dim(gen()[[1]])[2], maxlen)
   expect_equivalent(dim(gen()[[1]])[3], words)
-  expect_equivalent(dim(gen()[[2]])[1], batch.size+1)
+  expect_equivalent(dim(gen()[[2]])[1], batch.size)
   expect_equivalent(dim(gen()[[2]])[2], words)
   expect_equivalent(length(gen()),2)
   
@@ -100,6 +100,6 @@ test_that("checking the generator for the Fasta files", {
   
   expect_silent(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen))
   
-  expect_type(gen()[[1]], "double")
-  expect_type(gen()[[2]], "double")
+  expect_type(gen()[[1]], "integer")
+  expect_type(gen()[[2]], "integer")
 })
