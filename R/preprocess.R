@@ -251,7 +251,7 @@ fastaFileGenerator <- function(corpus.dir,
                                maxlen = 250,
                                max_iter = 20,
                                vocabulary = c("\n", "a", "c", "g", "t"),
-                               verbose = TRUE){
+                               verbose = FALSE){
   
   fasta.files <- list.files(
     path = xfun::normalize_path(corpus.dir),
@@ -271,10 +271,10 @@ fastaFileGenerator <- function(corpus.dir,
   length_current_seq <- nchar(seq)
   
   # information data frame
-  if (verbose) {info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), used_full_file=logical(),
+  if (verbose) info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), used_full_file=logical(),
                                      stringsAsFactors = FALSE)
-      message("initializing")
-  }              
+  if (verbose) message("initializing")
+                
   function() {
     start_time <- Sys.time()
     iter <- 1
