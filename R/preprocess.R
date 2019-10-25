@@ -271,9 +271,10 @@ fastaFileGenerator <- function(corpus.dir,
   length_current_seq <- nchar(seq)
   
   # information data frame
-  if (verbose) info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), used_full_file=logical(),
+  if (verbose) {info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), used_full_file=logical(),
                                      stringsAsFactors = FALSE)
-  
+      message("initializing")
+  }              
   function() {
     start_time <- Sys.time()
     iter <- 1
