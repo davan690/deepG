@@ -227,10 +227,11 @@ trainNetwork <- function(path,
             separator = ";",
             append = TRUE
           ),
-          callback_tensorboard(paste0(tensorboard.log, run.name),
-                               write_grads = T, write_images = T, 
-                               update_freq = "epoch",
-                               write_graph = T, histogram_freq = 1)
+          callback_tensorboard(paste0(tensorboard.log, run.name), 
+                               histogram_freq = 1,
+                               write_graph = F,
+                               write_images = T,
+                               embeddings_freq = 1)
         )
       )
   } else {
