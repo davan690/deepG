@@ -21,5 +21,13 @@ NULL
 .globals$tensorboard <- NULL
 
 .onLoad <- function(libname, pkgname) {
-  message("The deepG package has been successfully. Please see ?deepG for informations.")
+  ensure.loaded()
+  print.tf.version()
+  
+  message("The deepG package has been successfully loaded. Please see ?deepG for informations or the Wiki to get startet https://github.com/hiddengenome/deepG/wiki")
+  
+  if (gpu.available()) {
+    message("To use GPUs, please run startGPUSession()")
+  }
+  
 }
