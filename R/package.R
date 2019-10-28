@@ -21,13 +21,18 @@ NULL
 .globals$tensorboard <- NULL
 
 .onLoad <- function(libname, pkgname) {
-  ensure.loaded()
-  print.tf.version()
   
+ # ensure.loaded() this breaks travis evaluation, enable as soon TF is running in travis
+
   message("The deepG package has been successfully loaded. Please see ?deepG for informations or the Wiki to get startet https://github.com/hiddengenome/deepG/wiki")
-  
-  if (gpu.available()) {
+
+  # check for GPU support
+  if (is.gpu.available() & is.cuda.build()) {
     message("To use GPUs, please run startGPUSession()")
+  } else if (is.gpu.available() & !is.cuda.build()) {
+    message("GPUs are available, but Tensorflow is not supporting CUDA, please see Wiki (ttps://github.com/hiddengenome/deepG/wiki) for installation instructions") else {
+      message("GPUs not found - deepG runs without GPU support!")
+    }
   }
   
 }
