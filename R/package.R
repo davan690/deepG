@@ -30,9 +30,8 @@ NULL
   if (is.gpu.available() & is.cuda.build()) {
     message("To use GPUs, please run startGPUSession()")
   } else if (is.gpu.available() & !is.cuda.build()) {
-    message("GPUs are available, but Tensorflow is not supporting CUDA, please see Wiki (ttps://github.com/hiddengenome/deepG/wiki) for installation instructions") else {
+    message("GPUs are available, but Tensorflow is not supporting CUDA, please see Wiki (ttps://github.com/hiddengenome/deepG/wiki) for installation instructions")
+    } else {
       message("GPUs not found - deepG runs without GPU support!")
     }
   }
-  
-}
