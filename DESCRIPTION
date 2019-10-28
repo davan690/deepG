@@ -9,6 +9,10 @@ Authors@R: c(
 Maintainer: Philipp Muench <pmu15@helmholtz-hzi.de>
 Description: deepG is a R library that contains a collection of scripts required for model generation and model analysis.
 License: AGPL_3 + file LICENSE
+SystemRequirements: TensorFlow (https://www.tensorflow.org/)
+URL: https://github.com/hiddengenome/deepg
+BugReports: https://github.com/hiddengenome/deepg/issues
+LazyData: true
 Depends:
     R (>= 3.4.0)
 Imports:
@@ -19,7 +23,6 @@ Imports:
     purrr,
     tokenizers,
     readr,
-    tfruns,
     tm,
     magrittr,
     dplyr,
@@ -27,8 +30,7 @@ Imports:
     ArgumentCheck,
     hdf5r,
     xfun,
-    Biostrings,
-    Rtsne
+    Biostrings
 biocViews:
     Biostrings
 NeedsCompilation: yes
