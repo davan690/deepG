@@ -60,7 +60,7 @@ trainNetwork <- function(path,
                          patience = 5,
                          cooldown = 5,
                          steps.per.epoch = "auto",
-                         tensorboard.log = "scratch/tensorboard/") {
+                         tensorboard.log = "/scratch/tensorboard/") {
   library(dplyr)
   library(keras)
   library(magrittr)
