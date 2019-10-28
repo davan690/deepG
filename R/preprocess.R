@@ -325,7 +325,11 @@ fastaFileGenerator <- function(corpus.dir,
       }
     }
     end_time <- Sys.time()
-    if (verbose) cat("\n", "running time:", end_time - start_time, "\n") 
+    if (verbose){
+      cat("running time:", end_time - start_time, "\n") 
+      obj_size <- format(object.size(list(x,y)),  units = "auto")
+      cat("batch size:", obj_size)
+    }  
     list(X = x, Y = y)
   }
 }
