@@ -328,7 +328,7 @@ fastaFileGenerator <- function(corpus.dir,
     if (verbose){
       cat("running time:", end_time - start_time, "\n") 
       obj_size <- format(object.size(list(x,y)),  units = "auto")
-      cat("batch size:", obj_size)
+      cat("batch size:", obj_size, "\n")
     }  
     list(X = x, Y = y)
   }
