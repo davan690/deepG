@@ -21,6 +21,5 @@ NULL
 .globals$tensorboard <- NULL
 
 .onLoad <- function(libname, pkgname) {
-  ensure_loaded()
   message("The deepG package has been successfully. Please see ?deepG for informations.")
 }
