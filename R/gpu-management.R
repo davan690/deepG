@@ -25,12 +25,22 @@ list.local.devices <- function(){
   message(tensorflow::tf$python$client$device_lib$list_local_devices())
 }
 
-gpu.available <- function() {
-  check <- tensorflow::tf$python$test$is_gpu_available()
-  if (check) {
-    message("GPUs found!") 
-  } else {
-    message("No GPUs found!")
-  }
-  return(check)
+is.gpu.available <- function() {
+  res <- tryCatch({
+    tensorflow::tf$test$is_gpu_available()
+  }, error = function(e) {
+    warning("Can not determine if GPU is configured.", call. = FALSE);
+    NA
+  })
+  res
+}
+
+is.cuda.build <- function() {
+  res <- tryCatch({
+    tensorflow::tf$test$is_built_with_cuda()
+  }, error = function(e) {
+    warning("Can not determine if TF is build with CUDA", call. = FALSE);
+    NA
+  })
+  res
 }
