@@ -58,3 +58,7 @@ messagef <- function (..., .newline = TRUE)
 {
   message(sprintf(...), appendLF = .newline)
 }
+
+ensure_loaded <- function() {
+  invisible(tf$`__version__`)
+}
