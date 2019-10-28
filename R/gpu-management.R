@@ -1,13 +1,16 @@
 #' Limit Tensorflow proccess to one or multiple GPUs.
 #'
 #' @param gpus GPU ids
+#' @param growth memory consumption of GPU grows and will not be blocked
 #' @export
-startGPUSession <- function(gpus = "0"){
+startGPUSession <- function(gpus = "0", growth = T){
   require(tensorflow)
   tf$reset_default_graph()
   sess_config <- list()
   Sys.setenv(CUDA_VISIBLE_DEVICES = gpus)
   sess_config$device_count <- list(GPU = 1L, CPU = 1L)
+  if (growth)
+    sess_config$gpu_options <- tf$GPUOptions(allow_growth = TRUE)
   session_conf <- do.call(tf$ConfigProto, sess_config)
   sess <- tf$Session(graph = tf$get_default_graph(), config = session_conf)
   sess$run(tf$global_variables_initializer())
