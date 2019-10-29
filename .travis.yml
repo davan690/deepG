@@ -12,7 +12,6 @@ addons:
     - libtool
     - subversion
     - libmagick++-dev
-    - python3-setuptools
 env:
   global:
   - PKG_CFLAGS="-pedantic"
@@ -36,7 +35,8 @@ before_install:
 - "./travis_setup.sh"
 - R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr', 'tensorflow'))"
 before_script:
-- sudo easy_install3 pip
+- sudo apt-get install python3-setuptools
+  sudo apt-get easy_install3 pip
 - R -e "tensorflow::install_tensorflow(version = '1.14', method = 'virtualenv')"
 - R -e 'tensorflow::tf_config()'
 - R --no-save <<< 'pkgload::load_all(); devtools::document()'
