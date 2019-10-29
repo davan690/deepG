@@ -14,7 +14,7 @@ predictNextNucleotide <- function(sequence,
   
   stopifnot(!missing(sequence))
   stopifnot(!missing(model))
-  stopifnot(nchar(sequnce > model$input_shape[2]))
+  stopifnot(nchar(sequence) >= model$input_shape[2])
   
   require(keras)
   require(dplyr)
@@ -72,7 +72,7 @@ replaceChar <- function(sequence,
   
   stopifnot(!missing(sequence))
   stopifnot(!missing(model))
-  stopifnot(nchar(sequnce > model$input_shape[2]))
+  stopifnot(nchar(sequence) >= model$input_shape[2])
 
   while (str_detect(sequence, char)) {
     # get the position

@@ -1,19 +1,19 @@
 context("predict")
 
 test_that("Prediction of next character", {
-  #example.model <-
-  #  keras::load_model_hdf5("example_model.hdf5") # model requires length of 30 char
+  example.model <-
+    keras::load_model_hdf5("example_model.hdf5") # model requires length of 30 char
   expect_error(predictNextNucleotide())
-  expect_error(predictNextNucleotide(sequence = "", model = NULL))
-  #expect_s4_class(predictNextNucleotide(strrep("A", 30),
-  #                                      example.model), "prediction")
+  expect_error(predictNextNucleotide(sequence = ""))
+  expect_error(predictNextNucleotide(model = ""))
+  #expect_type(predictNextNucleotide(sequence = strrep("A", 30), model = example.model),"S4")
 })
 
 test_that("Prediction of replacement of n characters", {
-  #example.model <-
-  #  keras::load_model_hdf5("example_model.hdf5") # model requires length of 30 char
+  example.model <-
+    keras::load_model_hdf5("example_model.hdf5")
   expect_error(replaceChar())
-  expect_error(replaceChar(sequence = "", model = NULL))
-  #expect_type(replaceChar(strrep("A", 30),
-   #                       example.model), "character")
+  expect_error(replaceChar(sequence = "", model = ""))
+  #expect_type(replaceChar(sequence = strrep("A", 30), model = 
+   #                         example.model), "character")
 })

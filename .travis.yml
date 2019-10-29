@@ -33,8 +33,12 @@ matrix:
 before_install:
 - chmod +x travis_setup.sh
 - "./travis_setup.sh"
-- R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr'))"
+- R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr','keras', 'tensorflow'))"
 before_script:
+- sudo apt-get install python3 python3-pip
+- pip3 install --upgrade --ignore-installed --user travis virtualenv
+- R -e 'keras::install_keras(tensorflow = "1.12")'
+- R -e 'tensorflow::tf_config()'
 - R --no-save <<< 'pkgload::load_all(); devtools::document()'
 after_success:
 - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE"
