@@ -36,7 +36,6 @@ before_install:
 - "./travis_setup.sh"
 - R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr', 'tensorflow'))"
 before_script:
-- python -m pip install --user virtualenv
 - R -e "tensorflow::install_tensorflow(version = '1.14', method = 'virtualenv')"
 - R -e 'tensorflow::tf_config()'
 - R --no-save <<< 'pkgload::load_all(); devtools::document()'
