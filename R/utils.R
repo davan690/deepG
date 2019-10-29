@@ -58,3 +58,14 @@ messagef <- function (..., .newline = TRUE)
 {
   message(sprintf(...), appendLF = .newline)
 }
+
+#' prints TF version
+#'
+#' @export
+print.tf.version <- function() {
+  message(paste("Tensoflow", tensorflow::tf$`__version__`, "found."))
+}
+
+ensure.loaded <- function() {
+  invisible(tensorflow::tf$`__version__`)
+}

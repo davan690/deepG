@@ -13,6 +13,9 @@
     <loc>https://hiddengenome.github.io/deepG//reference/crispr_sample.html</loc>
   </url>
   <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/deepG.html</loc>
+  </url>
+  <url>
     <loc>https://hiddengenome.github.io/deepG//reference/end_gpu_session.html</loc>
   </url>
   <url>
@@ -50,6 +53,9 @@
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/preprocessSemiRedundant.html</loc>
+  </url>
+  <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/print.tf.version.html</loc>
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/replaceChar.html</loc>
