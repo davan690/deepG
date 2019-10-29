@@ -258,6 +258,8 @@ fastaFileGenerator <- function(corpus.dir,
     pattern = paste0("*.", format),
     full.names = TRUE)
   
+  if (verbose) file_list <- list.files(corpus.dir)     
+  
   next.file <- 1
   start_index <- 1
   sequence_vector <- vector("character")
@@ -302,8 +304,8 @@ fastaFileGenerator <- function(corpus.dir,
       # go to end of file or stop when enough samples are collected 
       end_index <- min(start_index + maxlen + (batch.size - num_samples) - 1,
                        length_current_seq)
-      # TODO: use only ending of filename (?)
-      if (verbose) info_df[num_files_used,] <- c(file, start_index, end_index, (start_index==1 & end_index==length_current_seq))
+    
+      if (verbose) info_df[num_files_used,] <- c(file_list[next.file], start_index, end_index, (start_index==1 & end_index==length_current_seq))
       sub_seq <- substr(seq, start_index, end_index)
       sequence_vector[num_files_used] <- sub_seq
       length_sub_seq <- nchar(sub_seq)
