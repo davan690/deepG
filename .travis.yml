@@ -31,12 +31,12 @@ matrix:
     env: HDF5_VERSION=1.10.1
   fast_finish: true
 before_install:
-- chmod +x travis_setup.sh
-- "./travis_setup.sh"
-- R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr', 'tensorflow'))"
+  - sudo apt-get install python3-setuptools
+  - sudo apt-get easy_install3 pip
+  - chmod +x travis_setup.sh
+  - "./travis_setup.sh"
+  - R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr', 'tensorflow'))"
 before_script:
-- sudo apt-get install python3-setuptools
-  sudo apt-get easy_install3 pip
 - R -e "tensorflow::install_tensorflow(version = '1.14', method = 'virtualenv')"
 - R -e 'tensorflow::tf_config()'
 - R --no-save <<< 'pkgload::load_all(); devtools::document()'
