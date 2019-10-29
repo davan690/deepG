@@ -3,8 +3,14 @@
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then # use homebrew version
   brew update
   brew install hdf5
+  brew install python
+  sudo easy_install pip
   echo "brew install finished"
 else # install from source
+  # pip
+  sudo apt-get install python3-setuptools
+  sudo easy_install3 pip
+  # hdf5
   cd ..
   wget "$HDF5_RELEASE_URL/hdf5-${HDF5_VERSION%.*}/hdf5-$HDF5_VERSION/src/hdf5-$HDF5_VERSION.tar.gz"
   tar -xzf "hdf5-$HDF5_VERSION.tar.gz"

@@ -31,8 +31,6 @@ matrix:
     env: HDF5_VERSION=1.10.1
   fast_finish: true
 before_install:
-  - sudo apt-get install python3-setuptools
-  - sudo apt-get easy_install3 pip
   - chmod +x travis_setup.sh
   - "./travis_setup.sh"
   - R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr', 'tensorflow'))"
