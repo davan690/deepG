@@ -11,6 +11,7 @@
 #' @import reticulate
 #' @import keras
 #' @import tensorflow
+#' @import dplyr
 #'
 #' @docType package
 #' @name deepG
@@ -22,7 +23,7 @@ NULL
 
 .onLoad <- function(libname, pkgname) {
   
- # ensure.loaded() this breaks travis evaluation, enable as soon TF is running in travis
+ ensure.loaded()
 
   message("The deepG package has been successfully loaded. Please see ?deepG for informations or the Wiki to get startet https://github.com/hiddengenome/deepG/wiki")
 
