@@ -12,10 +12,7 @@ addons:
     - libtool
     - subversion
     - libmagick++-dev
-    - python3-dev
-    - python3-pip
-    - python3-virtualenv
-    - python3-venv
+    
 env:
   global:
   - PKG_CFLAGS="-pedantic"
@@ -39,8 +36,8 @@ before_install:
 - "./travis_setup.sh"
 - R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr', 'tensorflow'))"
 before_script:
-- python3 -m pip install --upgrade --ignore-installed --user travis virtualenv
-- R -e "tensorflow::install_tensorflow(version = '1.14')"
+- python -m pip install --user virtualenv
+- R -e "tensorflow::install_tensorflow(version = '1.14', method = 'virtualenv')"
 - R -e 'tensorflow::tf_config()'
 - R --no-save <<< 'pkgload::load_all(); devtools::document()'
 after_success:
