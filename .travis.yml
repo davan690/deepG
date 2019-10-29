@@ -12,7 +12,8 @@ addons:
     - libtool
     - subversion
     - libmagick++-dev
-    
+install:
+  - sudo easy_install3 pip
 env:
   global:
   - PKG_CFLAGS="-pedantic"
