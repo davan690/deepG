@@ -3,16 +3,26 @@
 \name{fastaFileGenerator}
 \alias{fastaFileGenerator}
 \title{custom generator for fasta files, will produce chunks in size of batch.size
-by iterating over the input files. If the input file is smaller than the
-batch.size, batch size will be reduced to the maximal size. So the last batch
-of a file is usually smaller.}
+by iterating over the input files.}
 \usage{
-fastaFileGenerator(corpus.dir, labels.dir, format = "fasta",
-  batch.size = 512, maxlen = 250, verbose = F)
+fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 512,
+  maxlen = 250, max_iter = 20, vocabulary = c("\\n", "a", "c", "g",
+  "t"), verbose = FALSE)
 }
 \arguments{
-\item{directory}{input directory where .fasta files are located}
+\item{corpus.dir}{input directory where .fasta files are located}
+
+\item{format}{file format}
+
+\item{batch.size}{number of samples}
+
+\item{maxlen}{length of one sample}
+
+\item{max_iter}{stop after max_iter number of iterations failed to produce new sample}
+
+\item{verbose}{TRUE/FALSE show information about files and running time}
 }
 \description{
-see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R
+custom generator for fasta files, will produce chunks in size of batch.size
+by iterating over the input files.
 }
