@@ -4,10 +4,12 @@
 \alias{startGPUSession}
 \title{Limit Tensorflow proccess to one or multiple GPUs.}
 \usage{
-startGPUSession(gpus = "0")
+startGPUSession(gpus = "0", growth = T)
 }
 \arguments{
 \item{gpus}{GPU ids}
+
+\item{growth}{memory consumption of GPU grows and will not be blocked}
 }
 \description{
 Limit Tensorflow proccess to one or multiple GPUs.
