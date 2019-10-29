@@ -12,6 +12,7 @@ addons:
     - libtool
     - subversion
     - libmagick++-dev
+    - python3-setuptools
 install:
   - sudo easy_install3 pip
 env:
