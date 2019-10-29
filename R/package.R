@@ -11,6 +11,7 @@
 #' @import reticulate
 #' @import keras
 #' @import tensorflow
+#' @import dplyr
 #'
 #' @docType package
 #' @name deepG
@@ -21,5 +22,17 @@ NULL
 .globals$tensorboard <- NULL
 
 .onLoad <- function(libname, pkgname) {
-  message("The deepG package has been successfully. Please see ?deepG for informations.")
-}
+  
+ ensure.loaded()
+
+  message("The deepG package has been successfully loaded. Please see ?deepG for informations or the Wiki to get startet https://github.com/hiddengenome/deepG/wiki")
+
+  # check for GPU support
+  if (is.gpu.available() & is.cuda.build()) {
+    message("To use GPUs, please run startGPUSession()")
+  } else if (is.gpu.available() & !is.cuda.build()) {
+    message("GPUs are available, but Tensorflow is not supporting CUDA, please see Wiki (ttps://github.com/hiddengenome/deepG/wiki) for installation instructions")
+    } else {
+      message("GPUs not found - deepG runs without GPU support!")
+    }
+  }
