@@ -203,7 +203,6 @@ calculateStepsPerEpoch <-
 #' Helper function for fastaFileGenerator
 #' @param sequence character sequence 
 #' @param maxlen length of one sample
-#' @export
 #' 
 #' Returns one hot encoding for every sequence  
 #' For example: sequence = "acatg", maxlen = 4, leads to
@@ -212,7 +211,7 @@ calculateStepsPerEpoch <-
 #'      0 1 0 0 0
 #'      0 0 0 0 1)
 #' Y = (0 0 0 1 0)       
-
+#' @export
 sequenceToArray <- function(sequence, maxlen, vocabulary = c("\n", "a", "c", "g", "t")){
   len_voc <- length(vocabulary)
   len_seq <- nchar(sequence)
@@ -244,7 +243,6 @@ sequenceToArray <- function(sequence, maxlen, vocabulary = c("\n", "a", "c", "g"
 #' @param max_iter stop after max_iter number of iterations failed to produce new sample 
 #' @param verbose TRUE/FALSE show information about files and running time  
 #' @export
-
 fastaFileGenerator <- function(corpus.dir,
                                format = "fasta",
                                batch.size = 512,
