@@ -13,6 +13,8 @@ Depends:
     R (>= 3.4.0)
 Imports:
     methods,
+    abind,
+    tensorflow,
     BiocGenerics,
     stringr,
     keras,
