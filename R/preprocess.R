@@ -219,7 +219,7 @@ sequenceToArray <- function(sequence, maxlen, vocabulary = c("\n", "a", "c", "g"
   tokenizer <- keras::fit_text_tokenizer(keras::text_tokenizer(char_level = TRUE, lower = TRUE), vocabulary) 
   sequence_int <- keras::texts_to_sequences(tokenizer, sequence) 
   seq_unlist <- sequence_int[[1]]
-  adjust <- len_voc*(seq(len_seq) - 1)
+  adjust <- len_voc*(seq(0, len_seq - 1))
   
   # every row in z one-hot encodes one character in sequence
   z[adjust + seq_unlist] <- 1L
