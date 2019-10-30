@@ -22,7 +22,6 @@ Imports:
     purrr,
     tokenizers,
     readr,
-    tfruns,
     tm,
     magrittr,
     dplyr,
