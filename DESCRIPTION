@@ -12,12 +12,13 @@ License: AGPL_3 + file LICENSE
 Depends:
     R (>= 3.4.0)
 Imports:
+    tensorflow,
+    reticulate,
+    keras,
     methods,
     abind,
-    tensorflow,
     BiocGenerics,
     stringr,
-    keras,
     purrr,
     tokenizers,
     readr,
