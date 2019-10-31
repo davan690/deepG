@@ -27,6 +27,7 @@
 #' @param epochs Number of full iterations over the dataset
 #' @param max.queue.size Queue on fit_generator()
 #' @param lr.plateau.factor Factor of decreasing learning rate when plateau is reached
+#' @param label.vocabulary.size Number of unique chars in the labels
 #' @param patience Number of epochs waiting for decrease in loss before reducing learningrate
 #' @param cooldown Number of epochs without changing learningrate
 #' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
