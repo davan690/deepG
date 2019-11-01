@@ -212,7 +212,7 @@ calculateStepsPerEpoch <-
 #'      0 0 0 0 1)
 #' Y = (0 0 0 1 0)       
 #' @export
-sequenceToArray <- function(sequence, maxlen, vocabulary = c("\n", "a", "c", "g", "t")){
+sequenceToArray <- function(sequence, maxlen, vocabulary = c("-", "|", "a", "c", "g", "t")){
   len_voc <- length(vocabulary)
   len_seq <- nchar(sequence)
   z <- array(0L, dim=c(len_seq*len_voc))  
@@ -248,7 +248,7 @@ fastaFileGenerator <- function(corpus.dir,
                                batch.size = 512,
                                maxlen = 250,
                                max_iter = 20,
-                               vocabulary = c("\n", "a", "c", "g", "t"),
+                               vocabulary = c("-", "|", "a", "c", "g", "t"),
                                verbose = FALSE){
   
   fasta.files <- list.files(
@@ -267,7 +267,7 @@ fastaFileGenerator <- function(corpus.dir,
   # pre-load the first file
   file <- fasta.files[[1]]
   fasta.file <- Biostrings::readDNAStringSet(file)
-  seq <- paste0(paste(fasta.file, collapse = "\n"),"\n")  
+  seq <- paste0(paste(fasta.file, collapse = "-"),"|")  
   length_current_seq <- nchar(seq)
   
   # information data frame
@@ -287,7 +287,7 @@ fastaFileGenerator <- function(corpus.dir,
         if (next.file > length(fasta.files)) next.file <<- 1
         file <<- fasta.files[[next.file]]
         fasta.file <- Biostrings::readDNAStringSet(file)
-        seq <- paste0(paste(fasta.file, collapse = "\n"),"\n") 
+        seq <- paste0(paste(fasta.file, collapse = "-"),"|") 
         length_current_seq <- nchar(seq)
         start_index <<- 1 
         if(iter > max_iter){
