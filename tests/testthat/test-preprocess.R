@@ -78,7 +78,7 @@ test_that("checking the generator for the Fasta files", {
   testpath <- file.path("fasta/")
   batch.size = 80
   maxlen = 50
-  words = 5
+  words = 6
   gen <- fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen)
   
   expect_equivalent(dim(gen()[[1]])[1], batch.size)
