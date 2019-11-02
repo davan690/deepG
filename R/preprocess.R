@@ -30,15 +30,13 @@ getVocabulary <- function(char, verbose = F) {
 #' X(4): DEFGH and Y(4): I
 #' 
 #' @param char Character input string of text with the length of one
-#' @param labels Character string of same length as char with character as labels
 #' @param maxlen Length of the semi-redundant sequences
 #' @param vocabulary Char contains the vocabulary from the input char, it should be sorted.
 #' If no vocabulary exists, it is generated from the input char
 #' @param verbose TRUE/FALSE
-#' @example preprocessSemiRedudant("abcd",labels=NULL,maxlen=2,verbose=F)
+#' @example preprocessSemiRedudant("abcd",maxlen=2,verbose=F)
 #' @export
 preprocessSemiRedundant <- function(char,
-                                    labels = NULL,
                                     maxlen = 250,
                                     vocabulary,
                                     verbose = F) {
@@ -49,12 +47,6 @@ preprocessSemiRedundant <- function(char,
   
   # Load, collapse, and tokenize text ("ACGT" -> "a" "c" "g" "t")
   text <- tokenizers::tokenize_characters(stringr::str_c(stringr::str_to_lower(char), collapse = "\n"), strip_non_alphanum = FALSE, simplify = TRUE)
-  
-  if (!is.null(labels)) {
-    text.labels <-
-      tokenizers::tokenize_characters(stringr::str_c(labels, collapse = "\n"), strip_non_alphanum = FALSE, simplify = TRUE)
-    text.labels.vocabulary <- sort(unique(text.labels))
-  }
   
   # Generating vocabulary from input char with the function getVocabulary()
   if (missing(vocabulary)) {
@@ -69,15 +61,16 @@ preprocessSemiRedundant <- function(char,
   
   if (verbose)
     message("Generation of semi-redundant sequences ...")
-  if (is.null(labels)) {
-    dataset <- purrr::map(seq(1, length(text) - maxlen, by = 1),
+  
+  dataset <- purrr::map(seq(1, length(text) - maxlen, by = 1),
                           ~ list(sentece = text[.x:(.x + maxlen - 1)],
                                  next_char = text[.x + maxlen]))
-    dataset <- purrr::transpose(dataset)
-    x <-
+  dataset <- purrr::transpose(dataset)
+  x <-
       array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
-    y <- array(0, dim = c(length(dataset$sentece), length(vocabulary)))
+  y <- array(0, dim = c(length(dataset$sentece), length(vocabulary)))
     # Vectorization
+  
   if (verbose)
     message("Vectorization ...")
   if (verbose)
@@ -94,34 +87,7 @@ preprocessSemiRedundant <- function(char,
       # target (next nucleotide in sequence)
       y[i,] <- as.integer(vocabulary == dataset$next_char[[i]])
     }
-    } else {
-      # use labels
-      dataset <- purrr::map(seq(1, length(text) - maxlen, by = 1),
-                            ~ list(sentece = text[.x:(.x + maxlen - 1)],
-                                   label = text.labels[.x + maxlen]))
-      dataset <- purrr::transpose(dataset)
-      
-      x <-
-        array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
-      y <- array(0, dim = c(length(dataset$sentece), length(text.labels.vocabulary)))
-      
-      # Vectorization
-      if (verbose)
-        message("Vectorization ...")
-      if (verbose)
-        pb <-  txtProgressBar(min = 0,
-                              max = length(dataset$sentece),
-                              style = 3)
-      for (i in 1:length(dataset$sentece)) {
-        if (verbose)
-          setTxtProgressBar(pb, i)
-        x[i, ,] <- sapply(vocabulary, function(x) {
-          as.integer(x == dataset$sentece[[i]])
-        })
-        y[i,] <- as.integer(text.labels.vocabulary == dataset$label[[i]])
-      }
-    }
-
+  
   results <- list("X" = x, "Y" = y)
   return(results)
 }
@@ -137,15 +103,9 @@ preprocessSemiRedundant <- function(char,
 #' @param verbose TRUE/FALSE
 #' @export
 preprocessFasta <- function(path,
-                            labels = NULL,
                             maxlen = 250,
                             vocabulary = c("\n", "a", "c", "g", "t"),
                             verbose = F) {
-  # process labels
-  if (!is.null(labels)){
-    fasta.file.labels <- Biostrings::readDNAStringSet(labels)
-    seq.labels <- paste0(paste(fasta.file.labels, collapse = "\n"), "\n")
-  } 
   
   # process corpus
   fasta.file <- Biostrings::readDNAStringSet(path)
@@ -153,50 +113,12 @@ preprocessFasta <- function(path,
   
   if(verbose)
     message("Preprocessing the data ...")
-  if (is.null(labels)){
+  
   seq.processed <-
     preprocessSemiRedundant(char = seq, maxlen = maxlen, vocabulary = vocabulary,
                             verbose = F) 
-  } else {
-    seq.processed <-
-      preprocessSemiRedundant(char = seq, labels = seq.labels, maxlen = maxlen,
-                              vocabulary = vocabulary, verbose = F) 
-  }
   return(seq.processed)
 }
-
-#' Calculate the steps per epoch
-#' 
-#' Do one full preprocessing iteration to the FASTA file to figure out what the observed
-#' steps_per_epoch value is.
-#' @param dir Input directory where .fasta files are located
-#' @param batch.size Number of samples  
-#' @param maxlen Length of the semi-redundant sequences
-#' @param format File format
-#' @param verbose TRUE/FALSE
-#' @export
-calculateStepsPerEpoch <-
-  function(dir,
-           batch.size = 256,
-           maxlen = 250,
-           format = "fasta",
-           verbose = F) {
-    library(xfun)
-    library(Biostrings)
-    steps.per.epoch <- 0
-    fasta.files <- list.files(
-      path = xfun::normalize_path(dir),
-      pattern = paste0("*.", format),
-      full.names = TRUE
-    )
-    for (file in fasta.files) {
-      fasta.file <- Biostrings::readDNAStringSet(file)
-      seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
-      steps.per.epoch <-
-        steps.per.epoch + ceiling((nchar(seq) - maxlen - 1) / batch.size)
-    }
-    return(steps.per.epoch)
-  }
 
 #' Custom generator for FASTA files
 #' 

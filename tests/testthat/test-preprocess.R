@@ -66,18 +66,12 @@ test_that("Generating semi-redundant chunks from Fasta files", {
   expect_type(preprocessFasta(file)$Y, "double")
 })
 
-test_that("Calculating steps per epoch", {
-  
-  expect_error(calculateStepsPerEpoch())
-
-})
-
 test_that("Checking the generator for the Fasta files", {
   
   testpath <- file.path("fasta/")
-  batch.size = 80
-  maxlen = 50
-  words = 5
+  batch.size <- 80
+  maxlen <- 50
+  words <- 5
   gen <- fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen)
   
   expect_equivalent(dim(gen()[[1]])[1], batch.size+1)
@@ -101,33 +95,3 @@ test_that("Checking the generator for the Fasta files", {
   expect_type(gen()[[1]], "double")
   expect_type(gen()[[2]], "double")
 })
-
-# test_that("Checking the generator for the Fasta files_2", {
-#   
-#   testpath <- file.path("fasta/")
-#   batch.size = 80
-#   maxlen = 50
-#   words = 5
-#   gen <- fastaFileGenerator_2(testpath, batch.size = batch.size, maxlen = maxlen)
-#   
-#   expect_equivalent(dim(gen()[[1]])[1], batch.size)
-#   expect_equivalent(dim(gen()[[1]])[2], maxlen)
-#   expect_equivalent(dim(gen()[[1]])[3], words)
-#   expect_equivalent(dim(gen()[[2]])[1], batch.size)
-#   expect_equivalent(dim(gen()[[2]])[2], words)
-#   expect_equivalent(length(gen()),2)
-#   
-#   expect_error(fastaFileGenerator_2())
-#   expect_error(fastaFileGenerator_2(""))
-#   
-#   expect_is(fastaFileGenerator_2(testpath),"function")
-#   expect_is(gen(),"list")
-#   expect_is(gen()[[1]], "array")
-#   expect_is(gen()[[2]],"matrix")
-#   
-#   #expect_message(fastaFileGenerator_2(testpath, batch.size = batch.size, maxlen = maxlen,verbose = T))
-#   expect_silent(fastaFileGenerator_2(testpath, batch.size = batch.size, maxlen = maxlen))
-#   
-#   expect_type(gen()[[1]], "double")
-#   expect_type(gen()[[2]], "double")
-# })
