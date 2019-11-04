@@ -1,31 +1,25 @@
-#' Predict next nucleotides in sequence output as S4 class
+#' Predict next nucleotides in sequence 
+#' 
+#' The output is a S4 class.
 #'
-#' @param sequence input sequence, length should be in sync with the model
-#' if length exceeds input.shape of model then only the right side of the
-#' sequence will be used
-#' @param model trained lstm
-#' @param vocabulary ordered vocabulary of input sequence
+#' @param sequence Input sequence, length should be in sync with the model.
+#' If length exceeds input.shape of model then only the right side of the
+#' sequence will be used.
+#' @param model Trained model from the function \code{trainNetwork()}
+#' @param vocabulary Ordered vocabulary of input sequence
 #' @export
 predictNextNucleotide <- function(sequence,
                                     model,
                                     vocabulary = c("\n", "a", "c", "g", "t")){
-  Check <- ArgumentCheck::newArgCheck()
-    if (missing(sequence))
-    stop("Need to specify sequence")
-  if (missing(model))
-    stop("Need to specify model")
-  Check <- ArgumentCheck::newArgCheck()
-  #* Add an error if sequence length is too small
-  if (nchar(sequence) < model$input_shape[2] )
-    ArgumentCheck::addError(
-      msg = paste0("'sequence' must be of length >", model$input_shape[2]),
-      argcheck = Check
-    )
-  #* Return errors and warnings (if any)
-  ArgumentCheck::finishArgCheck(Check)
+  
+  stopifnot(!missing(sequence))
+  stopifnot(!missing(model))
+  stopifnot(nchar(sequence) >= model$input_shape[2])
+  
   require(keras)
   require(dplyr)
   require(tokenizers)
+  
   setClass(Class = "prediction",
            representation(
              next_char = "character",
@@ -61,31 +55,24 @@ predictNextNucleotide <- function(sequence,
 }
 
 
-#' Replaces specific nucleotides in a sequence one by one
-#' @param sequence input sequence
-#' @param model trained lstm
-#' @param char character that will be replaced
-#' @param vocabulary ordered vocabulary of input sequence
+#' Replaces specific nucleotides in a sequence
+#' 
+#' @param sequence Input sequence, length should be in sync with the model.
+#' If length exceeds input.shape of model then only the right side of the
+#' sequence will be used.
+#' @param model Trained model from the function \code{trainNetwork()}
+#' @param char Character in the sequence that will be replaced
+#' @param vocabulary Ordered vocabulary of input sequence
 #' @export
 replaceChar <- function(sequence,
                          model,
                          char = "X",
                          vocabulary = c("\n", "a", "c", "g", "t")){
   require(stringr)
-  Check <- ArgumentCheck::newArgCheck()
-  if (missing(sequence))
-    stop("Need to specify sequence")
-  if (missing(model))
-    stop("Need to specify model")
-  Check <- ArgumentCheck::newArgCheck()
-  #* Add an error if sequence length is too small
-  if (nchar(sequence) < model$input_shape[2] )
-    ArgumentCheck::addError(
-      msg = paste0("'sequence' must be of length >", model$input_shape[2]),
-      argcheck = Check
-    )
-  #* Return errors and warnings (if any)
-  ArgumentCheck::finishArgCheck(Check)
+  
+  stopifnot(!missing(sequence))
+  stopifnot(!missing(model))
+  stopifnot(nchar(sequence) >= model$input_shape[2])
 
   while (str_detect(sequence, char)) {
     # get the position
@@ -95,7 +82,7 @@ replaceChar <- function(sequence,
     seed <- substr(sequence,
                    next_position - model$input_shape[[2]] - 1,
                    next_position - 1)
-    prediction <- predict_next_nucleotide(seed, model, vocabulary)
+    prediction <- predictNextNucleotide(seed, model, vocabulary)
     sequence <- paste0(prediction@solution,
                        substr(sequence, next_position + 1,
                               nchar(sequence)))

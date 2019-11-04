@@ -69,3 +69,36 @@ print.tf.version <- function() {
 ensure.loaded <- function() {
   invisible(tensorflow::tf$`__version__`)
 }
+
+#' Calculate the steps per epoch
+#' 
+#' Do one full preprocessing iteration to the FASTA file to figure out what the observed
+#' steps_per_epoch value is.
+#' @param dir Input directory where .fasta files are located
+#' @param batch.size Number of samples  
+#' @param maxlen Length of the semi-redundant sequences
+#' @param format File format
+#' @param verbose TRUE/FALSE
+#' @export
+calculateStepsPerEpoch <-
+  function(dir,
+           batch.size = 256,
+           maxlen = 250,
+           format = "fasta",
+           verbose = F) {
+    library(xfun)
+    library(Biostrings)
+    steps.per.epoch <- 0
+    fasta.files <- list.files(
+      path = xfun::normalize_path(dir),
+      pattern = paste0("*.", format),
+      full.names = TRUE
+    )
+    for (file in fasta.files) {
+      fasta.file <- Biostrings::readDNAStringSet(file)
+      seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
+      steps.per.epoch <-
+        steps.per.epoch + ceiling((nchar(seq) - maxlen - 1) / batch.size)
+    }
+    return(steps.per.epoch)
+}

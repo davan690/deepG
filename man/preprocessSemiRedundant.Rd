@@ -2,31 +2,27 @@
 % Please edit documentation in R/preprocess.R
 \name{preprocessSemiRedundant}
 \alias{preprocessSemiRedundant}
-\title{Preprocess string to semi redundant one-hot vector}
+\title{Preprocess string to semi-redundant one-hot vector}
 \usage{
-preprocessSemiRedundant(char, labels = NULL, maxlen = 250, vocabulary,
-  verbose = F)
+preprocessSemiRedundant(char, maxlen = 250, vocabulary, verbose = F)
 }
 \arguments{
-\item{char}{a character string of text, length of one}
+\item{char}{Character input string of text with the length of one}
 
-\item{labels}{a character string of same length as char with character as labels}
+\item{maxlen}{Length of the semi-redundant sequences}
 
-\item{maxlen}{length of semi-redundant sequences of maxlen characters}
-
-\item{vocabulary}{char, should be sorted, if not set char vocabulary will be used}
+\item{vocabulary}{Char contains the vocabulary from the input char, it should be sorted.
+If no vocabulary exists, it is generated from the input char}
 
 \item{verbose}{TRUE/FALSE}
 }
 \description{
-Outputs semi-redundant set of input string
-Preprocess a character input
-Collapse and tokenize and vectorize character
-Use this function with a character string as input such as data(train)
-if the input text ist ABCDEFGHIJKLM and the maxlen is set to 5, the chunks would be
-X(1): ABCDE Y(1):F
-X(2): BCDEF Y(2):G
-X(3): CDEFG Y(3):H
-X(4): DEFGH (4):I
-...
+Outputs semi-redundant set of input character string.
+Collapse, tokenize, and vectorize the character.
+Use this function with a character string as input. For example, 
+if the input text is ABCDEFGHI and the length(maxlen) is 5, the generating chunks would be:
+X(1): ABCDE and Y(1): F;
+X(2): BCDEF and Y(2): G;
+X(3): CDEFG and Y(3): H;
+X(4): DEFGH and Y(4): I
 }

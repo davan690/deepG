@@ -2,29 +2,27 @@
 % Please edit documentation in R/train.R
 \name{trainNetwork}
 \alias{trainNetwork}
-\title{Trains a (mostly) LSTM model on genomic data. Designed for developing genome based language models (GenomeNet)}
+\title{Trains a (mostly) Long short-term memory (LSTM) model on genomic data. Designed for developing genome based language models (GenomeNet)}
 \usage{
-trainNetwork(path, dataset, labels, validation.split = 0.05,
-  run.name = "run", maxlen = 250, dropout.rate = 0.3,
-  layer.size = 2048, batch.size = 512, layers.lstm = 4,
-  solver = "adam", use.codon.cnn = FALSE, learning.rate = 0.001,
-  use.cudnn = FALSE, use.multiple.gpus = FALSE, merge.on.cpu = TRUE,
-  gpu.num = 2, vocabulary.size = 5, label.vocabulary.size = 3,
-  epochs = 10, max.queue.size = 100, lr.plateau.factor = 0.1,
-  patience = 5, cooldown = 5, steps.per.epoch = "auto")
+trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
+  maxlen = 250, dropout.rate = 0.3, layer.size = 2048,
+  batch.size = 512, layers.lstm = 4, solver = "adam",
+  use.codon.cnn = FALSE, learning.rate = 0.001, use.cudnn = FALSE,
+  use.multiple.gpus = FALSE, merge.on.cpu = TRUE, gpu.num = 2,
+  vocabulary.size = 5, epochs = 10, max.queue.size = 100,
+  lr.plateau.factor = 0.1, patience = 5, cooldown = 5,
+  steps.per.epoch = "auto")
 }
 \arguments{
-\item{path}{Path to folder where individual or multiple fasta files are located}
+\item{path}{Path to folder where individual or multiple FASTA files are located}
 
-\item{dataset}{Dataframe holding training samples in RAM instead of using generator.}
+\item{dataset}{Dataframe holding training samples in RAM instead of using generator}
 
-\item{labels}{path to folder where labels are located}
+\item{validation.split}{Defines the fraction of the batches that will be used for validation}
 
-\item{validation.split}{Defines the fraction of the batches that will be used for validation.}
+\item{run.name}{Name of the run (without file ending)}
 
-\item{run.name}{name of the run (without file ending)}
-
-\item{maxlen}{Time steps to unroll for (e.g. length of semi-redundant chunks).}
+\item{maxlen}{Time steps to unroll for (e.g. length of semi-redundant chunks)}
 
 \item{dropout.rate}{Dropout rate for LSTM cells}
 
@@ -34,39 +32,36 @@ trainNetwork(path, dataset, labels, validation.split = 0.05,
 
 \item{layers.lstm}{Number of LSTM layers}
 
-\item{solver}{optimizer (on default Adam)}
+\item{solver}{Optimizer on default adam (options: "adam", "adagrad", "rmsprop", "sgd")}
 
-\item{use.codon.cnn}{first layer is a CNN layer with size of 3 to mimic codons (experimental)}
+\item{use.codon.cnn}{First layer is a CNN layer with size of 3 to mimic codons (experimental)}
 
-\item{learning.rate}{learning rate for optimizer}
+\item{learning.rate}{Learning rate for optimizer}
 
-\item{use.cudnn}{if true, using layer_cudnn_lstm() instead of layer_lstm() which is if GPU supports cudnn}
+\item{use.cudnn}{If true, using layer_cudnn_lstm() instead of layer_lstm() which is if GPU supports cudnn}
 
-\item{use.multiple.gpus}{if true, multi_gpu_model() will be used based on gpu_num}
+\item{use.multiple.gpus}{If true, multi_gpu_model() will be used based on gpu_num}
 
-\item{merge.on.cpu}{true on default, false recommend if the server supports NVlink, only relevant if use.multiple.gpu is true}
+\item{merge.on.cpu}{True on default, false recommend if the server supports NVlink, only relevant if use.multiple.gpu is true}
 
-\item{gpu.num}{number of GPUs to be used, only relevant if multiple_gpu is true}
+\item{gpu.num}{Number of GPUs to be used, only relevant if multiple_gpu is true}
 
-\item{vocabulary.size}{number of unique chars in training set'}
+\item{vocabulary.size}{Number of unique chars in training set}
 
-\item{epochs}{number of full iterations over the dataset}
+\item{epochs}{Number of full iterations over the dataset}
 
-\item{max.queue.size}{queue on fit_generator()}
+\item{max.queue.size}{Queue on fit_generator()}
 
-\item{lr.plateau.factor}{factor of decreasing learning rate when plateau ich reached}
+\item{lr.plateau.factor}{Factor of decreasing learning rate when plateau is reached}
 
-\item{patience}{number of epochs wating for decrease in loss before reducing learing rate}
+\item{patience}{Number of epochs waiting for decrease in loss before reducing learningrate}
 
-\item{cooldown}{number of epochs without changing learning rate}
+\item{cooldown}{Number of epochs without changing learningrate}
 
-\item{steps.per.epoch}{number of training samples divided by the batch_size, is 20139934 on SGB dataset}
-
-\item{layer.size}{number of cells per network layer#'}
+\item{steps.per.epoch}{Number of training samples divided by the batch.size, is 20139934 on SGB dataset}
 }
 \description{
-Depth and number of neurons per layer of the netwok can be specified. First layer can be a CNN that is designed to capture codons.
-If a path to a folder where fasta files are located is provided, batches will ge generated using a external generator which
-is recommended for big training sets. Alternative, a dataset can be supplied that holds the preprocessed batches (generated by \code{preprocessSemiRedundant}) and their
-labels and keeps them in RAM. Supports also training on intances with multiple GPUs and scales linear with number of GPUs present.
+Depth and number of neurons per layer of the netwok can be specified. First layer can be a Convolutional Neural Network (CNN) that is designed to capture codons.
+If a path to a folder where FASTA files are located is provided, batches will ge generated using a external generator which
+is recommended for big training sets. Alternative, a dataset can be supplied that holds the preprocessed batches (generated by \code{preprocessSemiRedundant()}) and keeps them in RAM. Supports also training on intances with multiple GPUs and scales linear with number of GPUs present.
 }

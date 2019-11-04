@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>do one full preprocessing iteration to figure out what the observed
-steps_per_epoch value is — calculateStepsPerEpoch • deepG</title>
+<title>Calculate the steps per epoch — calculateStepsPerEpoch • deepG</title>
 
 
 <!-- jquery -->
@@ -36,10 +35,9 @@ steps_per_epoch value is — calculateStepsPerEpoch • deepG</title>
 
 
 
-<meta property="og:title" content="do one full preprocessing iteration to figure out what the observed
-steps_per_epoch value is — calculateStepsPerEpoch" />
-<meta property="og:description" content="do one full preprocessing iteration to figure out what the observed
-steps_per_epoch value is" />
+<meta property="og:title" content="Calculate the steps per epoch — calculateStepsPerEpoch" />
+<meta property="og:description" content="Do one full preprocessing iteration to the FASTA file to figure out what the observed
+steps_per_epoch value is." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,26 +101,50 @@ steps_per_epoch value is" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>do one full preprocessing iteration to figure out what the observed
-steps_per_epoch value is</h1>
+    <h1>Calculate the steps per epoch</h1>
     
     <div class="hidden name"><code>calculateStepsPerEpoch.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>do one full preprocessing iteration to figure out what the observed
-steps_per_epoch value is</p>
+    <p>Do one full preprocessing iteration to the FASTA file to figure out what the observed
+steps_per_epoch value is.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calculateStepsPerEpoch</span>(<span class='no'>dir</span>, <span class='kw'>batch.size</span> <span class='kw'>=</span> <span class='fl'>256</span>, <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>250</span>,
-  <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"fasta"</span>)</pre>
+  <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"fasta"</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>dir</th>
+      <td><p>Input directory where .fasta files are located</p></td>
+    </tr>
+    <tr>
+      <th>batch.size</th>
+      <td><p>Number of samples</p></td>
+    </tr>
+    <tr>
+      <th>maxlen</th>
+      <td><p>Length of the semi-redundant sequences</p></td>
+    </tr>
+    <tr>
+      <th>format</th>
+      <td><p>File format</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>TRUE/FALSE</p></td>
+    </tr>
+    </table>
 
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
     </ul>
 
   </div>

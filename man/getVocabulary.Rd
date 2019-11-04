@@ -7,10 +7,10 @@
 getVocabulary(char, verbose = F)
 }
 \arguments{
-\item{char}{a character string of text, length of one}
+\item{char}{Character string of text with the length of one}
 
 \item{verbose}{TRUE/FALSE}
 }
 \description{
-Use this function with a character string as input such as data(train)
+Use this function with a character string.
 }

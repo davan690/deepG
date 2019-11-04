@@ -1,108 +1,82 @@
 #' Returns the vocabulary from character string
 #'
-#' Use this function with a character string as input such as data(train)
+#' Use this function with a character string.
 #'
-#' @param char a character string of text, length of one
+#' @param char Character string of text with the length of one
 #' @param verbose TRUE/FALSE
 #' @export
 getVocabulary <- function(char, verbose = F) {
-  library(dplyr)
+  
   stopifnot(!is.null(char))
   stopifnot(nchar(char) > 0)
-  vocabulary <-  char %>%  stringr::str_to_lower() %>%
-    stringr::str_c(collapse = "\n") %>%
-    tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE) %>%
-    unique() %>%
-    sort()
+  
+  vocabulary <- sort(unique(tokenizers::tokenize_characters(
+    stringr::str_c(stringr::str_to_lower(char),collapse = "\n"), strip_non_alphanum = FALSE, simplify = TRUE)))
+
   if (verbose)
-    print(vocabulary)
+    message("The vocabulary:", vocabulary)
   return(vocabulary)
 }
 
-#' Preprocess string to semi redundant one-hot vector
+#' Preprocess string to semi-redundant one-hot vector
 #'
-#' Outputs semi-redundant set of input string
-#' Preprocess a character input
-#' Collapse and tokenize and vectorize character
-#' Use this function with a character string as input such as data(train)
-#' if the input text ist ABCDEFGHIJKLM and the maxlen is set to 5, the chunks would be
-#' X(1): ABCDE Y(1):F
-#' X(2): BCDEF Y(2):G
-#' X(3): CDEFG Y(3):H
-#' X(4): DEFGH (4):I
-#' ...
-#'
-#' @param char a character string of text, length of one
-#' @param labels a character string of same length as char with character as labels
-#' @param maxlen length of semi-redundant sequences of maxlen characters
-#' @param vocabulary char, should be sorted, if not set char vocabulary will be used
+#' Outputs semi-redundant set of input character string.
+#' Collapse, tokenize, and vectorize the character.
+#' Use this function with a character string as input. For example, 
+#' if the input text is ABCDEFGHI and the length(maxlen) is 5, the generating chunks would be:
+#' X(1): ABCDE and Y(1): F;
+#' X(2): BCDEF and Y(2): G;
+#' X(3): CDEFG and Y(3): H;
+#' X(4): DEFGH and Y(4): I
+#' 
+#' @param char Character input string of text with the length of one
+#' @param maxlen Length of the semi-redundant sequences
+#' @param vocabulary Char contains the vocabulary from the input char, it should be sorted.
+#' If no vocabulary exists, it is generated from the input char
 #' @param verbose TRUE/FALSE
+#' @example preprocessSemiRedudant("abcd",maxlen=2,verbose=F)
 #' @export
 preprocessSemiRedundant <- function(char,
-                                    labels = NULL,
                                     maxlen = 250,
                                     vocabulary,
                                     verbose = F) {
-  require(dplyr)
-  Check <- ArgumentCheck::newArgCheck()
-  #* Add an error if maxlen <1
-  if (maxlen < 1)
-    ArgumentCheck::addError(msg = "'maxlen' must be >= 1",
-                            argcheck = Check)
   
-  if (!missing(vocabulary)) {
-    #* Add an error if vocabulary is <1
-    if (length(vocabulary) < 1)
-      ArgumentCheck::addError(msg = "'vocabulary' must be a character of length > 0",
-                              argcheck = Check)
-  }
-  #* Return errors and warnings (if any)
-  ArgumentCheck::finishArgCheck(Check)
+  stopifnot(!is.null(char))
+  stopifnot(nchar(char) > 0)
+  stopifnot(maxlen > 0)
   
   # Load, collapse, and tokenize text ("ACGT" -> "a" "c" "g" "t")
-  text <- char %>%
-    stringr::str_to_lower() %>%
-    stringr::str_c(collapse = "\n") %>%
-    tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
+  text <- tokenizers::tokenize_characters(stringr::str_c(stringr::str_to_lower(char), collapse = "\n"), strip_non_alphanum = FALSE, simplify = TRUE)
   
-  if (!is.null(labels)) {
-    text.labels <- labels %>%
-      stringr::str_c(collapse = "\n") %>%
-      tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
-    text.labels.vocabulary <- text.labels %>%
-      unique() %>%
-      sort()
-  }
-  
-  #if (verbose)
-  #  print(sprintf("corpus length: %d", xt))
-  
+  # Generating vocabulary from input char with the function getVocabulary()
   if (missing(vocabulary)) {
-    vocabulary <- text %>%
-      unique() %>%
-      sort()
+    if (verbose)
+      message("Finding the vocabulary ...")
+    vocabulary <- getVocabulary(char)
   }
-  if (verbose)
-    print(sprintf("vocabulary size: %d", length(vocabulary)))
   
+  if(verbose)
+    message("Vocabulary size:", length(vocabulary))
   # Cut the text in semi-redundant sequences of maxlen characters
+  
   if (verbose)
-    print("generation of semi-redundant sequences ...")
-  if (is.null(labels)) {
-    dataset <- purrr::map(seq(1, length(text) - maxlen , by = 1),
+    message("Generation of semi-redundant sequences ...")
+  
+  dataset <- purrr::map(seq(1, length(text) - maxlen, by = 1),
                           ~ list(sentece = text[.x:(.x + maxlen - 1)],
                                  next_char = text[.x + maxlen]))
-    dataset <- purrr::transpose(dataset)
-    x <-
+  dataset <- purrr::transpose(dataset)
+  x <-
       array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
-    y <- array(0, dim = c(length(dataset$sentece), length(vocabulary)))
+  y <- array(0, dim = c(length(dataset$sentece), length(vocabulary)))
     # Vectorization
-    if (verbose)
-      print("vectorization ...")
-    if (verbose)
-      pb <-  txtProgressBar(min = 0,
-                            max = length(dataset$sentece),
-                            style = 3)
+  
+  if (verbose)
+    message("Vectorization ...")
+  if (verbose)
+    pb <-  txtProgressBar(min = 0,
+                          max = length(dataset$sentece),
+                          style = 3)
     for (i in 1:length(dataset$sentece)) {
       if (verbose)
         setTxtProgressBar(pb, i)
@@ -113,65 +87,37 @@ preprocessSemiRedundant <- function(char,
       # target (next nucleotide in sequence)
       y[i,] <- as.integer(vocabulary == dataset$next_char[[i]])
     }
-    } else {
-      # use labels
-      dataset <- purrr::map(seq(1, length(text) - maxlen , by = 1),
-                            ~ list(sentece = text[.x:(.x + maxlen - 1)],
-                                   label = text.labels[.x + maxlen]))
-      dataset <- purrr::transpose(dataset)
-      
-      x <-
-        array(0, dim = c(length(dataset$sentece), maxlen, length(vocabulary)))
-      y <- array(0, dim = c(length(dataset$sentece), length(text.labels.vocabulary)))
-      
-      # Vectorization
-      if (verbose)
-        print("vectorization ...")
-      if (verbose)
-        pb <-  txtProgressBar(min = 0,
-                              max = length(dataset$sentece),
-                              style = 3)
-      for (i in 1:length(dataset$sentece)) {
-        if (verbose)
-          setTxtProgressBar(pb, i)
-        x[i, ,] <- sapply(vocabulary, function(x) {
-          as.integer(x == dataset$sentece[[i]])
-        })
-        y[i,] <- as.integer(text.labels.vocabulary == dataset$label[[i]])
-      }
-    }
-
+  
   results <- list("X" = x, "Y" = y)
   return(results)
 }
 
-#' wrapper of the preprocessSemiRedundant() function called on the genomic contents of one
-#' fasta file. Multiple entries are combined with newline characters.
+#' Wrapper of the preprocessSemiRedundant()-function 
+#' 
+#' It called on the genomic contents of one
+#' FASTA file. Multiple entries are combined with newline characters.
+#' @param path Path to the FASTA file
+#' @param maxlen Length of the semi-redundant sequences
+#' @param vocabulary Char contains the vocabulary from the input char, it should be sorted.
+#' If no vocabulary exists, it is generated from the input char
+#' @param verbose TRUE/FALSE
 #' @export
 preprocessFasta <- function(path,
-                            labels = NULL,
                             maxlen = 250,
                             vocabulary = c("-", "|", "a", "c", "g", "t"),
                             verbose = F) {
-  # process labels
-  if (!is.null(labels)){
-    fasta.file.labels <- Biostrings::readDNAStringSet(labels)
-    seq.labels <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
-  } 
+
   
   # process corpus
   fasta.file <- Biostrings::readDNAStringSet(path)
   seq <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
   
-  if (is.null(labels)){
+  if(verbose)
+    message("Preprocessing the data ...")
+  
   seq.processed <-
     preprocessSemiRedundant(char = seq, maxlen = maxlen, vocabulary = vocabulary,
                             verbose = F) 
-  } else {
-    seq.processed <-
-      preprocessSemiRedundant(char = seq, labels = seq.labels, maxlen = maxlen,
-                              vocabulary = vocabulary, verbose = F) 
-  }
   return(seq.processed)
 }
 
@@ -309,4 +255,3 @@ fastaFileGenerator <- function(corpus.dir,
     list(X = x, Y = y)
   }
 }
-
