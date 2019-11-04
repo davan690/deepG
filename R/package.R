@@ -1,6 +1,6 @@
 #' deepG for GenomeNet
 #'
-#' deepG is a is an open source software librar for building deep neuronal 
+#' deepG is a is an open source software library for building deep neuronal 
 #' networks for genomic modeling
 #' 
 #' This package generates \href{http://www.genomenet.de}{GenomeNet}

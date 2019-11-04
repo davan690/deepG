@@ -1,6 +1,6 @@
 context("preprocess")
 
-test_that("correct vocabulary extraction", {
+test_that("Correct vocabulary extraction", {
   
   expect_equal(getVocabulary("ABC"), c("a", "b", "c"))
   expect_equal(getVocabulary("CBA"), c("a", "b", "c"))
@@ -18,18 +18,18 @@ test_that("correct vocabulary extraction", {
   
   expect_is(getVocabulary("abc"),"character")
   
-  expect_output(getVocabulary("abc", verbose = T))
-  
+  expect_message(getVocabulary("abc", verbose = T))
   expect_silent(getVocabulary("abc"))
 })
 
-test_that("generating semi-redundant chunks", {
+test_that("Generating semi-redundant chunks", {
   
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2),"list")
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2)$X,"array")
   expect_is(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y,"matrix")
   
   expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[1], 16)
+  expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2, vocabulary = c("a","b","c","d")))[1], 16)
   expect_equivalent(lengths(preprocessSemiRedundant(char = "abcd", maxlen = 2))[2], 8)
   expect_equivalent(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y, matrix(c(0,0,1,0,0,0,0,1), byrow = TRUE, nrow = 2))           
   expect_equivalent(length(preprocessSemiRedundant(char="abcd", maxlen = 2)),2)
@@ -39,17 +39,16 @@ test_that("generating semi-redundant chunks", {
   expect_error(preprocessSemiRedundant(char = "abcd", vocabulary = ""))
   expect_error(preprocessSemiRedundant(char = "abcd", vocabulary = 0))
   
-  expect_output(preprocessSemiRedundant(char = "abcd", maxlen = 2, verbose = T))
-  
+  expect_message(preprocessSemiRedundant(char = "abcd", maxlen = 2, verbose = T))
   expect_silent(preprocessSemiRedundant(char = "abcd", maxlen = 2))
 
   expect_type(preprocessSemiRedundant(char = "abcd", maxlen = 2)$X, "double")
   expect_type(preprocessSemiRedundant(char = "abcd", maxlen = 2)$Y, "double")
 })
 
-test_that("generating semi-redundant chunks from Fasta files", {
+test_that("Generating semi-redundant chunks from Fasta files", {
   
-  file = file.path("fasta/a.fasta")
+  file <- file.path("fasta/a.fasta")
   
   expect_is(preprocessFasta(file),"list")
   expect_is(preprocessFasta(file)$X,"array")
@@ -67,18 +66,12 @@ test_that("generating semi-redundant chunks from Fasta files", {
   expect_type(preprocessFasta(file)$Y, "double")
 })
 
-test_that("calculating steps per epoch", {
-  
-  expect_error(calculateStepsPerEpoch())
-
-})
-
-test_that("checking the generator for the Fasta files", {
+test_that("Checking the generator for the Fasta files", {
   
   testpath <- file.path("fasta/")
-  batch.size = 80
-  maxlen = 50
-  words = 5
+  batch.size <- 80
+  maxlen <- 50
+  words <- 5
   gen <- fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen)
   
   expect_equivalent(dim(gen()[[1]])[1], batch.size+1)
@@ -97,7 +90,6 @@ test_that("checking the generator for the Fasta files", {
   expect_is(gen()[[2]],"matrix")
   
   expect_message(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen,verbose = T))
-  
   expect_silent(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen))
   
   expect_type(gen()[[1]], "double")

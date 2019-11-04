@@ -46,7 +46,7 @@ on AWS instances the GPU version can be installed via `conda create -y --name r-
 
 # Usage
 
-## generating of GenomeNet 
+## Generating of GenomeNet 
 
 ### Generate a genomic language model from a collection of FASTA files
 
@@ -54,10 +54,16 @@ on AWS instances the GPU version can be installed via `conda create -y --name r-
 history <- trainNetwork(path = "input_dir")
 ```
 
-When you have multiple GPUs available you can run
+The following settings are helpful for testing the training on CPU. The used FASTA files are located in example_files/fasta.
 
 ``` r
-history <- trainNetwork(path = "input_dir", cudnn = T, multiple_gpu = T, gpu_num = 1:8, run_name= "GenomeNet", epochs = 100, steps_per_epoch = 10000)
+history <- trainNetwork(path = "input_dir",  use.cudnn = F, maxlen = 50, batch.size = 80, epochs = 5, steps.per.epoch = 100, layers.lstm = 3, max.queue.size = 500, dropout.rate = 0.35, layer.size = 1028)
+```
+
+When you have multiple GPUs available you can run:
+
+``` r
+history <- trainNetwork(path = "input_dir", use.cudnn = T, use.multiple.gpus = T, gpu.num = 1:8, run.name= "GenomeNet", epochs = 100, steps.per.epoch = 10000)
 ```
 
 See the `?trainNetwork` for further information how to setup file names and network size.
@@ -73,10 +79,9 @@ crispr_preprocessed <- preprocessSemiRedundant(crispr_sample)
 history <- trainNetwork(dataset = crispr_preprocessed)
 ```
 
-
 ## Train a deep network for multiclass prediction
 
-here the FASTA files are located as individual files in `input_dir/` and labels are defined in `fasta-like` files in `fasta_label_dir/` with a `.txt` ending.
+Here the FASTA files are located as individual files in `input_dir/` and labels are defined in `fasta-like` files in `fasta_label_dir/` with a `.txt` ending.
 
 example file `file1.fasta` in `input_dir/`:
 
@@ -107,7 +112,7 @@ The library comes with three different datasets for testing.
 ## License and copyright
 Copyright 2019 Philipp Münch
 
-Source code to deepG is made available under the terms of the [GNU Affero General Public License](LICENSE.txt) (AGPL). deepG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+Source code to deepG is made available under the terms of the GNU Affero General Public License (AGPL). deepG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
 
 ## Supported by
 
