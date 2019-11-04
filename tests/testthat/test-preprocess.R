@@ -55,7 +55,7 @@ test_that("generating semi-redundant chunks from Fasta files", {
   expect_is(preprocessFasta(file)$X,"array")
   expect_is(preprocessFasta(file)$Y,"matrix")
   
-  expect_equivalent(lengths(preprocessFasta(file))[2], 33055)
+  expect_equivalent(lengths(preprocessFasta(file))[2], 39672)
   expect_equivalent(length(preprocessFasta(file)),2)
   
   expect_error(preprocessFasta())
