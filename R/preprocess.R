@@ -151,17 +151,17 @@ preprocessSemiRedundant <- function(char,
 preprocessFasta <- function(path,
                             labels = NULL,
                             maxlen = 250,
-                            vocabulary = c("\n", "a", "c", "g", "t"),
+                            vocabulary = c("-", "|", "a", "c", "g", "t"),
                             verbose = F) {
   # process labels
   if (!is.null(labels)){
     fasta.file.labels <- Biostrings::readDNAStringSet(labels)
-    seq.labels <- paste0(paste(fasta.file.labels, collapse = "\n"), "\n")
+    seq.labels <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
   } 
   
   # process corpus
   fasta.file <- Biostrings::readDNAStringSet(path)
-  seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
+  seq <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
   
   if (is.null(labels)){
   seq.processed <-
@@ -193,7 +193,7 @@ calculateStepsPerEpoch <-
     )
     for (file in fasta.files) {
       fasta.file <- Biostrings::readDNAStringSet(file)
-      seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
+      seq <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
       steps.per.epoch <-
         steps.per.epoch + ceiling((nchar(seq) - maxlen) / batch.size)
     }
@@ -267,7 +267,7 @@ fastaFileGenerator <- function(corpus.dir,
   # pre-load the first file
   file <- fasta.files[[1]]
   fasta.file <- Biostrings::readDNAStringSet(file)
-  seq <- paste0(paste(fasta.file, collapse = "-"),"|")  
+  seq <- paste0("|", paste(fasta.file, collapse = "-"),"|")  
   length_current_seq <- nchar(seq)
   
   # information data frame
