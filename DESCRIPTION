@@ -16,6 +16,7 @@ Imports:
     reticulate,
     keras,
     methods,
+    abind,
     BiocGenerics,
     stringr,
     purrr,

@@ -45,7 +45,8 @@ trainNetwork <- function(path,
                          use.multiple.gpus = FALSE,
                          merge.on.cpu = TRUE,
                          gpu.num = 2,
-                         vocabulary.size = 5,
+                         vocabulary.size = 6,
+                         label.vocabulary.size = 3,
                          epochs = 10,
                          max.queue.size = 100,
                          lr.plateau.factor = .1,
@@ -159,8 +160,9 @@ trainNetwork <- function(path,
     if (steps.per.epoch == "auto") {
       message("Calculating required steps per epoch ...")
       steps.per.epoch <-
-        calculateStepsPerEpoch(path, batch.size = batch.size)
-      message(paste("Full epoch requires", steps.per.epoch, "steps."))
+         calculateStepsPerEpoch(path, maxlen = maxlen, batch.size = batch.size)
+      messagef(paste("Full epoch requires", steps.per.epoch, "steps."))
+
     }
     # training
     message("Start training ...")

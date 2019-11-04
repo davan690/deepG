@@ -104,12 +104,13 @@ preprocessSemiRedundant <- function(char,
 #' @export
 preprocessFasta <- function(path,
                             maxlen = 250,
-                            vocabulary = c("\n", "a", "c", "g", "t"),
+                            vocabulary = c("-", "|", "a", "c", "g", "t"),
                             verbose = F) {
+
   
   # process corpus
   fasta.file <- Biostrings::readDNAStringSet(path)
-  seq <- paste0(paste(fasta.file, collapse = "\n"), "\n")
+  seq <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
   
   if(verbose)
     message("Preprocessing the data ...")
@@ -120,112 +121,137 @@ preprocessFasta <- function(path,
   return(seq.processed)
 }
 
-#' Custom generator for FASTA files
+
+#' Helper function for fastaFileGenerator
+#' @param sequence character sequence 
+#' @param maxlen length of one sample
 #' 
-#' Produce chunks in size of batch.size
-#' by iterating over the input files. If the input file is smaller than the
-#' batch.size, batch size will be reduced to the maximal size. So the last batch
-#' of a file is usually smaller.
-#' See <https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R>
-#' @param corpus.dir Input directory where .fasta files are located
-#' @param labels.dir Input directory where .fasta files with the labels are located
-#' @param format File format
-#' @param batch.size Number of samples  
-#' @param maxlen Length of the semi-redundant sequences
-#' @param verbose TRUE/FALSE
+#' Returns one hot encoding for every sequence  
+#' For example: sequence = "acatg", maxlen = 4, leads to
+#' X = (0 1 0 0 0  
+#'      0 0 1 0 0
+#'      0 1 0 0 0
+#'      0 0 0 0 1)
+#' Y = (0 0 0 1 0)       
+#' @export
+sequenceToArray <- function(sequence, maxlen, vocabulary = c("-", "|", "a", "c", "g", "t")){
+  len_voc <- length(vocabulary)
+  len_seq <- nchar(sequence)
+  z <- array(0L, dim=c(len_seq*len_voc))  
+  tokenizer <- keras::fit_text_tokenizer(keras::text_tokenizer(char_level = TRUE, lower = TRUE), vocabulary) 
+  sequence_int <- keras::texts_to_sequences(tokenizer, sequence) 
+  seq_unlist <- sequence_int[[1]]
+  adjust <- len_voc*(seq(0, len_seq - 1))
+  
+  # every row in z one-hot encodes one character in sequence
+  z[adjust + seq_unlist] <- 1L
+  z <- keras::array_reshape(z, dim=c(len_seq, len_voc))
+  
+  x <- array(0L, dim = c(len_seq - maxlen, maxlen, len_voc))
+  for (i in 1:(len_seq - maxlen)){
+    x[i, , ] <- z[i:(maxlen+i-1), ] 
+  }
+  y <- z[(maxlen+1):nrow(z),]
+  list(x, y)
+}
+
+
+#' custom generator for fasta files, will produce chunks in size of batch.size
+#' by iterating over the input files. 
+#' @param corpus.dir input directory where .fasta files are located
+#' @param format file format
+#' @param batch.size number of samples  
+#' @param maxlen length of one sample 
+#' @param max_iter stop after max_iter number of iterations failed to produce new sample 
+#' @param verbose TRUE/FALSE show information about files and running time  
 #' @export
 fastaFileGenerator <- function(corpus.dir,
-                               labels.dir,
                                format = "fasta",
                                batch.size = 512,
                                maxlen = 250,
-                               verbose = F) {
+                               max_iter = 20,
+                               vocabulary = c("-", "|", "a", "c", "g", "t"),
+                               verbose = FALSE){
+  
   fasta.files <- list.files(
     path = xfun::normalize_path(corpus.dir),
     pattern = paste0("*.", format),
-    full.names = TRUE
-  )
+    full.names = TRUE)
   
-  if (!missing(labels.dir)){
-    label.files <- paste0(labels.dir, gsub(pattern = paste0("\\.",format,"$"), "", basename(fasta.files)),".txt")
-  }
+  if (verbose) file_list <- list.files(corpus.dir)     
   
   next.file <- 1
-  batch.num <- 0
-  batch.end <- 0
+  start_index <- 1
+  sequence_vector <- vector("character")
+  num_files_used <- 0 # counts files overall used for one batch, not unique number of files 
+  num_samples <- 0
+  
   # pre-load the first file
   file <- fasta.files[[1]]
-  if (!missing(labels.dir)) {
-    label <- label.files[[1]]
-    use_labels <<- TRUE
-    preprocessed <- preprocessFasta(path = file, labels = label, maxlen = maxlen)
-  } else {
-    use_labels <<- FALSE
-    preprocessed <- preprocessFasta(path = file, maxlen = maxlen)
-  }
-  if (verbose)
-    message("Initializing ...")
+  fasta.file <- Biostrings::readDNAStringSet(file)
+  seq <- paste0("|", paste(fasta.file, collapse = "-"),"|")  
+  length_current_seq <- nchar(seq)
+  
+  # information data frame
+  if (verbose) info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), used_full_file=logical(),
+                                     stringsAsFactors = FALSE)
+  if (verbose) message("initializing")
+                
   function() {
-    # move to nexdt file if we cannot process another batch
-    if (((batch.num) * batch.size) > nrow(preprocessed$X)) {
-      if (verbose)
-        message("Reached end of file.")
-      # move to the next file
-      next.file <<- next.file + 1
-      # reset batch coordinates
-      batch.num <<- 0
-      batch.end <<- 0
-      # at the end of the file list, start from the beginning
-      if (next.file > length(fasta.files)) {
-        if (verbose)
-          message("Resetting to first file.")
-        # reset file number
-        next.file <<- 1
-        # reset batch coordinates
-        batch.num <<- 0
-        batch.end <<- 0
+    start_time <- Sys.time()
+    iter <- 1
+    # loop until enough samples collected
+    while(num_samples < batch.size){  
+      
+      # loop through files until sequence of suitable length is found   
+      while(start_index + maxlen >= length_current_seq){
+        next.file <<- next.file + 1 
+        if (next.file > length(fasta.files)) next.file <<- 1
+        file <<- fasta.files[[next.file]]
+        fasta.file <- Biostrings::readDNAStringSet(file)
+        seq <- paste0(paste(fasta.file, collapse = "-"),"|") 
+        length_current_seq <- nchar(seq)
+        start_index <<- 1 
+        if(iter > max_iter){
+          stop('exceeded max_iter value, try reducing maxlen parameter')
+          break
+        }
+        iter <- iter + 1
       }
-      # read in the new file
-      file <<- fasta.files[[next.file]]
-      if (use_labels) {
-        preprocessed <- preprocessFasta(path = file, labels = label, maxlen = maxlen)
-      } else {
-        preprocessed <- preprocessFasta(path = file, maxlen = maxlen)
+      
+      num_files_used <<- num_files_used + 1
+      
+      # go to end of file or stop when enough samples are collected 
+      end_index <- min(start_index + maxlen + (batch.size - num_samples) - 1,
+                       length_current_seq)
+    
+      if (verbose) info_df[num_files_used,] <- c(file_list[next.file], start_index, end_index, (start_index==1 & end_index==length_current_seq))
+      sub_seq <- substr(seq, start_index, end_index)
+      sequence_vector[num_files_used] <- sub_seq
+      length_sub_seq <- nchar(sub_seq)
+      num_samples <- num_samples + length_sub_seq - maxlen 
+      start_index <<- start_index + length_sub_seq - maxlen 
+    }
+    
+    if (verbose) cat("number of files used:", num_files_used, "\n")
+    if (verbose) print(info_df)
+    num_files_used <<- 0
+    
+    array_list <- purrr::map(1:length(sequence_vector), ~sequenceToArray(sequence_vector[.x], maxlen = maxlen))
+    x <- array_list[[1]][[1]]
+    y <- array_list[[1]][[2]]
+    if (length(array_list)>1){
+      for (i in 2:length(array_list)){
+        x <- abind::abind(x,array_list[[i]][[1]], along = 1)
+        y <- abind::abind(y,array_list[[i]][[2]], along = 1)
       }
     }
-    # proceccing a batch
-    batch.num <<- batch.num + 1
-    batch.start <<- batch.end + 1
-    # check if full batch size can be processed, if not temporaly reduce
-    # batch_size to maximum possible
-    if ((batch.start + batch.size) > nrow(preprocessed$X)) {
-      if (verbose)
-        message("Reduce batch.size temporarily.")
-      batch.end <- nrow(preprocessed$X)
-      # reduced batch size
-    } else {
-      # regular batch.size
-      batch.end <<- batch.start + batch.size  # 12
-    }
-    if (verbose)
-      message(
-        paste(
-          "Generating batch number",
-          batch.num,
-          batch.start,
-          "-",
-          batch.end,
-          "of file",
-          file,
-          "index",
-          next.file
-        )
-      )
-    x.batch <-
-      preprocessed$X[batch.start:batch.end, , ]# dim should be (batch_size, maxlen, words)
-    y.batch <-
-      preprocessed$Y[batch.start:batch.end,]   # dim should be (batch_size, words)
-    # return the file
-    list(x.batch, y.batch)
+    end_time <- Sys.time()
+    if (verbose){
+      cat("running time:", end_time - start_time, "\n") 
+      obj_size <- format(object.size(list(x,y)),  units = "auto")
+      cat("batch size:", obj_size, "\n")
+    }  
+    list(X = x, Y = y)
   }
 }
