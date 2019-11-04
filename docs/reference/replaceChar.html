@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Replaces specific nucleotides in a sequence one by one — replaceChar • deepG</title>
+<title>Replaces specific nucleotides in a sequence — replaceChar • deepG</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Replaces specific nucleotides in a sequence one by one — replaceChar" />
-<meta property="og:description" content="Replaces specific nucleotides in a sequence one by one" />
+<meta property="og:title" content="Replaces specific nucleotides in a sequence — replaceChar" />
+<meta property="og:description" content="Replaces specific nucleotides in a sequence" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,13 +100,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Replaces specific nucleotides in a sequence one by one</h1>
+    <h1>Replaces specific nucleotides in a sequence</h1>
     
     <div class="hidden name"><code>replaceChar.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Replaces specific nucleotides in a sequence one by one</p>
+    <p>Replaces specific nucleotides in a sequence</p>
     </div>
 
     <pre class="usage"><span class='fu'>replaceChar</span>(<span class='no'>sequence</span>, <span class='no'>model</span>, <span class='kw'>char</span> <span class='kw'>=</span> <span class='st'>"X"</span>, <span class='kw'>vocabulary</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"\n"</span>, <span class='st'>"a"</span>,
@@ -117,19 +117,21 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>sequence</th>
-      <td><p>input sequence</p></td>
+      <td><p>Input sequence, length should be in sync with the model.
+If length exceeds input.shape of model then only the right side of the
+sequence will be used.</p></td>
     </tr>
     <tr>
       <th>model</th>
-      <td><p>trained lstm</p></td>
+      <td><p>Trained model from the function <code><a href='trainNetwork.html'>trainNetwork()</a></code></p></td>
     </tr>
     <tr>
       <th>char</th>
-      <td><p>character that will be replaced</p></td>
+      <td><p>Character in the sequence that will be replaced</p></td>
     </tr>
     <tr>
       <th>vocabulary</th>
-      <td><p>ordered vocabulary of input sequence</p></td>
+      <td><p>Ordered vocabulary of input sequence</p></td>
     </tr>
     </table>
 

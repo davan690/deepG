@@ -6,7 +6,7 @@
 \usage{
 getStatesFromFasta(model = NULL,
   fasta.path = "example_files/fasta/a.fasta", maxlen = 80,
-  batch.size = 100, verbose = T)
+  batch.size = 100, verbose = F)
 }
 \arguments{
 \item{model}{keras model}

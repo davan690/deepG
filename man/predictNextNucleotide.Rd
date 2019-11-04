@@ -2,20 +2,20 @@
 % Please edit documentation in R/predict.R
 \name{predictNextNucleotide}
 \alias{predictNextNucleotide}
-\title{Predict next nucleotides in sequence output as S4 class}
+\title{Predict next nucleotides in sequence}
 \usage{
 predictNextNucleotide(sequence, model, vocabulary = c("\\n", "a", "c",
   "g", "t"))
 }
 \arguments{
-\item{sequence}{input sequence, length should be in sync with the model
-if length exceeds input.shape of model then only the right side of the
-sequence will be used}
+\item{sequence}{Input sequence, length should be in sync with the model.
+If length exceeds input.shape of model then only the right side of the
+sequence will be used.}
 
-\item{model}{trained lstm}
+\item{model}{Trained model from the function \code{trainNetwork()}}
 
-\item{vocabulary}{ordered vocabulary of input sequence}
+\item{vocabulary}{Ordered vocabulary of input sequence}
 }
 \description{
-Predict next nucleotides in sequence output as S4 class
+The output is a S4 class.
 }

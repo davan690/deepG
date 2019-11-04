@@ -2,13 +2,22 @@
 % Please edit documentation in R/preprocess.R
 \name{preprocessFasta}
 \alias{preprocessFasta}
-\title{wrapper of the preprocessSemiRedundant() function called on the genomic contents of one
-fasta file. Multiple entries are combined with newline characters.}
+\title{Wrapper of the preprocessSemiRedundant()-function}
 \usage{
-preprocessFasta(path, labels = NULL, maxlen = 250,
-  vocabulary = c("\\n", "a", "c", "g", "t"), verbose = F)
+preprocessFasta(path, maxlen = 250, vocabulary = c("\\n", "a", "c",
+  "g", "t"), verbose = F)
+}
+\arguments{
+\item{path}{Path to the FASTA file}
+
+\item{maxlen}{Length of the semi-redundant sequences}
+
+\item{vocabulary}{Char contains the vocabulary from the input char, it should be sorted.
+If no vocabulary exists, it is generated from the input char}
+
+\item{verbose}{TRUE/FALSE}
 }
 \description{
-wrapper of the preprocessSemiRedundant() function called on the genomic contents of one
-fasta file. Multiple entries are combined with newline characters.
+It called on the genomic contents of one
+FASTA file. Multiple entries are combined with newline characters.
 }

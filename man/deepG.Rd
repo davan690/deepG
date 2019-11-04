@@ -6,7 +6,7 @@
 \alias{deepG-package}
 \title{deepG for GenomeNet}
 \description{
-deepG is a is an open source software librar for building deep neuronal 
+deepG is a is an open source software library for building deep neuronal 
 networks for genomic modeling
 }
 \details{

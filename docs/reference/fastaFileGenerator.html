@@ -6,10 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>custom generator for fasta files, will produce chunks in size of batch.size
-by iterating over the input files. If the input file is smaller than the
-batch.size, batch size will be reduced to the maximal size. So the last batch
-of a file is usually smaller. — fastaFileGenerator • deepG</title>
+<title>Custom generator for FASTA files — fastaFileGenerator • deepG</title>
 
 
 <!-- jquery -->
@@ -38,11 +35,12 @@ of a file is usually smaller. — fastaFileGenerator • deepG</title>
 
 
 
-<meta property="og:title" content="custom generator for fasta files, will produce chunks in size of batch.size
+<meta property="og:title" content="Custom generator for FASTA files — fastaFileGenerator" />
+<meta property="og:description" content="Produce chunks in size of batch.size
 by iterating over the input files. If the input file is smaller than the
 batch.size, batch size will be reduced to the maximal size. So the last batch
-of a file is usually smaller. — fastaFileGenerator" />
-<meta property="og:description" content="see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R" />
+of a file is usually smaller.
+See &amp;lt;https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R&amp;gt;" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -106,16 +104,17 @@ of a file is usually smaller. — fastaFileGenerator" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>custom generator for fasta files, will produce chunks in size of batch.size
-by iterating over the input files. If the input file is smaller than the
-batch.size, batch size will be reduced to the maximal size. So the last batch
-of a file is usually smaller.</h1>
+    <h1>Custom generator for FASTA files</h1>
     
     <div class="hidden name"><code>fastaFileGenerator.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R</p>
+    <p>Produce chunks in size of batch.size
+by iterating over the input files. If the input file is smaller than the
+batch.size, batch size will be reduced to the maximal size. So the last batch
+of a file is usually smaller.
+See &lt;https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R&gt;</p>
     </div>
 
     <pre class="usage"><span class='fu'>fastaFileGenerator</span>(<span class='no'>corpus.dir</span>, <span class='no'>labels.dir</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"fasta"</span>,
@@ -125,8 +124,28 @@ of a file is usually smaller.</h1>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>directory</th>
-      <td><p>input directory where .fasta files are located</p></td>
+      <th>corpus.dir</th>
+      <td><p>Input directory where .fasta files are located</p></td>
+    </tr>
+    <tr>
+      <th>labels.dir</th>
+      <td><p>Input directory where .fasta files with the labels are located</p></td>
+    </tr>
+    <tr>
+      <th>format</th>
+      <td><p>File format</p></td>
+    </tr>
+    <tr>
+      <th>batch.size</th>
+      <td><p>Number of samples</p></td>
+    </tr>
+    <tr>
+      <th>maxlen</th>
+      <td><p>Length of the semi-redundant sequences</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>TRUE/FALSE</p></td>
     </tr>
     </table>
 

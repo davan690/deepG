@@ -2,20 +2,22 @@
 % Please edit documentation in R/predict.R
 \name{replaceChar}
 \alias{replaceChar}
-\title{Replaces specific nucleotides in a sequence one by one}
+\title{Replaces specific nucleotides in a sequence}
 \usage{
 replaceChar(sequence, model, char = "X", vocabulary = c("\\n", "a",
   "c", "g", "t"))
 }
 \arguments{
-\item{sequence}{input sequence}
+\item{sequence}{Input sequence, length should be in sync with the model.
+If length exceeds input.shape of model then only the right side of the
+sequence will be used.}
 
-\item{model}{trained lstm}
+\item{model}{Trained model from the function \code{trainNetwork()}}
 
-\item{char}{character that will be replaced}
+\item{char}{Character in the sequence that will be replaced}
 
-\item{vocabulary}{ordered vocabulary of input sequence}
+\item{vocabulary}{Ordered vocabulary of input sequence}
 }
 \description{
-Replaces specific nucleotides in a sequence one by one
+Replaces specific nucleotides in a sequence
 }
