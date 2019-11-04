@@ -9,9 +9,9 @@ trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
   batch.size = 512, layers.lstm = 4, solver = "adam",
   use.codon.cnn = FALSE, learning.rate = 0.001, use.cudnn = FALSE,
   use.multiple.gpus = FALSE, merge.on.cpu = TRUE, gpu.num = 2,
-  vocabulary.size = 5, epochs = 10, max.queue.size = 100,
-  lr.plateau.factor = 0.1, patience = 5, cooldown = 5,
-  steps.per.epoch = "auto")
+  vocabulary.size = 6, label.vocabulary.size = 3, epochs = 10,
+  max.queue.size = 100, lr.plateau.factor = 0.1, patience = 5,
+  cooldown = 5, steps.per.epoch = "auto")
 }
 \arguments{
 \item{path}{Path to folder where individual or multiple FASTA files are located}
