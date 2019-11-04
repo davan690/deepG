@@ -89,8 +89,8 @@ trainNetwork <- function(path,
         filters = 81,
         input_shape = c(maxlen, vocabulary.size)
       )  %>%
-      layer_max_pooling_1d(pool_size = 3)  %>%
-      layer_batch_normalization(momentum = .8)
+      keras::layer_max_pooling_1d(pool_size = 3)  %>%
+      keras::layer_batch_normalization(momentum = .8)
   }
   
   # following layers
@@ -152,7 +152,7 @@ trainNetwork <- function(path,
     keras::optimizer_sgd(lr = learning.rate)
   
   model %>% keras::compile(loss = "categorical_crossentropy",
-                           optimizer = optimizer)
+                           optimizer = optimizer, metrics = c("acc"))
   
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
@@ -164,35 +164,42 @@ trainNetwork <- function(path,
     gen.val <-
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
     
+    # generate data for embedding browser
+    seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
+    embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
+    embedding.data <- embedding.data.raw$X
+    
+ 
     # training
     message("Start training ...")
     history <-
       model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
-        validation_steps = 10,
+        validation_steps = 1,
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
         callbacks = list(
-          callback_model_checkpoint(paste0(run.name, "_checkpoints.h5"), period = 5),
-          callback_reduce_lr_on_plateau(
+          keras::callback_model_checkpoint(paste0(run.name, "_checkpoints.h5")),
+          keras::callback_reduce_lr_on_plateau(
             monitor = "loss",
             factor = lr.plateau.factor,
             patience = patience,
             cooldown = cooldown
           ),
-          callback_tensorboard(paste0(tensorboard.log, run.name), 
-                               histogram_freq = 1,
-                               write_graph = F,
-                               write_images = T,
-                               embeddings_freq = 1),
-          callback_csv_logger(
+          keras::callback_tensorboard(file.path(tensorboard.log, run.name),
+                                      write_graph = T, 
+                                      histogram_freq = 1,
+                                      write_images = T,
+                                      write_grads = T,
+                                      embeddings_data = embedding.data,
+                                      embeddings_freq = 1),
+          keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
             separator = ";",
-            append = TRUE
-          )
-        )
+            append = TRUE)
+      )
       )
   } else {
     message("Start training ...")
