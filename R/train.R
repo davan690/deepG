@@ -194,7 +194,7 @@ trainNetwork <- function(path,
     if (steps.per.epoch == "auto") {
       messagef("Calculating required steps per epoch.")
       steps.per.epoch <-
-        calculateStepsPerEpoch(path, batch.size = batch.size)
+        calculateStepsPerEpoch(path, maxlen = maxlen, batch.size = batch.size)
       messagef(paste("Full epoch requires", steps.per.epoch, "steps."))
     }
     # training
