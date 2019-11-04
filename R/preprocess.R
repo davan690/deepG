@@ -175,30 +175,6 @@ preprocessFasta <- function(path,
   return(seq.processed)
 }
 
-#' do one full preprocessing iteration to figure out what the observed
-#' steps_per_epoch value is
-#' @export
-calculateStepsPerEpoch <-
-  function(dir,
-           batch.size = 256,
-           maxlen = 250,
-           format = "fasta") {
-    library(xfun)
-    library(Biostrings)
-    steps.per.epoch <- 0
-    fasta.files <- list.files(
-      path = xfun::normalize_path(dir),
-      pattern = paste0("*.", format),
-      full.names = TRUE
-    )
-    for (file in fasta.files) {
-      fasta.file <- Biostrings::readDNAStringSet(file)
-      seq <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
-      steps.per.epoch <-
-        steps.per.epoch + ceiling((nchar(seq) - maxlen) / batch.size)
-    }
-    return(steps.per.epoch)
-  }
 
 #' Helper function for fastaFileGenerator
 #' @param sequence character sequence 
