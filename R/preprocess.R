@@ -181,7 +181,7 @@ preprocessFasta <- function(path,
 #' @param maxlen length of one sample
 #' 
 #' Returns one hot encoding for every sequence  
-#' For example: sequence = "acatg", maxlen = 4, leads to
+#' For example: sequence = "acatg", maxlen = 4, vocabulary = c("-", "a", "c", "g", "t") leads to
 #' X = (0 1 0 0 0  
 #'      0 0 1 0 0
 #'      0 1 0 0 0
