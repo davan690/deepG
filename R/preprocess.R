@@ -211,10 +211,11 @@ fastaFileGenerator <- function(corpus.dir,
     path = xfun::normalize_path(corpus.dir),
     pattern = paste0("*.", format),
     full.names = TRUE)
+  
   num_files <- length(fasta.files)
   
   # regular expression for chars outside vocabulary
-  pattern <- paste0("[^", paste0(vocabulary, collapse = ""), "]")
+  char_pattern <- paste0("[^", paste0(vocabulary, collapse = ""), "]")
   
   # sequence vector collects strings until one batch can be created 
   sequence_vector <- vector("character")
@@ -235,7 +236,7 @@ fastaFileGenerator <- function(corpus.dir,
   seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
   # test for chars outside vocabulary
   if (showWarnings){
-    charsOutsideVoc <- stringr::str_detect(seq, pattern)  
+    charsOutsideVoc <- stringr::str_detect(seq, char_pattern)  
     if (charsOutsideVoc) warning("file ", file, " contains characters outside of vocabulary")
   }
   
@@ -276,7 +277,7 @@ fastaFileGenerator <- function(corpus.dir,
           num_sub_seq <<- length(sub_seq)
           # test for chars outside vocabulary
           if (showWarnings){
-            charsOutsideVoc <- stringr::str_detect(seq, pattern)  
+            charsOutsideVoc <- stringr::str_detect(seq, char_pattern)  
             if (charsOutsideVoc) warning("file ", file, " contains characters outside the vocabulary")
           }
         } else {
