@@ -104,13 +104,13 @@ preprocessSemiRedundant <- function(char,
 #' @export
 preprocessFasta <- function(path,
                             maxlen = 250,
-                            vocabulary = c("-", "|", "a", "c", "g", "t"),
+                            vocabulary = c("s", "-", "a", "c", "g", "t"),
                             verbose = F) {
 
   
   # process corpus
   fasta.file <- Biostrings::readDNAStringSet(path)
-  seq <- paste0("|", paste(fasta.file, collapse = "-"),"|") 
+  seq <- paste0("s", paste(fasta.file, collapse = "-"),"s") 
   
   if(verbose)
     message("Preprocessing the data ...")
@@ -127,14 +127,14 @@ preprocessFasta <- function(path,
 #' @param maxlen length of one sample
 #' 
 #' Returns one hot encoding for every sequence  
-#' For example: sequence = "acatg", maxlen = 4, vocabulary = c("-", "a", "c", "g", "t") leads to
+#' For example: sequence = "acatg", maxlen = 4, vocabulary = c("s", "a", "c", "g", "t") leads to
 #' X = (0 1 0 0 0  
 #'      0 0 1 0 0
 #'      0 1 0 0 0
 #'      0 0 0 0 1)
 #' Y = (0 0 0 1 0)       
 #' @export
-sequenceToArray <- function(sequence, maxlen, vocabulary = c("-", "|", "a", "c", "g", "t")){
+sequenceToArray <- function(sequence, maxlen, vocabulary = c("s", "|", "a", "c", "g", "t")){
   len_voc <- length(vocabulary)
   len_seq <- nchar(sequence)
   z <- array(0L, dim=c(len_seq*len_voc))  
@@ -192,10 +192,10 @@ fastaFileGenerator <- function(corpus.dir,
                                batch.size = 256,
                                maxlen = 250,
                                max_iter = 20,
-                               seqStart = "|",
-                               seqEnd= "|",
+                               seqStart = "s",
+                               seqEnd= "s",
                                withinFile = "-",
-                               vocabulary = c("|","-","a", "c", "g", "t"),
+                               vocabulary = c("s","-","a", "c", "g", "t"),
                                verbose = FALSE,
                                randomFiles = FALSE,
                                #replaceInFileSampling = TRUE,
