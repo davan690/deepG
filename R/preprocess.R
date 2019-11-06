@@ -156,6 +156,22 @@ sequenceToArray <- function(sequence, maxlen, vocabulary = c("-", "|", "a", "c",
 }
 
 
+#' Helper function for fastaFileGenerator 
+#' 
+#' splits a character sequences into vector of sequences
+#' @param seq a character sequence
+#' @param vocabulary vector of allowed characters
+#' @param maxlen sequences in the output <= (maxlen + 1) get discarded    
+#' @export 
+splitSequence <- function(seq, vocabulary, maxlen){
+  seq <- stringr::str_to_lower(seq)
+  pattern = paste0("[^", paste0(vocabulary, collapse = ""), "]")
+  subSeq  <- stringr::str_split(seq, pattern)[[1]]
+  # only keep sequences that are long enough for one sample 
+  subSeq <- subSeq[nchar(subSeq) > maxlen] 
+  subSeq
+}
+
 #' custom generator for fasta files, will produce chunks in size of batch.size
 #' by iterating over the input files. 
 #' @param corpus.dir input directory where .fasta files are located
@@ -170,7 +186,7 @@ sequenceToArray <- function(sequence, maxlen, vocabulary = c("-", "|", "a", "c",
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
 #' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
 #' @export
-
+ 
 fastaFileGenerator <- function(corpus.dir,
                                format = "fasta",
                                batch.size = 256,
@@ -184,7 +200,7 @@ fastaFileGenerator <- function(corpus.dir,
                                randomFiles = FALSE,
                                #replaceInFileSampling = TRUE,
                                #step = 1, 
-                               showWarnings = TRUE){
+                               showWarnings = FALSE){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary))
@@ -305,4 +321,3 @@ fastaFileGenerator <- function(corpus.dir,
     list(X = x, Y = y)
   }
 }
-
