@@ -165,8 +165,8 @@ sequenceToArray <- function(sequence, maxlen, vocabulary = c("-", "|", "a", "c",
 #' @export 
 splitSequence <- function(seq, vocabulary, maxlen){
   seq <- stringr::str_to_lower(seq)
-  pattern = paste0("[^", paste0(vocabulary, collapse = ""), "]")
-  subSeq  <- stringr::str_split(seq, pattern)[[1]]
+  voc_pattern = paste0("[^", paste0(vocabulary, collapse = ""), "]")
+  subSeq  <- stringr::str_split(seq, voc_pattern)[[1]]
   # only keep sequences that are long enough for one sample 
   subSeq <- subSeq[nchar(subSeq) > maxlen] 
   subSeq
@@ -215,7 +215,7 @@ fastaFileGenerator <- function(corpus.dir,
   num_files <- length(fasta.files)
   
   # regular expression for chars outside vocabulary
-  char_pattern <- paste0("[^", paste0(vocabulary, collapse = ""), "]")
+  voc_pattern <- paste0("[^", paste0(vocabulary, collapse = ""), "]")
   
   # sequence vector collects strings until one batch can be created 
   sequence_vector <- vector("character")
@@ -236,7 +236,7 @@ fastaFileGenerator <- function(corpus.dir,
   seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
   # test for chars outside vocabulary
   if (showWarnings){
-    charsOutsideVoc <- stringr::str_detect(seq, char_pattern)  
+    charsOutsideVoc <- stringr::str_detect(seq, voc_pattern)  
     if (charsOutsideVoc) warning("file ", file, " contains characters outside of vocabulary")
   }
   
@@ -277,7 +277,7 @@ fastaFileGenerator <- function(corpus.dir,
           num_sub_seq <<- length(sub_seq)
           # test for chars outside vocabulary
           if (showWarnings){
-            charsOutsideVoc <- stringr::str_detect(seq, char_pattern)  
+            charsOutsideVoc <- stringr::str_detect(seq, voc_pattern)  
             if (charsOutsideVoc) warning("file ", file, " contains characters outside the vocabulary")
           }
         } else {
