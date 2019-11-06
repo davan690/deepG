@@ -104,13 +104,13 @@ preprocessSemiRedundant <- function(char,
 #' @export
 preprocessFasta <- function(path,
                             maxlen = 250,
-                            vocabulary = c("s", "-", "a", "c", "g", "t"),
+                            vocabulary = c("s", "w", "a", "c", "g", "t"),
                             verbose = F) {
 
   
   # process corpus
   fasta.file <- Biostrings::readDNAStringSet(path)
-  seq <- paste0("s", paste(fasta.file, collapse = "-"),"s") 
+  seq <- paste0("s", paste(fasta.file, collapse = "w"),"s") 
   
   if(verbose)
     message("Preprocessing the data ...")
@@ -134,7 +134,7 @@ preprocessFasta <- function(path,
 #'      0 0 0 0 1)
 #' Y = (0 0 0 1 0)       
 #' @export
-sequenceToArray <- function(sequence, maxlen, vocabulary = c("s", "|", "a", "c", "g", "t")){
+sequenceToArray <- function(sequence, maxlen, vocabulary = c("s", "w", "a", "c", "g", "t")){
   len_voc <- length(vocabulary)
   len_seq <- nchar(sequence)
   z <- array(0L, dim=c(len_seq*len_voc))  
@@ -194,8 +194,8 @@ fastaFileGenerator <- function(corpus.dir,
                                max_iter = 20,
                                seqStart = "s",
                                seqEnd= "s",
-                               withinFile = "-",
-                               vocabulary = c("s","-","a", "c", "g", "t"),
+                               withinFile = "w",
+                               vocabulary = c("s","w","a", "c", "g", "t"),
                                verbose = FALSE,
                                randomFiles = FALSE,
                                #replaceInFileSampling = TRUE,
