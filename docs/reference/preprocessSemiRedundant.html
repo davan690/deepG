@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Preprocess string to semi redundant one-hot vector — preprocessSemiRedundant • deepG</title>
+<title>Preprocess string to semi-redundant one-hot vector — preprocessSemiRedundant • deepG</title>
 
 
 <!-- jquery -->
@@ -35,17 +35,15 @@
 
 
 
-<meta property="og:title" content="Preprocess string to semi redundant one-hot vector — preprocessSemiRedundant" />
-<meta property="og:description" content="Outputs semi-redundant set of input string
-Preprocess a character input
-Collapse and tokenize and vectorize character
-Use this function with a character string as input such as data(train)
-if the input text ist ABCDEFGHIJKLM and the maxlen is set to 5, the chunks would be
-X(1): ABCDE Y(1):F
-X(2): BCDEF Y(2):G
-X(3): CDEFG Y(3):H
-X(4): DEFGH (4):I
-..." />
+<meta property="og:title" content="Preprocess string to semi-redundant one-hot vector — preprocessSemiRedundant" />
+<meta property="og:description" content="Outputs semi-redundant set of input character string.
+Collapse, tokenize, and vectorize the character.
+Use this function with a character string as input. For example, 
+if the input text is ABCDEFGHI and the length(maxlen) is 5, the generating chunks would be:
+X(1): ABCDE and Y(1): F;
+X(2): BCDEF and Y(2): G;
+X(3): CDEFG and Y(3): H;
+X(4): DEFGH and Y(4): I" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -109,45 +107,39 @@ X(4): DEFGH (4):I
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Preprocess string to semi redundant one-hot vector</h1>
+    <h1>Preprocess string to semi-redundant one-hot vector</h1>
     
     <div class="hidden name"><code>preprocessSemiRedundant.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Outputs semi-redundant set of input string
-Preprocess a character input
-Collapse and tokenize and vectorize character
-Use this function with a character string as input such as data(train)
-if the input text ist ABCDEFGHIJKLM and the maxlen is set to 5, the chunks would be
-X(1): ABCDE Y(1):F
-X(2): BCDEF Y(2):G
-X(3): CDEFG Y(3):H
-X(4): DEFGH (4):I
-...</p>
+    <p>Outputs semi-redundant set of input character string.
+Collapse, tokenize, and vectorize the character.
+Use this function with a character string as input. For example, 
+if the input text is ABCDEFGHI and the length(maxlen) is 5, the generating chunks would be:
+X(1): ABCDE and Y(1): F;
+X(2): BCDEF and Y(2): G;
+X(3): CDEFG and Y(3): H;
+X(4): DEFGH and Y(4): I</p>
     </div>
 
-    <pre class="usage"><span class='fu'>preprocessSemiRedundant</span>(<span class='no'>char</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='no'>vocabulary</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
+    <pre class="usage"><span class='fu'>preprocessSemiRedundant</span>(<span class='no'>char</span>, <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='no'>vocabulary</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>char</th>
-      <td><p>a character string of text, length of one</p></td>
-    </tr>
-    <tr>
-      <th>labels</th>
-      <td><p>a character string of same length as char with character as labels</p></td>
+      <td><p>Character input string of text with the length of one</p></td>
     </tr>
     <tr>
       <th>maxlen</th>
-      <td><p>length of semi-redundant sequences of maxlen characters</p></td>
+      <td><p>Length of the semi-redundant sequences</p></td>
     </tr>
     <tr>
       <th>vocabulary</th>
-      <td><p>char, should be sorted, if not set char vocabulary will be used</p></td>
+      <td><p>Char contains the vocabulary from the input char, it should be sorted.
+If no vocabulary exists, it is generated from the input char</p></td>
     </tr>
     <tr>
       <th>verbose</th>

@@ -121,8 +121,7 @@
         <td>
           <p><code><a href="calculateStepsPerEpoch.html">calculateStepsPerEpoch()</a></code> </p>
         </td>
-        <td><p>do one full preprocessing iteration to figure out what the observed
-steps_per_epoch value is</p></td>
+        <td><p>Calculate the steps per epoch</p></td>
       </tr><tr>
         
         <td>
@@ -165,10 +164,7 @@ Can be loaded to workspace via data(crispr_sample)</p></td>
         <td>
           <p><code><a href="fastaFileGenerator.html">fastaFileGenerator()</a></code> </p>
         </td>
-        <td><p>custom generator for fasta files, will produce chunks in size of batch.size
-by iterating over the input files. If the input file is smaller than the
-batch.size, batch size will be reduced to the maximal size. So the last batch
-of a file is usually smaller.</p></td>
+        <td><p>Custom generator for FASTA files</p></td>
       </tr><tr>
         
         <td>
@@ -218,20 +214,19 @@ Can be loaded to workspace via data(parenthesis)</p></td>
         <td>
           <p><code><a href="predictNextNucleotide.html">predictNextNucleotide()</a></code> </p>
         </td>
-        <td><p>Predict next nucleotides in sequence output as S4 class</p></td>
+        <td><p>Predict next nucleotides in sequence</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="preprocessFasta.html">preprocessFasta()</a></code> </p>
         </td>
-        <td><p>wrapper of the preprocessSemiRedundant() function called on the genomic contents of one
-fasta file. Multiple entries are combined with newline characters.</p></td>
+        <td><p>Wrapper of the preprocessSemiRedundant()-function</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="preprocessSemiRedundant.html">preprocessSemiRedundant()</a></code> </p>
         </td>
-        <td><p>Preprocess string to semi redundant one-hot vector</p></td>
+        <td><p>Preprocess string to semi-redundant one-hot vector</p></td>
       </tr><tr>
         
         <td>
@@ -243,7 +238,7 @@ fasta file. Multiple entries are combined with newline characters.</p></td>
         <td>
           <p><code><a href="replaceChar.html">replaceChar()</a></code> </p>
         </td>
-        <td><p>Replaces specific nucleotides in a sequence one by one</p></td>
+        <td><p>Replaces specific nucleotides in a sequence</p></td>
       </tr><tr>
         
         <td>
@@ -255,7 +250,7 @@ fasta file. Multiple entries are combined with newline characters.</p></td>
         <td>
           <p><code><a href="trainNetwork.html">trainNetwork()</a></code> </p>
         </td>
-        <td><p>Trains a (mostly) LSTM model on genomic data. Designed for developing genome based language models (GenomeNet)</p></td>
+        <td><p>Trains a (mostly) Long short-term memory (LSTM) model on genomic data. Designed for developing genome based language models (GenomeNet)</p></td>
       </tr><tr>
         
         <td>
