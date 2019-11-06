@@ -170,6 +170,7 @@ sequenceToArray <- function(sequence, maxlen, vocabulary = c("-", "|", "a", "c",
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
 #' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
 #' @export
+
 fastaFileGenerator <- function(corpus.dir,
                                format = "fasta",
                                batch.size = 256,
@@ -304,3 +305,4 @@ fastaFileGenerator <- function(corpus.dir,
     list(X = x, Y = y)
   }
 }
+
