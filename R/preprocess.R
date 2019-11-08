@@ -125,19 +125,23 @@ preprocessFasta <- function(path,
 #' Helper function for fastaFileGenerator
 #' @param sequence character sequence 
 #' @param maxlen length of one sample
-#' 
+#' @param vocabulary set of characters to encode  
+#' @param step how often to take a sample
 #' Returns one hot encoding for every sequence  
-#' For example: sequence = "acatg", maxlen = 4, vocabulary = c("l", "a", "c", "g", "t") leads to
+#' For example: sequence = "acatg", maxlen = 4, vocabulary = c("p","a", "c", "g", "t"), step = 1  leads to
 #' X = (0 1 0 0 0  
 #'      0 0 1 0 0
 #'      0 1 0 0 0
 #'      0 0 0 0 1)
 #' Y = (0 0 0 1 0)       
 #' @export
-sequenceToArray <- function(sequence, maxlen, vocabulary = c("l", "p", "a", "c", "g", "t")){
+sequenceToArray <- function(sequence, maxlen, vocabulary, step){
   len_voc <- length(vocabulary)
   len_seq <- nchar(sequence)
-  z <- array(0L, dim=c(len_seq*len_voc))  
+  # len_seq should be n * step + maxlen + 1 for some integer n
+  # how many samples can be extracted from sequence
+  numberOfSamples <- ((len_seq - maxlen - 1)/step) + 1  
+  z <- array(0L, dim=c(len_seq * len_voc))  
   tokenizer <- keras::fit_text_tokenizer(keras::text_tokenizer(char_level = TRUE, lower = TRUE), vocabulary) 
   sequence_int <- keras::texts_to_sequences(tokenizer, sequence) 
   seq_unlist <- sequence_int[[1]]
@@ -147,11 +151,13 @@ sequenceToArray <- function(sequence, maxlen, vocabulary = c("l", "p", "a", "c",
   z[adjust + seq_unlist] <- 1L
   z <- keras::array_reshape(z, dim=c(len_seq, len_voc))
   
-  x <- array(0L, dim = c(len_seq - maxlen, maxlen, len_voc))
-  for (i in 1:(len_seq - maxlen)){
-    x[i, , ] <- z[i:(maxlen+i-1), ] 
+  x <- array(0L, dim = c(numberOfSamples, maxlen, len_voc))
+  for (i in 1:numberOfSamples){
+    start <- 1 + (i - 1) * step
+    end <- start + maxlen - 1
+    x[i, , ] <- z[start:end, ] 
   }
-  y <- z[(maxlen+1):nrow(z),]
+  y <- z[1 + step * (0:(numberOfSamples-1)) + maxlen, ]
   list(x, y)
 }
 
