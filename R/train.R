@@ -65,9 +65,6 @@ trainNetwork <- function(path,
   stopifnot(batch.size > 1)
   stopifnot(steps.per.epoch > 0)
   
-  if (dir.exists(file.path(tensorboard.log, run.name))) {
-    stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
-  }
   
   message("Initialize model. This can take a few minutes.")
   if (use.multiple.gpus) {
