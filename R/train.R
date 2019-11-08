@@ -164,10 +164,6 @@ trainNetwork <- function(path,
     gen.val <-
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
     
-    # generate data for embedding browser
-    # seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
-    #  embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
-    #  embedding.data <- embedding.data.raw$X
     
  
     # training
@@ -180,27 +176,7 @@ trainNetwork <- function(path,
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
-        callbacks = list(
-          keras::callback_model_checkpoint(paste0(run.name, "_checkpoints.h5")),
-          keras::callback_reduce_lr_on_plateau(
-            monitor = "loss",
-            factor = lr.plateau.factor,
-            patience = patience,
-            cooldown = cooldown
-          ),
-          keras::callback_tensorboard(file.path(tensorboard.log, run.name),
-                                      write_graph = T, 
-                                      histogram_freq = 1,
-                                      write_images = T,
-                                      write_grads = T
-                                      # embeddings_data = embedding.data,
-                                      #embeddings_freq = 1
-                                      ),
-          keras::callback_csv_logger(
-            paste0(run.name, "_log.csv"),
-            separator = ";",
-            append = TRUE)
-      )
+        callbacks = NULL 
       )
   } else {
     message("Start training ...")
