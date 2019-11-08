@@ -55,8 +55,7 @@ trainNetwork <- function(path,
                          lr.plateau.factor = .1,
                          patience = 5,
                          cooldown = 5,
-                         steps.per.epoch = 10000,
-                         tensorboard.log = "/scratch/tensorboard") {
+                         steps.per.epoch = 10000) {
 
   stopifnot(maxlen > 0)
   stopifnot(dropout.rate < 1 | dropout.rate > 0)
