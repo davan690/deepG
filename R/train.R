@@ -55,6 +55,7 @@ trainNetwork <- function(path,
                          lr.plateau.factor = .1,
                          patience = 5,
                          cooldown = 5,
+                         dummyGen = FALSE,
                          steps.per.epoch = 10000) {
 
   stopifnot(maxlen > 0)
@@ -157,12 +158,17 @@ trainNetwork <- function(path,
   if (missing(dataset)) {
     message("Starting fasta generator ...")
     # generator for training
-    gen <-
+   
+    if (dummyGen){
+     gen <- dummyGenerator(batch.size = batch.size, maxlen = maxlen)
+     gen.val <- dummyGenerator(batch.size = batch.size, maxlen = maxlen)
+    } else {
+     gen <-
         fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
     # generator for validation
     gen.val <-
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
-    
+    }
     
  
     # training
