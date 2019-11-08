@@ -255,3 +255,11 @@ fastaFileGenerator <- function(corpus.dir,
     list(X = x, Y = y)
   }
 }
+
+dummyGenerator(batch.size, maxlen, vocabulary = c("-", "|", "a", "c", "g", "t")){
+  seq <- paste0(rep("a", batch.size + maxlen), collapse="")  
+  fixedArrays <- sequenceToArray(sequence = seq, maxlen = maxlen, vocabulary = vocabulary)
+  function(){
+    fixedArrays
+  }
+}
