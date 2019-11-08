@@ -165,9 +165,9 @@ trainNetwork <- function(path,
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
     
     # generate data for embedding browser
-    seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
-    embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
-    embedding.data <- embedding.data.raw$X
+    # seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
+    #  embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
+    #  embedding.data <- embedding.data.raw$X
     
  
     # training
@@ -193,7 +193,7 @@ trainNetwork <- function(path,
                                       histogram_freq = 1,
                                       write_images = T,
                                       write_grads = T,
-                                      embeddings_data = embedding.data,
+                                      # embeddings_data = embedding.data,
                                       embeddings_freq = 1),
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
