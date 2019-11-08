@@ -192,9 +192,10 @@ trainNetwork <- function(path,
                                       write_graph = T, 
                                       histogram_freq = 1,
                                       write_images = T,
-                                      write_grads = T,
+                                      write_grads = T
                                       # embeddings_data = embedding.data,
-                                      embeddings_freq = 1),
+                                      #embeddings_freq = 1
+                                      ),
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
             separator = ";",
