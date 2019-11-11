@@ -256,11 +256,19 @@ fastaFileGenerator <- function(corpus.dir,
   }
 }
 
-dummyGenerator <- function(batch.size, maxlen, vocabulary = c("-", "|", "a", "c", "g", "t")){
-  seq <- paste0(rep("a", batch.size + maxlen), collapse="")  
+#' dummy generator for testing purposes 
+#' @export
+dummyGenerator <- function(batch.size, maxlen, vocabulary = c("l", "p", "a", "c", "g", "t")){
+  seq <- paste0(sample(vocabulary, size = batch.size + maxlen, replace = TRUE), collapse="")  
   fixedArrays <- sequenceToArray(sequence = seq, maxlen = maxlen, vocabulary = vocabulary)
+  rowsY <- nrow(fixedArrays[[2]])
+  X <- fixedArrays[[1]]
+  Y <- fixedArrays[[2]]
+  shuffleY <- sample(rowsY)
   function(){
-    fixedArrays
+    Y <<- Y[shuffleY,]
+    list(X = X, Y = Y)
   }
 }
 
+  
