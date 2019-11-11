@@ -55,7 +55,7 @@ trainNetwork <- function(path,
                          lr.plateau.factor = .1,
                          patience = 5,
                          cooldown = 5,
-                         steps.per.epoch = 1000,
+                         steps.per.epoch = 100,
                          tensorboard.log = "/scratch/tensorboard2") {
 
   stopifnot(maxlen > 0)
@@ -161,20 +161,35 @@ trainNetwork <- function(path,
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
     message("Starting fasta generator ...")
+    
     # generator for training
     gen <-
         fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
+    
     # generator for validation
     gen.val <-
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
     
-    test_scalar <- keras::callback_lambda(on_epoch_end = function(epoch, logs) {
-      print(tensorflow::tf$summary$scalar("test_rate", data = runif(1), step = epoch))
+    scalar.test <- keras::callback_lambda(on_epoch_end = function(epoch, logs) {
+      tensorflow::tf$summary$scalar("test_rate", data = runif(1), step = epoch)
     })
+    
+    # callback that prints the nucleotide-wise accuracy to tensorboard 
+    #scalar.evaluation <- keras::callback_lambda(on_epoch_end = function(epoch, logs) {
+    #  # 
+    #  #scores <- keras::predict_generator(model, gen.val, steps = 5)
+    #  text <- "AAAAAAAAAACCCCCCCCCCCCCCCCCCCCCCCCCGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+    #  test.encoded <- preprocessSemiRedundant(text, vocabulary = c("-", "|", "a", "c", "g", "t"), maxlen = 100)
+    #  predictions <- keras::predict_proba(model, test.encoded$X)
+    #  tensorflow::tf$summary$scalar("acc_a", data = runif(1), step = epoch)
+    #  tensorflow::tf$summary$scalar("acc_c", data = runif(1), step = epoch)
+    #  tensorflow::tf$summary$scalar("acc_g", data = runif(1), step = epoch)
+    #  tensorflow::tf$summary$scalar("acc_t", data = runif(1), step = epoch)
+    #})
     
     # training
     message("Start training ...")
-    model %>% keras::fit_generator(
+    history <- model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
         validation_steps = 1,
@@ -189,7 +204,7 @@ trainNetwork <- function(path,
             patience = patience,
             cooldown = cooldown
           ),
-          test_scalar,
+          scalar.test,
           keras::callback_tensorboard(file.path(tensorboard.log, run.name),
                                       write_graph = T, 
                                       histogram_freq = 1,
@@ -224,4 +239,6 @@ trainNetwork <- function(path,
     overwrite = TRUE,
     include_optimizer = TRUE
   )
+  return(history)
 }
+
