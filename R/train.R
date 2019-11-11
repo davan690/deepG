@@ -56,7 +56,7 @@ trainNetwork <- function(path,
                          patience = 5,
                          cooldown = 5,
                          steps.per.epoch = 1000,
-                         tensorboard.log = "/scratch/tensorboard") {
+                         tensorboard.log = "/scratch/tensorboard2") {
 
   stopifnot(maxlen > 0)
   stopifnot(dropout.rate < 1 | dropout.rate > 0)
@@ -151,6 +151,10 @@ trainNetwork <- function(path,
     optimizer <-
     keras::optimizer_sgd(lr = learning.rate)
   
+  # start TB file writer 
+  file_writer <- tensorflow::tf$summary$create_file_writer(file.path(tensorboard.log, run.name))
+  file_writer$set_as_default()
+  
   model %>% keras::compile(loss = "categorical_crossentropy",
                            optimizer = optimizer, metrics = c("acc"))
   
@@ -164,11 +168,13 @@ trainNetwork <- function(path,
     gen.val <-
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
     
-
+    test_scalar <- keras::callback_lambda(on_epoch_end = function(epoch, logs) {
+      print(tensorflow::tf$summary$scalar("test_rate", data = runif(1), step = epoch))
+    })
+    
     # training
     message("Start training ...")
-    history <-
-      model %>% keras::fit_generator(
+    model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
         validation_steps = 1,
@@ -183,6 +189,7 @@ trainNetwork <- function(path,
             patience = patience,
             cooldown = cooldown
           ),
+          test_scalar,
           keras::callback_tensorboard(file.path(tensorboard.log, run.name),
                                       write_graph = T, 
                                       histogram_freq = 1,
@@ -217,5 +224,4 @@ trainNetwork <- function(path,
     overwrite = TRUE,
     include_optimizer = TRUE
   )
-  return(history)
 }
