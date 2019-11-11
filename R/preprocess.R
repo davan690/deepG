@@ -171,7 +171,22 @@ fastaFileGenerator <- function(corpus.dir,
                                maxlen = 250,
                                max_iter = 20,
                                vocabulary = c("-", "|", "a", "c", "g", "t"),
-                               verbose = FALSE){
+                               verbose = FALSE,
+                               dummyGen = FALSE){
+  
+  if (dummyGen){
+    
+    seq <- paste0(sample(vocabulary, size = batch.size + maxlen, replace = TRUE), collapse="")  
+    fixedArrays <- sequenceToArray(sequence = seq, maxlen = maxlen, vocabulary = vocabulary)
+    rowsY <- nrow(fixedArrays[[2]])
+    X <- fixedArrays[[1]]
+    Y <- fixedArrays[[2]]
+    shuffleY <- sample(rowsY)
+    function(){
+      Y <<- Y[shuffleY,]
+      list(X = X, Y = Y)
+    }
+  } else {
   
   fasta.files <- list.files(
     path = xfun::normalize_path(corpus.dir),
@@ -196,62 +211,64 @@ fastaFileGenerator <- function(corpus.dir,
   if (verbose) info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), used_full_file=logical(),
                                      stringsAsFactors = FALSE)
   if (verbose) message("initializing")
-                
-  function() {
-    start_time <- Sys.time()
-    iter <- 1
-    # loop until enough samples collected
-    while(num_samples < batch.size){  
-      
-      # loop through files until sequence of suitable length is found   
-      while(start_index + maxlen > length_current_seq){
-        next.file <<- next.file + 1 
-        if (next.file > length(fasta.files)) next.file <<- 1
-        file <<- fasta.files[[next.file]]
-        fasta.file <- Biostrings::readDNAStringSet(file)
-        seq <- paste0(paste(fasta.file, collapse = "-"),"|") 
-        length_current_seq <- nchar(seq)
-        start_index <<- 1 
-        if(iter > max_iter){
-          stop('exceeded max_iter value, try reducing maxlen parameter')
-          break
+  
+    function() {
+      start_time <- Sys.time()
+      iter <- 1
+      # loop until enough samples collected
+      while(num_samples < batch.size){  
+        
+        # loop through files until sequence of suitable length is found   
+        while(start_index + maxlen > length_current_seq){
+          next.file <<- next.file + 1 
+          if (next.file > length(fasta.files)) next.file <<- 1
+          file <<- fasta.files[[next.file]]
+          fasta.file <- Biostrings::readDNAStringSet(file)
+          seq <- paste0(paste(fasta.file, collapse = "-"),"|") 
+          length_current_seq <- nchar(seq)
+          start_index <<- 1 
+          if(iter > max_iter){
+            stop('exceeded max_iter value, try reducing maxlen parameter')
+            break
+          }
+          iter <- iter + 1
         }
-        iter <- iter + 1
+        
+        num_files_used <<- num_files_used + 1
+        
+        # go to end of file or stop when enough samples are collected 
+        end_index <- min(start_index + maxlen + (batch.size - num_samples) - 1,
+                         length_current_seq)
+        
+        if (verbose) info_df[num_files_used,] <- c(file_list[next.file], start_index, end_index, (start_index==1 & end_index==length_current_seq))
+        sub_seq <- substr(seq, start_index, end_index)
+        sequence_vector[num_files_used] <- sub_seq
+        length_sub_seq <- nchar(sub_seq)
+        num_samples <- num_samples + length_sub_seq - maxlen 
+        start_index <<- start_index + length_sub_seq - maxlen 
       }
       
-      num_files_used <<- num_files_used + 1
+      if (verbose) cat("number of files used:", num_files_used, "\n")
+      if (verbose) print(info_df)
+      num_files_used <<- 0
       
-      # go to end of file or stop when enough samples are collected 
-      end_index <- min(start_index + maxlen + (batch.size - num_samples) - 1,
-                       length_current_seq)
-    
-      if (verbose) info_df[num_files_used,] <- c(file_list[next.file], start_index, end_index, (start_index==1 & end_index==length_current_seq))
-      sub_seq <- substr(seq, start_index, end_index)
-      sequence_vector[num_files_used] <- sub_seq
-      length_sub_seq <- nchar(sub_seq)
-      num_samples <- num_samples + length_sub_seq - maxlen 
-      start_index <<- start_index + length_sub_seq - maxlen 
-    }
-    
-    if (verbose) cat("number of files used:", num_files_used, "\n")
-    if (verbose) print(info_df)
-    num_files_used <<- 0
-    
-    array_list <- purrr::map(1:length(sequence_vector), ~sequenceToArray(sequence_vector[.x], maxlen = maxlen))
-    x <- array_list[[1]][[1]]
-    y <- array_list[[1]][[2]]
-    if (length(array_list)>1){
-      for (i in 2:length(array_list)){
-        x <- abind::abind(x,array_list[[i]][[1]], along = 1)
-        y <- abind::abind(y,array_list[[i]][[2]], along = 1)
+      array_list <- purrr::map(1:length(sequence_vector), ~sequenceToArray(sequence_vector[.x], maxlen = maxlen))
+      x <- array_list[[1]][[1]]
+      y <- array_list[[1]][[2]]
+      if (length(array_list)>1){
+        for (i in 2:length(array_list)){
+          x <- abind::abind(x,array_list[[i]][[1]], along = 1)
+          y <- abind::abind(y,array_list[[i]][[2]], along = 1)
+        }
       }
+      end_time <- Sys.time()
+      if (verbose){
+        cat("running time:", end_time - start_time, "\n") 
+        obj_size <- format(object.size(list(x,y)),  units = "auto")
+        cat("batch size:", obj_size, "\n")
+      }  
+      list(X = x, Y = y)
     }
-    end_time <- Sys.time()
-    if (verbose){
-      cat("running time:", end_time - start_time, "\n") 
-      obj_size <- format(object.size(list(x,y)),  units = "auto")
-      cat("batch size:", obj_size, "\n")
-    }  
-    list(X = x, Y = y)
   }
 }
+
