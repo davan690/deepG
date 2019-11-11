@@ -156,16 +156,12 @@ trainNetwork <- function(path,
     message("Starting fasta generator ...")
     # generator for training
     
-    if (dummyGen){
-      gen <- dummyGenerator(batch.size = batch.size, maxlen = maxlen)
-      gen.val <- dummyGenerator(batch.size = batch.size, maxlen = maxlen)
-    } else {
-      gen <-
-        fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
+    gen <-
+        fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen, dummyGen = dummyGen )
       # generator for validation
       gen.val <-
-        fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
-    }
+        fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen, dummyGen = dummyGen )
+    
     
     
     # training
