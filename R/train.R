@@ -36,11 +36,11 @@ trainNetwork <- function(path,
                          dataset,
                          validation.split = .05,
                          run.name = "run",
-                         maxlen = 100,
+                         maxlen = 250,
                          dropout.rate = .3,
-                         layer.size = 512,
+                         layer.size = 2048,
                          batch.size = 512,
-                         layers.lstm = 3,
+                         layers.lstm = 4,
                          solver = "adam",
                          use.codon.cnn = FALSE,
                          learning.rate = .001,
@@ -50,14 +50,14 @@ trainNetwork <- function(path,
                          gpu.num = 2,
                          vocabulary.size = 6,
                          label.vocabulary.size = 3,
-                         epochs = 5,
+                         epochs = 10,
                          max.queue.size = 100,
                          lr.plateau.factor = .1,
                          patience = 5,
                          cooldown = 5,
-                         steps.per.epoch = 100,
-                         tensorboard.log = "/scratch/tensorboard2") {
-
+                         steps.per.epoch = 10000,
+                         tensorboard.log = "/scratch/tensorboard") {
+  
   stopifnot(maxlen > 0)
   stopifnot(dropout.rate < 1 | dropout.rate > 0)
   stopifnot(layer.size > 1)
@@ -151,45 +151,29 @@ trainNetwork <- function(path,
     optimizer <-
     keras::optimizer_sgd(lr = learning.rate)
   
-  # start TB file writer 
-  file_writer <- tensorflow::tf$summary$create_file_writer(file.path(tensorboard.log, run.name))
-  file_writer$set_as_default()
-  
   model %>% keras::compile(loss = "categorical_crossentropy",
                            optimizer = optimizer, metrics = c("acc"))
   
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
     message("Starting fasta generator ...")
-    
     # generator for training
     gen <-
-        fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
-    
+      fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
     # generator for validation
     gen.val <-
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
     
-    scalar.test <- keras::callback_lambda(on_epoch_end = function(epoch, logs) {
-      tensorflow::tf$summary$scalar("test_rate", data = runif(1), step = epoch)
-    })
+    # generate data for embedding browser
+    # seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
+    #  embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
+    #  embedding.data <- embedding.data.raw$X
     
-    # callback that prints the nucleotide-wise accuracy to tensorboard 
-    #scalar.evaluation <- keras::callback_lambda(on_epoch_end = function(epoch, logs) {
-    #  # 
-    #  #scores <- keras::predict_generator(model, gen.val, steps = 5)
-    #  text <- "AAAAAAAAAACCCCCCCCCCCCCCCCCCCCCCCCCGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
-    #  test.encoded <- preprocessSemiRedundant(text, vocabulary = c("-", "|", "a", "c", "g", "t"), maxlen = 100)
-    #  predictions <- keras::predict_proba(model, test.encoded$X)
-    #  tensorflow::tf$summary$scalar("acc_a", data = runif(1), step = epoch)
-    #  tensorflow::tf$summary$scalar("acc_c", data = runif(1), step = epoch)
-    #  tensorflow::tf$summary$scalar("acc_g", data = runif(1), step = epoch)
-    #  tensorflow::tf$summary$scalar("acc_t", data = runif(1), step = epoch)
-    #})
     
     # training
     message("Start training ...")
-    history <- model %>% keras::fit_generator(
+    history <-
+      model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
         validation_steps = 1,
@@ -204,18 +188,19 @@ trainNetwork <- function(path,
             patience = patience,
             cooldown = cooldown
           ),
-          scalar.test,
           keras::callback_tensorboard(file.path(tensorboard.log, run.name),
                                       write_graph = T, 
                                       histogram_freq = 1,
                                       write_images = T,
                                       write_grads = T
-                                      ),
+                                      # embeddings_data = embedding.data,
+                                      #embeddings_freq = 1
+          ),
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
             separator = ";",
             append = TRUE)
-      )
+        )
       )
   } else {
     message("Start training ...")
@@ -241,4 +226,3 @@ trainNetwork <- function(path,
   )
   return(history)
 }
-
