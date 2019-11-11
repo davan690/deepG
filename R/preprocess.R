@@ -272,3 +272,22 @@ fastaFileGenerator <- function(corpus.dir,
   }
 }
 
+<<<<<<< HEAD
+=======
+#' dummy generator for testing purposes 
+#' @export
+dummyGenerator <- function(batch.size, maxlen, vocabulary = c("l", "p", "a", "c", "g", "t")){
+  seq <- paste0(sample(vocabulary, size = batch.size + maxlen, replace = TRUE), collapse="")  
+  fixedArrays <- sequenceToArray(sequence = seq, maxlen = maxlen, vocabulary = vocabulary)
+  rowsY <- nrow(fixedArrays[[2]])
+  X <- fixedArrays[[1]]
+  Y <- fixedArrays[[2]]
+  shuffleY <- sample(rowsY)
+  function(){
+    Y <<- Y[shuffleY,]
+    list(X = X, Y = Y)
+  }
+}
+
+  
+>>>>>>> 633b1b7d1f7e4f73c4b5271f6f8eaa0b142b9aff
