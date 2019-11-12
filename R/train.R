@@ -116,7 +116,7 @@ trainNetwork <- function(path,
   } else {
     # non-cudnn
     for (i in 1:(layers.lstm - 1)) {
-      model %<>%
+      model %>%
         keras::layer_lstm(
           layer.size,
           input_shape = c(maxlen, vocabulary.size),
