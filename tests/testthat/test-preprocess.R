@@ -94,7 +94,7 @@ test_that("Checking the generator for the Fasta files", {
   expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 0, 0, 1)) # T
 
   ###################
-  # test for steps = 3
+  # test for step = 3
   gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, step = 3, showWarnings = FALSE)
   arrays <- gen()
   
