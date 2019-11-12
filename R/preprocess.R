@@ -313,6 +313,7 @@ fastaFileGenerator <- function(corpus.dir,
       }
     }
     
+    # empty sequence_vector for next batch 
     sequence_vector <<- vector("character")
     sequence_vector_index <<- 1
     num_samples <<- 0
