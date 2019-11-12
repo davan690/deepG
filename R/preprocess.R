@@ -207,7 +207,7 @@ fastaFileGenerator <- function(corpus.dir,
                                showWarnings = TRUE){
   
   for (i in c(seqStart, seqStart, withinFile)) {
-    if(!(i %in% vocabulary))
+    if(!(i %in% vocabulary) & i!="")
       stop("seqStart, seqEnd and withinFile variables must be in vocabulary")
   }  
   
