@@ -278,6 +278,7 @@ fastaFileGenerator <- function(corpus.dir,
           length_current_seq <<- nchar(current_seq) 
         } 
         
+
         if(iter > max_iter){
           stop('exceeded max_iter value, try reducing maxlen parameter')
           break
