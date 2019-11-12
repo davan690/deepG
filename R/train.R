@@ -60,6 +60,10 @@ trainNetwork <- function(path,
                          steps.per.epoch = 10000,
                          step = 1,
                          randomFiles = FALSE,
+                         seqStart = "l",
+                         seqEnd= "l",
+                         withinFile = "p",
+                         vocabulary = c("l","p","a", "c", "g", "t"),
                          tensorboard.log = "/scratch/tensorboard") {
 
   stopifnot(maxlen > 0)
@@ -163,10 +167,14 @@ trainNetwork <- function(path,
     message("Starting fasta generator ...")
     # generator for training
     gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
-                              maxlen = maxlen, step = step, randomFiles = randomFiles)
+                              maxlen = maxlen, step = step, randomFiles = randomFiles,
+                              seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                              vocabulary = vocabulary)
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
-                                  maxlen = maxlen, step = step, randomFiles = randomFiles)
+                                  maxlen = maxlen, step = step, randomFiles = randomFiles,
+                                  seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                                  vocabulary = vocabulary)
 
     # generate data for embedding browser
     # seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
