@@ -27,6 +27,8 @@
 #' @param lr.plateau.factor Factor of decreasing learning rate when plateau is reached
 #' @param patience Number of epochs waiting for decrease in loss before reducing learningrate
 #' @param cooldown Number of epochs without changing learningrate
+#' @param step how often to take a sample 
+#' @param randomFiles go through files sequentially or shuffle beforehand
 #' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
 #' @export
 trainNetwork <- function(path,
@@ -52,7 +54,9 @@ trainNetwork <- function(path,
                          lr.plateau.factor = .1,
                          patience = 5,
                          cooldown = 5,
-                         steps.per.epoch = "auto") {
+                         steps.per.epoch = "auto",
+                         step = 1,
+                         randomFiles) {
   library(dplyr)
   library(keras)
   library(magrittr)
@@ -153,7 +157,7 @@ trainNetwork <- function(path,
   if (missing(dataset)) {
     message("Starting fasta generator ...")
     gen <-
-        fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
+        fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen, step = step, randomFiles = randomFiles)
     
     # calculate the number of steps after one epoch is finished (full iteration) with the function
     # steps.per.epoch()
