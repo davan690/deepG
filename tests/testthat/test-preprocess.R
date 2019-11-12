@@ -92,8 +92,7 @@ test_that("Checking the generator for the Fasta files", {
   expect_equivalent(arrays[[1]][1, 2, ], c(0, 0, 1, 0, 0, 0)) # A
   expect_equivalent(arrays[[1]][1, 3, ], c(0, 0, 0, 0, 0, 1)) # T
   expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 0, 0, 1)) # T
-  expect_equivalent(arrays[[2]][2, ], c(0, 0, 0, 1, 0, 0)) # C
-  
+
   ###################
   # test for steps = 3
   gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, step = 3, showWarnings = FALSE)
@@ -105,18 +104,22 @@ test_that("Checking the generator for the Fasta files", {
   expect_equivalent(arrays[[1]][2, 2, ], c(0, 0, 0, 1, 0, 0)) # C
   expect_equivalent(arrays[[1]][2, 3, ], c(0, 0, 0, 1, 0, 0)) # C
   expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 0, 0, 1)) # T 
-  expect_equivalent(arrays[[2]][2, ], c(0, 0, 0, 0, 1, 0)) # G
-  
+
   ###################
   # tests with chars outside vocabulary, vocabulary does not contain "A"
   # generarator discards samples containing "A" 
   gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, step = 2, showWarnings = FALSE, vocabulary = c("l","p", "c", "g", "t"))
   arrays <- gen()
   
-  expect_equivalent(arrays[[1]][1, 1, ], c(0, 0, 0, 0, 0, 1)) # T 
-  expect_equivalent(arrays[[1]][1, 2, ], c(0, 0, 0, 0, 0, 1)) # T
-  expect_equivalent(arrays[[1]][1, 3, ], c(0, 0, 0, 1, 0, 0)) # C
-  expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 1, 0, 0)) # C
+  expect_equivalent(arrays[[1]][1, 1, ], c(0, 0, 0, 0, 1)) # T 
+  expect_equivalent(arrays[[1]][1, 2, ], c(0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[1]][1, 3, ], c(0, 0, 1, 0, 0)) # C
+  expect_equivalent(arrays[[2]][1, ], c(0, 0, 1, 0, 0)) # C
+  
+  expect_equivalent(arrays[[1]][2, 1, ], c(0, 0, 0, 1, 0)) # G
+  expect_equivalent(arrays[[1]][2, 2, ], c(0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[1]][2, 3, ], c(0, 0, 0, 1, 0)) # G
+  expect_equivalent(arrays[[2]][2, ], c(0, 0, 1, 0, 0)) # C
   
   
   expect_error(fastaFileGenerator())
