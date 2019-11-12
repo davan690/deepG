@@ -73,7 +73,7 @@ test_that("Checking the generator for the Fasta files", {
   maxlen = 50
   words = 6
 
-  gen <- fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE)
+  gen <- fastaFileGenerator(corpus.dir =  testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE)
   
   expect_equivalent(dim(gen()[[1]])[1], batch.size)
   expect_equivalent(dim(gen()[[1]])[2], maxlen)
@@ -84,14 +84,21 @@ test_that("Checking the generator for the Fasta files", {
   
   expect_error(fastaFileGenerator())
   expect_error(fastaFileGenerator(""))
+  expect_error(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "l",
+                                  vocabulary = c("x","y","z")))
   
   expect_is(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE), "function")
   expect_is(gen(), "list")
   expect_is(gen()[[1]], "array")
   expect_is(gen()[[2]], "matrix")
   
-  expect_message(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE, verbose = T))
+  expect_message(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, 
+                                    seqStart = "", showWarnings = FALSE, verbose = T))
   expect_silent(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE))
+  
+  expect_warning(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", seqEnd= "",
+                                              withinFile = "", vocabulary = c("x","y","z", "a", "b", "c"), showWarnings = TRUE))
+  
   
   expect_type(gen()[[1]], "integer")
   expect_type(gen()[[2]], "integer")
