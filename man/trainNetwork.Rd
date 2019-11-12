@@ -5,13 +5,14 @@
 \title{Trains a (mostly) Long short-term memory (LSTM) model on genomic data. Designed for developing genome based language models (GenomeNet)}
 \usage{
 trainNetwork(path, path.val, dataset, validation.split = 0.05,
-  run.name = "run", maxlen = 250, dropout.rate = 0.3,
-  layer.size = 2048, batch.size = 512, layers.lstm = 4,
-  solver = "adam", use.codon.cnn = FALSE, learning.rate = 0.001,
-  use.cudnn = FALSE, use.multiple.gpus = FALSE, merge.on.cpu = TRUE,
-  gpu.num = 2, vocabulary.size = 6, label.vocabulary.size = 3,
-  epochs = 10, max.queue.size = 100, lr.plateau.factor = 0.1,
-  patience = 5, cooldown = 5, steps.per.epoch = 10000,
+  run.name = "run", maxlen = 250, dropout = 0,
+  recurrent_dropout = 0, layer.size = 2048, batch.size = 512,
+  layers.lstm = 4, solver = "adam", use.codon.cnn = FALSE,
+  learning.rate = 0.001, use.cudnn = FALSE,
+  use.multiple.gpus = FALSE, merge.on.cpu = TRUE, gpu.num = 2,
+  vocabulary.size = 6, label.vocabulary.size = 3, epochs = 10,
+  max.queue.size = 100, lr.plateau.factor = 0.1, patience = 5,
+  cooldown = 5, steps.per.epoch = 10000,
   tensorboard.log = "/scratch/tensorboard")
 }
 \arguments{
@@ -27,7 +28,9 @@ trainNetwork(path, path.val, dataset, validation.split = 0.05,
 
 \item{maxlen}{Time steps to unroll for (e.g. length of semi-redundant chunks)}
 
-\item{dropout.rate}{Dropout rate for LSTM cells}
+\item{dropout}{Fraction of the units to drop for inputs}
+
+\item{recurrent_dropout}{Fraction of the units to drop for recurrent state}
 
 \item{layer.size}{Number of cells per network layer}
 
