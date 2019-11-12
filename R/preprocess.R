@@ -167,7 +167,7 @@ sequenceToArray <- function(sequence, maxlen, vocabulary, step){
 #' splits a character sequences into vector of sequences
 #' @param seq a character sequence
 #' @param vocabulary vector of allowed characters
-#' @param maxlen sequences in the output <= (maxlen + 1) get discarded    
+#' @param maxlen sequences in the output < (maxlen + 1) get discarded    
 #' @export 
 splitSequence <- function(seq, vocabulary, maxlen){
   seq <- stringr::str_to_lower(seq)
