@@ -73,7 +73,7 @@ test_that("Checking the generator for the Fasta files", {
   maxlen = 50
   words = 6
 
-  gen <- fastaFileGenerator(corpus.dir =  testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE)
+  gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE)
   
   expect_equivalent(dim(gen()[[1]])[1], batch.size)
   expect_equivalent(dim(gen()[[1]])[2], maxlen)
@@ -81,6 +81,27 @@ test_that("Checking the generator for the Fasta files", {
   expect_equivalent(dim(gen()[[2]])[1], batch.size)
   expect_equivalent(dim(gen()[[2]])[2], words)
   expect_equivalent(length(gen()),2)
+  
+  
+  gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, showWarnings = FALSE)
+  arrays <- gen()
+  # a.fasta file starts with ATTCCGAAGTGCTGGATGCGGGTCAGACG
+  
+  expect_equivalent(arrays[[1]][1, 1, ], c(1, 0, 0, 0, 0, 0)) # start char l
+  expect_equivalent(arrays[[1]][1, 2, ], c(0, 0, 1, 0, 0, 0)) # A
+  expect_equivalent(arrays[[1]][1, 3, ], c(0, 0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[2]][2, ], c(0, 0, 0, 1, 0, 0)) # C
+  
+  # test for steps > 1
+  gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, step = 3, showWarnings = FALSE)
+  arrays <- gen()
+  
+  expect_equivalent(arrays[[1]][2, 1, ], c(0, 0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[1]][2, 2, ], c(0, 0, 0, 1, 0, 0)) # C
+  expect_equivalent(arrays[[1]][2, 3, ], c(0, 0, 0, 1, 0, 0)) # C
+  expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 0, 0, 1)) # T 
+  expect_equivalent(arrays[[2]][, ], c(0, 0, 0, 0, 1, 0)) # G
   
   expect_error(fastaFileGenerator())
   expect_error(fastaFileGenerator(""))
