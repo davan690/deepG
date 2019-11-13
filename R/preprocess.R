@@ -207,9 +207,9 @@ fastaFileGenerator <- function(corpus.dir,
         next.file <<- next.file + 1 
         if (next.file > length(fasta.files)) next.file <<- 1
         file <<- fasta.files[[next.file]]
-        fasta.file <- Biostrings::readDNAStringSet(file)
-        seq <- paste0(paste(fasta.file, collapse = "-"),"|") 
-        length_current_seq <- nchar(seq)
+        fasta.file <<- Biostrings::readDNAStringSet(file)
+        seq <<- paste0(paste(fasta.file, collapse = "-"),"|") 
+        length_current_seq <<- nchar(seq)
         start_index <<- 1 
         if(iter > max_iter){
           stop('exceeded max_iter value, try reducing maxlen parameter')
@@ -224,7 +224,7 @@ fastaFileGenerator <- function(corpus.dir,
       end_index <- min(start_index + maxlen + (batch.size - num_samples) - 1,
                        length_current_seq)
     
-      if (verbose) info_df[num_files_used,] <- c(file_list[next.file], start_index, end_index)
+      if (verbose) info_df[num_files_used,] <- c(fasta.files[next.file], start_index, end_index)
       sub_seq <- substr(seq, start_index, end_index)
       sequence_vector[num_files_used] <- sub_seq
       length_sub_seq <- nchar(sub_seq)
