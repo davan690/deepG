@@ -171,7 +171,7 @@ fastaFileGenerator <- function(corpus.dir,
                                maxlen = 250,
                                max_iter = 20,
                                vocabulary = c("-", "|", "a", "c", "g", "t"),
-                               verbose = FALSE){
+                               verbose = TRUE){
   
   fasta.files <- list.files(
     path = xfun::normalize_path(corpus.dir),
