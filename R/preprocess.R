@@ -171,7 +171,7 @@ fastaFileGenerator <- function(corpus.dir,
                                maxlen = 250,
                                max_iter = 20,
                                vocabulary = c("-", "|", "a", "c", "g", "t"),
-                               verbose = TRUE){
+                               verbose = FALSE){
   
   fasta.files <- list.files(
     path = xfun::normalize_path(corpus.dir),
@@ -193,8 +193,7 @@ fastaFileGenerator <- function(corpus.dir,
   length_current_seq <- nchar(seq)
   
   # information data frame
-  if (verbose) info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), used_full_file=logical(),
-                                     stringsAsFactors = FALSE)
+  if (verbose) info_df <- data.frame(file= character(), start_index=integer(), end_index=integer(), stringsAsFactors = FALSE)
   if (verbose) message("initializing")
                 
   function() {
@@ -225,7 +224,7 @@ fastaFileGenerator <- function(corpus.dir,
       end_index <- min(start_index + maxlen + (batch.size - num_samples) - 1,
                        length_current_seq)
     
-      if (verbose) info_df[num_files_used,] <- c(file_list[next.file], start_index, end_index, (start_index==1 & end_index==length_current_seq))
+      if (verbose) info_df[num_files_used,] <- c(file_list[next.file], start_index, end_index)
       sub_seq <- substr(seq, start_index, end_index)
       sequence_vector[num_files_used] <- sub_seq
       length_sub_seq <- nchar(sub_seq)
