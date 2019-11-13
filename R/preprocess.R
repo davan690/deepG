@@ -266,8 +266,8 @@ fastaFileGenerator <- function(corpus.dir,
           if (file_index > length(fasta.files)) file_index <<- 1
           filePath <<- fasta.files[[file_index]]
           fasta.file <<- Biostrings::readDNAStringSet(filePath)
-          seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
-          sub_seq <- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
+          seq <<- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
+          sub_seq <<- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
           current_seq <<- sub_seq[1]
           length_current_seq <<- nchar(current_seq) 
           num_sub_seq <<- length(sub_seq)
