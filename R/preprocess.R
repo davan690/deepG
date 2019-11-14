@@ -235,17 +235,14 @@ fastaFileGenerator <- function(corpus.dir,
   filePath <- fasta.files[[file_index]]
   fasta.file <- Biostrings::readDNAStringSet(filePath)
   seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
-  # test for chars outside vocabulary
-  if (showWarnings){
-    charsOutsideVoc <- stringr::str_detect(seq, pattern)  
-    if (charsOutsideVoc) warning("file ", filePath, " contains characters outside vocabulary")
-  }
   
   # split seq around chars not in vocabulary
-  sub_seq <- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
-  current_seq <- sub_seq[1]
+  seq_split <- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
+  current_seq <- seq_split[1]
   length_current_seq <- nchar(current_seq)
-  num_sub_seq <- length(sub_seq)
+  num_sub_seq <- length(seq_split)
+  # test for chars outside vocabulary
+  if (num_sub_seq > 1 & showWarnings) warning("file ", filePath, " contains characters outside vocabulary")
   
   if (verbose) message("initializing")
   
@@ -260,21 +257,21 @@ fastaFileGenerator <- function(corpus.dir,
         start_index <<- 1
         
         # go to next file (if condition true) or next sub-sequence (else) 
-        if (next_sub_seq > length(sub_seq)){
+        if (next_sub_seq > length(seq_split)){
           next_sub_seq <<- 1
           file_index <<- file_index + 1 
           if (file_index > length(fasta.files)) file_index <<- 1
           filePath <<- fasta.files[[file_index]]
           fasta.file <<- Biostrings::readDNAStringSet(filePath)
           seq <<- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
-          sub_seq <<- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
-          current_seq <<- sub_seq[1]
+          seq_split <<- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
+          current_seq <<- seq_split[1]
           length_current_seq <<- nchar(current_seq) 
-          num_sub_seq <<- length(sub_seq)
+          num_sub_seq <<- length(seq_split)
           # test for chars outside vocabulary
           if (num_sub_seq > 1 & showWarnings) warning("file ", filePath, " contains characters outside vocabulary")
         } else {
-          current_seq <<- sub_seq[next_sub_seq]
+          current_seq <<- seq_split[next_sub_seq]
           length_current_seq <<- nchar(current_seq) 
         } 
         
