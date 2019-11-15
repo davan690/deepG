@@ -103,7 +103,7 @@ test_that("Checking the generator for the Fasta files", {
   expect_equivalent(arrays[[1]][2, 1, ], c(0, 0, 0, 0, 0, 1)) # T
   expect_equivalent(arrays[[1]][2, 2, ], c(0, 0, 0, 1, 0, 0)) # C
   expect_equivalent(arrays[[1]][2, 3, ], c(0, 0, 0, 1, 0, 0)) # C
-  expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 0, 0, 1)) # T 
+  expect_equivalent(arrays[[2]][2, ], c(0, 0, 0, 0, 1, 0)) # G
 
   ###################
   # tests with chars outside vocabulary, vocabulary does not contain "A"
@@ -136,8 +136,9 @@ test_that("Checking the generator for the Fasta files", {
                                     seqStart = "", showWarnings = FALSE, verbose = T))
   expect_silent(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE))
   
+  # no T in vocabulary
   expect_warning(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", seqEnd= "",
-                                              withinFile = "", vocabulary = c("x","y","z", "a", "b", "c"), showWarnings = TRUE))
+                                              withinFile = "", vocabulary = c("a", "c", "g"), showWarnings = TRUE))
   
   
   expect_type(gen()[[1]], "integer")
