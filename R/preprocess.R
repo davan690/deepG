@@ -204,7 +204,7 @@ fastaFileGenerator <- function(corpus.dir,
                                verbose = FALSE,
                                randomFiles = FALSE,
                                step = 1, 
-                               showWarnings = TRUE){
+                               showWarnings = FALSE){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary) & i!="")
@@ -242,7 +242,10 @@ fastaFileGenerator <- function(corpus.dir,
   length_current_seq <- nchar(current_seq)
   num_sub_seq <- length(seq_split)
   # test for chars outside vocabulary
-  if (num_sub_seq > 1 & showWarnings) warning("file ", filePath, " contains characters outside vocabulary")
+  if (showWarnings){
+    charsOutsideVoc <- stringr::str_detect(stringr::str_to_lower(seq), pattern)  
+    if (charsOutsideVoc) warning("file ", filePath, " contains characters outside vocabulary")
+  }
   
   if (verbose) message("initializing")
   
@@ -269,7 +272,10 @@ fastaFileGenerator <- function(corpus.dir,
           length_current_seq <<- nchar(current_seq) 
           num_sub_seq <<- length(seq_split)
           # test for chars outside vocabulary
-          if (num_sub_seq > 1 & showWarnings) warning("file ", filePath, " contains characters outside vocabulary")
+          if (showWarnings){
+            charsOutsideVoc <- stringr::str_detect(stringr::str_to_lower(seq), pattern)  
+            if (charsOutsideVoc) warning("file ", filePath, " contains characters outside vocabulary")
+          }
         } else {
           current_seq <<- seq_split[next_sub_seq]
           length_current_seq <<- nchar(current_seq) 
@@ -288,10 +294,10 @@ fastaFileGenerator <- function(corpus.dir,
       end_index <- min(start_index + maxlen + (batch.size - num_samples - 1) * step,
                        (potential_num_samples - 1)*step + start_index + maxlen)
       
-      current_sub_seq <- substr(current_seq, start_index, end_index)
-      sequence_vector[sequence_vector_index] <- current_sub_seq
-      length_cur_sub_seq <- nchar(current_sub_seq)
-      num_new_samples <- ((length_cur_sub_seq - maxlen - 1 ) / step) + 1  
+      sample_sub_seq <- substr(current_seq, start_index, end_index)
+      sequence_vector[sequence_vector_index] <- sample_sub_seq
+      length_sample_sub_seq <- nchar(sample_sub_seq)
+      num_new_samples <- ((length_sample_sub_seq - maxlen - 1 ) / step) + 1  
       num_samples <- num_samples + num_new_samples 
       start_index <<- start_index + step*num_new_samples  
       sequence_vector_index <- sequence_vector_index + 1
