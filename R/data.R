@@ -20,3 +20,15 @@
 #' @format Large character of 4.9 Mb
 #' @references \url{http://github.com/philippmuench}
 "parenthesis"
+
+#' E. coli genome for evaluation 
+#' Can be loaded to workspace via data(ecoli)
+#' @format Large character of 4.4 Mb
+#' @references \url{https://science.sciencemag.org/content/277/5331/1453.long}
+"ecoli"
+
+#' subset of the E. coli genome for evaluation 
+#' Can be loaded to workspace via data(ecoli_small)
+#' @format character
+#' @references \url{https://science.sciencemag.org/content/277/5331/1453.long}
+"ecoli_small"
