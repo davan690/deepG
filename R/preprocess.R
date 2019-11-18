@@ -190,7 +190,8 @@ splitSequence <- function(seq, vocabulary, maxlen){
 #' @param seqEnd insert character at end of sequence
 #' @param withinFile insert characters within sequence
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
-#' @param step how often to take a sample#' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
+#' @param step how often to take a sample#'
+#' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
 #' @export
 fastaFileGenerator <- function(corpus.dir,
                                format = "fasta",
