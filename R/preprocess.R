@@ -190,7 +190,7 @@ splitSequence <- function(seq, vocabulary, maxlen){
 #' @param seqEnd insert character at end of sequence
 #' @param withinFile insert characters within sequence
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
-#' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
+#' @param step how often to take a sample#' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
 #' @export
 fastaFileGenerator <- function(corpus.dir,
                                format = "fasta",
@@ -250,7 +250,6 @@ fastaFileGenerator <- function(corpus.dir,
   if (verbose) message("initializing")
   
   function() {
-    start_time <- Sys.time()
     iter <- 1
     # loop until enough samples collected
     while(num_samples < batch.size){  
@@ -299,7 +298,7 @@ fastaFileGenerator <- function(corpus.dir,
       length_sample_sub_seq <- nchar(sample_sub_seq)
       num_new_samples <- ((length_sample_sub_seq - maxlen - 1 ) / step) + 1  
       num_samples <- num_samples + num_new_samples 
-      start_index <<- start_index + step*num_new_samples  
+      start_index <<- start_index + step * num_new_samples  
       sequence_vector_index <- sequence_vector_index + 1
       
     }
@@ -321,12 +320,6 @@ fastaFileGenerator <- function(corpus.dir,
     sequence_vector_index <<- 1
     num_samples <<- 0
     
-    end_time <- Sys.time()
-    if (verbose){
-      cat("running time:", end_time - start_time, "\n") 
-      obj_size <- format(object.size(list(x,y)),  units = "auto")
-      cat("batch size:", obj_size, "\n")
-    }  
     list(X = x, Y = y)
   }
 }
