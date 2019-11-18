@@ -11,7 +11,8 @@
 #' @param validation.split Defines the fraction of the batches that will be used for validation
 #' @param run.name Name of the run (without file ending)
 #' @param maxlen Time steps to unroll for (e.g. length of semi-redundant chunks)
-#' @param dropout.rate Dropout rate for LSTM cells
+#' @param dropout Fraction of the units to drop for inputs
+#' @param recurrent_dropout Fraction of the units to drop for recurrent state
 #' @param layer.size Number of cells per network layer
 #' @param batch.size Number of samples that are used for one network update
 #' @param layers.lstm Number of LSTM layers
@@ -39,7 +40,8 @@ trainNetwork <- function(path,
                          validation.split = .05,
                          run.name = "run",
                          maxlen = 250,
-                         dropout.rate = .3,
+                         dropout = 0,
+                         recurrent_dropout = 0,
                          layer.size = 2048,
                          batch.size = 512,
                          layers.lstm = 4,
@@ -65,9 +67,10 @@ trainNetwork <- function(path,
                          withinFile = "p",
                          vocabulary = c("l","p","a", "c", "g", "t"),
                          tensorboard.log = "/scratch/tensorboard") {
-
+  
   stopifnot(maxlen > 0)
-  stopifnot(dropout.rate < 1 | dropout.rate > 0)
+  stopifnot(dropout <= 1 & dropout >= 0)
+  stopifnot(recurrent_dropout <= 1 & recurrent_dropout >= 0)
   stopifnot(layer.size > 1)
   stopifnot(layers.lstm > 1)
   stopifnot(batch.size > 1)
@@ -76,6 +79,10 @@ trainNetwork <- function(path,
   if (dir.exists(file.path(tensorboard.log, run.name))) {
     stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
   }
+  
+  if (use.cudnn & (recurrent_dropout > 0 | recurrent_dropout > 0)){
+    warning("Dropout is not supported by cuDNN and will be ignored")
+  } 
   
   message("Initialize model. This can take a few minutes.")
   if (use.multiple.gpus) {
@@ -109,28 +116,26 @@ trainNetwork <- function(path,
           layer.size,
           input_shape = c(maxlen, vocabulary.size),
           return_sequences = T
-        ) %>%
-        keras::layer_dropout(rate = dropout.rate)
+        ) 
     }
     # last LSTM layer
     model %>%
-      keras::layer_cudnn_lstm(layer.size) %>%
-      keras::layer_dropout(rate = dropout.rate)
+      keras::layer_cudnn_lstm(layer.size) 
   } else {
     # non-cudnn
     for (i in 1:(layers.lstm - 1)) {
-      model %<>%
+      model %>%
         keras::layer_lstm(
           layer.size,
           input_shape = c(maxlen, vocabulary.size),
-          return_sequences = T
-        ) %>%
-        keras::layer_dropout(rate = dropout.rate)
+          return_sequences = T,
+          dropout = dropout,
+          recurrent_dropout = recurrent_dropout
+        )
     }
     # last LSTM layer
     model %>%
-      keras::layer_lstm(layer.size) %>%
-      keras::layer_dropout(rate = dropout.rate)
+      keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
   }
   
   model %>% keras::layer_dense(vocabulary.size) %>%
@@ -170,6 +175,7 @@ trainNetwork <- function(path,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
                               seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
                               vocabulary = vocabulary)
+
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
                                   maxlen = maxlen, step = step, randomFiles = randomFiles,
@@ -181,14 +187,14 @@ trainNetwork <- function(path,
     #  embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
     #  embedding.data <- embedding.data.raw$X
     
- 
+    
     # training
     message("Start training ...")
     history <-
       model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
-        validation_steps = 1,
+        validation_steps = floor(steps.per.epoch/20),
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
@@ -207,12 +213,12 @@ trainNetwork <- function(path,
                                       write_grads = T
                                       # embeddings_data = embedding.data,
                                       #embeddings_freq = 1
-                                      ),
+          ),
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
             separator = ";",
             append = TRUE)
-      )
+        )
       )
   } else {
     message("Start training ...")

@@ -279,8 +279,6 @@ fastaFileGenerator <- function(corpus.dir,
           current_seq <<- seq_split[next_sub_seq]
           length_current_seq <<- nchar(current_seq) 
         } 
-        
-
         if(iter > max_iter){
           stop('exceeded max_iter value, try reducing maxlen parameter')
           break
@@ -300,8 +298,7 @@ fastaFileGenerator <- function(corpus.dir,
       num_samples <- num_samples + num_new_samples 
       start_index <<- start_index + step * num_new_samples  
       sequence_vector_index <- sequence_vector_index + 1
-      
-    }
+     }
     
     # one hot encode strings collected in sequence_vector and connect arrays
     array_list <- purrr::map(1:length(sequence_vector),
