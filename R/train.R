@@ -32,6 +32,9 @@
 #' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
 #' @param step frequency of sampling steps
 #' @param randomFiles TRUE/FALSE go through files sequentially or shuffle beforehand
+#' @param seqStart insert character at beginning of sequence
+#' @param seqEnd insert character at end of sequence
+#' @param withinFile insert characters within sequences
 #' @param tensorboard.log path to tensorboard log directory
 #' @export
 trainNetwork <- function(path,
