@@ -8,6 +8,7 @@
 #' @param path Path to folder where individual or multiple FASTA files are located for training
 #' @param path.val Path to folder where individual or multiple FASTA files are located for validation
 #' @param dataset Dataframe holding training samples in RAM instead of using generator 
+#' @param checkpoint_path Path to where function creates a new folder (using run.name) for checkpoints 
 #' @param validation.split Defines the fraction of the batches that will be used for validation
 #' @param run.name Name of the run (without file ending)
 #' @param maxlen Time steps to unroll for (e.g. length of semi-redundant chunks)
@@ -43,6 +44,7 @@
 trainNetwork <- function(path,
                          path.val,
                          dataset,
+                         checkpoint_path,
                          validation.split = .05,
                          run.name = "run",
                          maxlen = 250,
@@ -74,12 +76,7 @@ trainNetwork <- function(path,
                          vocabulary = c("l","p","a", "c", "g", "t"),
                          tensorboard.log = "/scratch/tensorboard",
                          checkpoint_folder,
-                         period = 1) {  # TODO: Should be created with run.name
-  
-  # Create folder for checkpoints
-  checkpoint_dir <- paste0(run.name, "Checkpoints")
-  dir.create(checkpoint_dir, showWarnings = FALSE)
-  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
+                         period = NULL) {  # TODO: Should be created with run.name
   
   stopifnot(maxlen > 0)
   stopifnot(dropout <= 1 & dropout >= 0)
@@ -88,6 +85,12 @@ trainNetwork <- function(path,
   stopifnot(layers.lstm > 1)
   stopifnot(batch.size > 1)
   stopifnot(steps.per.epoch > 0)
+  
+  ## create folder for checkpoints using run.name
+  ## filenames contain epoch and validation loss 
+  # checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
+  # dir.create(checkpoint_dir, showWarnings = FALSE)
+  # filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
   
   if (dir.exists(file.path(tensorboard.log, run.name))) {
     stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
@@ -233,28 +236,7 @@ trainNetwork <- function(path,
       dataset$Y,
       batch_size = batch.size,
       validation_split = validation.split,
-      epochs = epochs,
-      callbacks = list(
-        keras::callback_model_checkpoint(filepath = filepath_checkpoints,
-                                         save_weights_only = FALSE,
-                                         verbose = 1),
-        keras::callback_reduce_lr_on_plateau(
-          monitor = "loss",
-          factor = lr.plateau.factor,
-          patience = patience,
-          cooldown = cooldown
-        ),
-        keras::callback_tensorboard(file.path(tensorboard.log, run.name),
-                                    write_graph = TRUE, 
-                                    histogram_freq = 1,
-                                    write_images = TRUE,
-                                    write_grads = TRUE),
-        keras::callback_csv_logger(
-          paste0(run.name, "_log.csv"),
-          separator = ";",
-          append = TRUE)
-      )
-    )
+      epochs = epochs)
     
   }
   
@@ -273,10 +255,6 @@ trainNetwork <- function(path,
 }
 
 
-
-
-
-
 # TODO: 
 # 1) epochs variable is misleading, better epoch = epoch + initial_epoch ?
 # 2) better handling of plots
@@ -284,7 +262,7 @@ trainNetwork <- function(path,
 # 4) Option to resume training by run.name + epoch, not model_path 
 # 5) model continues with different files ?
 # 6) Option to use metric other than val_loss
-
+# 7) Option not to save/create checkpoints for trainNetwork and resumeTraining
 
 
 #' @title Takes a pretrained model and continues training 
@@ -316,7 +294,7 @@ trainNetwork <- function(path,
 #' @param seqStart Insert character at beginning of sequence
 #' @param seqEnd Insert character at end of sequence
 #' @param withinFile Insert characters within sequences
-#' @param vocabulary vector of allowed characters, samples with other chars get discarded
+#' @param vocabulary vector of allowed characters, should be equal to original model's vocabulary
 #' @param tensorboard.log Path to tensorboard log directory
 #' @param period Interval (number of epochs) between checkpoints
 #' @param initial_epoch Epoch at which to start training 
@@ -389,7 +367,9 @@ resumeTraining <- function(model_path,
                              optimizer = optimizer, metrics = c("acc"))
   }
   
-  checkpoint_dir <- paste0(run.name, "_checkpoints")
+  # create folder for checkpoints using run.name
+  # filenames contain epoch and validation loss 
+  checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
   dir.create(checkpoint_dir, showWarnings = FALSE)
   filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
   
