@@ -73,7 +73,7 @@ test_that("Checking the generator for the Fasta files", {
   maxlen = 50
   words = 6
 
-  gen <- fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen)
+  gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE)
   
   expect_equivalent(dim(gen()[[1]])[1], batch.size)
   expect_equivalent(dim(gen()[[1]])[2], maxlen)
@@ -82,16 +82,64 @@ test_that("Checking the generator for the Fasta files", {
   expect_equivalent(dim(gen()[[2]])[2], words)
   expect_equivalent(length(gen()),2)
   
+  
+  gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, showWarnings = FALSE)
+  arrays <- gen()
+  # a.fasta file starts with ATTCCGAAGTGCTGGATGCGGGTCAGACG
+  # X[1,,] corresponds to lAT (generator inserts "l"  at start of new file)
+  
+  expect_equivalent(arrays[[1]][1, 1, ], c(1, 0, 0, 0, 0, 0)) # start char l
+  expect_equivalent(arrays[[1]][1, 2, ], c(0, 0, 1, 0, 0, 0)) # A
+  expect_equivalent(arrays[[1]][1, 3, ], c(0, 0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[2]][1, ], c(0, 0, 0, 0, 0, 1)) # T
+
+  ###################
+  # test for step = 3
+  gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, step = 3, showWarnings = FALSE)
+  arrays <- gen()
+  
+  # a.fasta file starts with ATTCCGAAGTGCTGGATGCGGGTCAGACG
+  # X[2,,] should correspond to TCC (generator inserts "l"  at start of new file)
+  expect_equivalent(arrays[[1]][2, 1, ], c(0, 0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[1]][2, 2, ], c(0, 0, 0, 1, 0, 0)) # C
+  expect_equivalent(arrays[[1]][2, 3, ], c(0, 0, 0, 1, 0, 0)) # C
+  expect_equivalent(arrays[[2]][2, ], c(0, 0, 0, 0, 1, 0)) # G
+
+  ###################
+  # tests with chars outside vocabulary, vocabulary does not contain "A"
+  # generarator discards samples containing "A" 
+  gen <- fastaFileGenerator(corpus.dir = testpath, batch.size = 5, maxlen = 3, step = 2, showWarnings = FALSE, vocabulary = c("l","p", "c", "g", "t"))
+  arrays <- gen()
+  
+  expect_equivalent(arrays[[1]][1, 1, ], c(0, 0, 0, 0, 1)) # T 
+  expect_equivalent(arrays[[1]][1, 2, ], c(0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[1]][1, 3, ], c(0, 0, 1, 0, 0)) # C
+  expect_equivalent(arrays[[2]][1, ], c(0, 0, 1, 0, 0)) # C
+  
+  expect_equivalent(arrays[[1]][2, 1, ], c(0, 0, 0, 1, 0)) # G
+  expect_equivalent(arrays[[1]][2, 2, ], c(0, 0, 0, 0, 1)) # T
+  expect_equivalent(arrays[[1]][2, 3, ], c(0, 0, 0, 1, 0)) # G
+  expect_equivalent(arrays[[2]][2, ], c(0, 0, 1, 0, 0)) # C
+  
+  
   expect_error(fastaFileGenerator())
   expect_error(fastaFileGenerator(""))
+  expect_error(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "l",
+                                  vocabulary = c("x","y","z")))
   
-  expect_is(fastaFileGenerator(testpath),"function")
-  expect_is(gen(),"list")
+  expect_is(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE), "function")
+  expect_is(gen(), "list")
   expect_is(gen()[[1]], "array")
-  expect_is(gen()[[2]],"matrix")
+  expect_is(gen()[[2]], "matrix")
   
-  expect_message(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen,verbose = T))
-  expect_silent(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen))
+  expect_message(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, 
+                                    seqStart = "", showWarnings = FALSE, verbose = T))
+  expect_silent(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", showWarnings = FALSE))
+  
+  # no T in vocabulary
+  expect_warning(fastaFileGenerator(testpath, batch.size = batch.size, maxlen = maxlen, seqStart = "", seqEnd= "",
+                                              withinFile = "", vocabulary = c("a", "c", "g"), showWarnings = TRUE))
+  
   
   expect_type(gen()[[1]], "integer")
   expect_type(gen()[[2]], "integer")

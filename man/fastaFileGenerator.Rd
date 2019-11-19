@@ -6,8 +6,8 @@
 by iterating over the input files.}
 \usage{
 fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 512,
-  maxlen = 250, max_iter = 20, vocabulary = c("-", "|", "a", "c",
-  "g", "t"), verbose = FALSE)
+  maxlen = 250, max_iter = 20, vocabulary = c("\\n", "a", "c", "g",
+  "t"), verbose = FALSE)
 }
 \arguments{
 \item{corpus.dir}{input directory where .fasta files are located}

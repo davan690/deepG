@@ -30,6 +30,11 @@
 #' @param patience Number of epochs waiting for decrease in loss before reducing learningrate
 #' @param cooldown Number of epochs without changing learningrate
 #' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
+#' @param step frequency of sampling steps
+#' @param randomFiles TRUE/FALSE go through files sequentially or shuffle beforehand
+#' @param seqStart insert character at beginning of sequence
+#' @param seqEnd insert character at end of sequence
+#' @param withinFile insert characters within sequences
 #' @param tensorboard.log path to tensorboard log directory
 #' @export
 trainNetwork <- function(path,
@@ -58,6 +63,12 @@ trainNetwork <- function(path,
                          patience = 5,
                          cooldown = 5,
                          steps.per.epoch = 10000,
+                         step = 1,
+                         randomFiles = FALSE,
+                         seqStart = "l",
+                         seqEnd= "l",
+                         withinFile = "p",
+                         vocabulary = c("l","p","a", "c", "g", "t"),
                          tensorboard.log = "/scratch/tensorboard") {
   
   stopifnot(maxlen > 0)
@@ -163,12 +174,17 @@ trainNetwork <- function(path,
   if (missing(dataset)) {
     message("Starting fasta generator ...")
     # generator for training
-    gen <-
-      fastaFileGenerator(corpus.dir = path, batch.size = batch.size, maxlen = maxlen)
+    gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
+                              maxlen = maxlen, step = step, randomFiles = randomFiles,
+                              seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                              vocabulary = vocabulary)
+
     # generator for validation
-    gen.val <-
-      fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
-    
+    gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
+                                  maxlen = maxlen, step = step, randomFiles = randomFiles,
+                                  seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                                  vocabulary = vocabulary)
+
     # generate data for embedding browser
     # seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
     #  embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))

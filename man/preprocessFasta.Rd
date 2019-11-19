@@ -4,7 +4,7 @@
 \alias{preprocessFasta}
 \title{Wrapper of the preprocessSemiRedundant()-function}
 \usage{
-preprocessFasta(path, maxlen = 250, vocabulary = c("-", "|", "a", "c",
+preprocessFasta(path, maxlen = 250, vocabulary = c("\\n", "a", "c",
   "g", "t"), verbose = F)
 }
 \arguments{
