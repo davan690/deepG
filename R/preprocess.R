@@ -189,6 +189,7 @@ splitSequence <- function(seq, vocabulary, maxlen){
 #' @param seqStart insert character at beginning of sequence
 #' @param seqEnd insert character at end of sequence
 #' @param withinFile insert characters within sequence
+#' @param vocabulary vector of allowed characters, samples with other chars get discarded
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
 #' @param step how often to take a sample#'
 #' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   

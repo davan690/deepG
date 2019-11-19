@@ -35,6 +35,7 @@
 #' @param seqStart insert character at beginning of sequence
 #' @param seqEnd insert character at end of sequence
 #' @param withinFile insert characters within sequences
+#' @param vocabulary vector of allowed characters, samples with other chars get discarded
 #' @param tensorboard.log path to tensorboard log directory
 #' @param checkpoint_folder path to checkpoint directory
 #' @param period Interval (number of epochs) between checkpoints
@@ -187,209 +188,12 @@ trainNetwork <- function(path,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
                               seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
                               vocabulary = vocabulary)
-
-    # generator for validation
-    gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
-                                  maxlen = maxlen, step = step, randomFiles = randomFiles,
-                                  seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                                  vocabulary = vocabulary)
-
-    # training
-    message("Start training ...")
-    history <-
-      model %>% keras::fit_generator(
-        generator = gen,
-        validation_data = gen.val,
-        validation_steps = floor(steps.per.epoch/20),
-        steps_per_epoch = steps.per.epoch,
-        max_queue_size = max.queue.size,
-        epochs = epochs,
-        callbacks = list(
-          keras::callback_model_checkpoint(filepath = filepath_checkpoints,
-                                           save_weights_only = FALSE,
-                                           verbose = 1),
-          keras::callback_reduce_lr_on_plateau(
-            monitor = "loss",
-            factor = lr.plateau.factor,
-            patience = patience,
-            cooldown = cooldown
-          ),
-          keras::callback_tensorboard(file.path(tensorboard.log, run.name),
-                                      write_graph = T, 
-                                      histogram_freq = 1,
-                                      write_images = T,
-                                      write_grads = T),
-          keras::callback_csv_logger(
-            paste0(run.name, "_log.csv"),
-            separator = ";",
-            append = TRUE)
-        )
-      )
-  } else {
-    message("Start training ...")
-    history <- model %>% keras::fit(
-      dataset$X,
-      dataset$Y,
-      batch_size = batch.size,
-      validation_split = validation.split,
-      epochs = epochs
-    )
-  }
-  
-  # save final model
-  message("Training done.\nSave model.")
-  Rmodel <-
-    keras::serialize_model(model, include_optimizer = TRUE)
-  save(Rmodel, file = paste0(run.name, "_full_model.Rdata"))
-  keras::save_model_hdf5(
-    model,
-    paste0(run.name, "_full_model.hdf5"),
-    overwrite = TRUE,
-    include_optimizer = TRUE
-  )
-  return(history)
-}
-
-
-
-
-
-
-## TODO: resume option for normal fit function
-
-
-
-
-
-
-#' @title Takes a pretrained model and continues training 
-#'
-#' @param path Path to folder where individual or multiple FASTA files are located for training
-#' @param path.val Path to folder where individual or multiple FASTA files are located for validation
-#' @param dataset Dataframe holding training samples in RAM instead of using generator 
-#' @param validation.split Defines the fraction of the batches that will be used for validation
-#' @param run.name Name of the run (without file ending)
-#' @param batch.size Number of samples that are used for one network update
-#' @param layers.lstm Number of LSTM layers
-#' @param solver Optimizer on default adam (options: "adam", "adagrad", "rmsprop", "sgd")
-#' @param learning.rate Learning rate for optimizer
-#' @param use.cudnn If true, using layer_cudnn_lstm() instead of layer_lstm() which is if GPU supports cudnn
-#' @param use.multiple.gpus If true, multi_gpu_model() will be used based on gpu_num
-#' @param gpu.num Number of GPUs to be used, only relevant if multiple_gpu is true
-#' @param merge.on.cpu True on default, false recommend if the server supports NVlink, only relevant if use.multiple.gpu is true
-#' @param vocabulary.size Number of unique chars in training set
-#' @param epochs Number of full iterations over the dataset
-#' @param max.queue.size Queue on fit_generator()
-#' @param lr.plateau.factor Factor of decreasing learning rate when plateau is reached
-#' @param patience Number of epochs waiting for decrease in loss before reducing learningrate
-#' @param cooldown Number of epochs without changing learningrate
-#' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
-#' @param step frequency of sampling steps
-#' @param randomFiles TRUE/FALSE go through files sequentially or shuffle beforehand
-#' @param seqStart insert character at beginning of sequence
-#' @param seqEnd insert character at end of sequence
-#' @param withinFile insert characters within sequences
-#' @param tensorboard.log path to tensorboard log directory
-#' @param checkpoint_folder path to checkpoint directory
-#' @param period Interval (number of epochs) between checkpoints
-#' @param initial_epoch epoch at which to start training 
-#' @param compile Whether to compile the model after loading
-#' @export
-resumeTraining <- function(path,
-                         path.val,
-                         dataset,
-                         validation.split = .05,
-                         run.name = "run",
-                         batch.size = 512,
-                         layers.lstm = 4,
-                         solver = "adam",
-                         learning.rate = .001,
-                         use.cudnn = FALSE,
-                         use.multiple.gpus = FALSE,
-                         merge.on.cpu = TRUE,
-                         gpu.num = 2,
-                         vocabulary.size = 6,
-                         label.vocabulary.size = 3,
-                         epochs = 10,
-                         max.queue.size = 100,
-                         lr.plateau.factor = .1,
-                         patience = 5,
-                         cooldown = 5,
-                         steps.per.epoch = 10000,
-                         step = 1,
-                         randomFiles = FALSE,
-                         seqStart = "l",
-                         seqEnd= "l",
-                         withinFile = "p",
-                         vocabulary = c("l","p","a", "c", "g", "t"),
-                         tensorboard.log = "/scratch/tensorboard",
-                         checkpoint_folder, # = "/scratch/checkpoints"
-                         period = 1,
-                         initial_epoch,
-                         compile = TRUE
-                         ) {
-  
-  if (initial_epoch >= epochs){
-    warning("networks trains (epochs - initial_epochs) times overall, not epochs times")
-  }
-  
-  model <- keras::load_model_hdf5(model_path, compile = compile)
-  
-  # Create folder for checkpoints, file name of check point contains epoch number and 
-  # validation loss
-  checkpoint_dir <- paste0(run.name, "Checkpoints")
-  dir.create(checkpoint_dir, showWarnings = FALSE)
-  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
-  
-  stopifnot(batch.size > 1)
-  stopifnot(steps.per.epoch > 0)
-  
-  if (dir.exists(file.path(tensorboard.log, run.name))) {
-    stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
-  }
-  
-  # print model layout to screen, should be done before multi_gpu_model
-  summary(model)
-  
-  if (use.multiple.gpus) {
-    model <- keras::multi_gpu_model(model,
-                                    gpus = gpu.num,
-                                    cpu_merge = merge.on.cpu)
-  }
-  
-  # choose optimization method
-  if (solver == "adam")
-    optimizer <-
-    keras::optimizer_adam(lr = learning.rate)
-  if (solver == "adagrad")
-    optimizer <-
-    keras::optimizer_adagrad(lr = learning.rate)
-  if (solver == "rmsprop")
-    optimizer <-
-    keras::optimizer_rmsprop(lr = learning.rate)
-  if (solver == "sgd")
-    optimizer <-
-    keras::optimizer_sgd(lr = learning.rate)
-  
-  model %>% keras::compile(loss = "categorical_crossentropy",
-                           optimizer = optimizer, metrics = c("acc"))
-  
-  # if no dataset is supplied, external fasta generator will generate batches
-  if (missing(dataset)) {
-    message("Starting fasta generator ...")
-    # generator for training
-    gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
-                              maxlen = maxlen, step = step, randomFiles = randomFiles,
-                              seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                              vocabulary = vocabulary)
     
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
                                   maxlen = maxlen, step = step, randomFiles = randomFiles,
                                   seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
                                   vocabulary = vocabulary)
-  
-    
     
     # training
     message("Start training ...")
@@ -401,7 +205,6 @@ resumeTraining <- function(path,
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
-        initial_epoch = initial_epoch,
         callbacks = list(
           keras::callback_model_checkpoint(filepath = filepath_checkpoints,
                                            save_weights_only = FALSE,
@@ -430,8 +233,29 @@ resumeTraining <- function(path,
       dataset$Y,
       batch_size = batch.size,
       validation_split = validation.split,
-      epochs = epochs
+      epochs = epochs,
+      callbacks = list(
+        keras::callback_model_checkpoint(filepath = filepath_checkpoints,
+                                         save_weights_only = FALSE,
+                                         verbose = 1),
+        keras::callback_reduce_lr_on_plateau(
+          monitor = "loss",
+          factor = lr.plateau.factor,
+          patience = patience,
+          cooldown = cooldown
+        ),
+        keras::callback_tensorboard(file.path(tensorboard.log, run.name),
+                                    write_graph = TRUE, 
+                                    histogram_freq = 1,
+                                    write_images = TRUE,
+                                    write_grads = TRUE),
+        keras::callback_csv_logger(
+          paste0(run.name, "_log.csv"),
+          separator = ";",
+          append = TRUE)
+      )
     )
+    
   }
   
   # save final model
@@ -447,4 +271,211 @@ resumeTraining <- function(path,
   )
   return(history)
 }
+
+
+
+
+
+
+# TODO: 
+# 1) epochs variable is misleading, better epoch = epoch + initial_epoch ?
+# 2) better handling of plots
+# 3) model has no memory of past learning rates etc., important for cooldown, patience ?
+# 4) Option to resume training by run.name + epoch, not model_path 
+# 5) model continues with different files ?
+# 6) Option to use metric other than val_loss
+
+
+
+#' @title Takes a pretrained model and continues training 
+#'
+#' @param model_path Path to a pretrained model
+#' @param checkpoint_path Path to where function creates a new folder (using run.name) for new checkpoints 
+#' @param path Path to folder where individual or multiple FASTA files are located for training
+#' @param path.val Path to folder where individual or multiple FASTA files are located for validation
+#' @param dataset Dataframe holding training samples in RAM instead of using generator 
+#' @param validation.split Defines the fraction of the batches that will be used for validation
+#' @param run.name Name of the run (without file ending)
+#' @param batch.size Number of samples that are used for one network update
+#' @param layers.lstm Number of LSTM layers
+#' @param solver Optimizer on default adam (options: "adam", "adagrad", "rmsprop", "sgd")
+#' @param learning.rate Learning rate for optimizer
+#' @param use.cudnn If true, using layer_cudnn_lstm() instead of layer_lstm() which is if GPU supports cudnn
+#' @param use.multiple.gpus If true, multi_gpu_model() will be used based on gpu_num
+#' @param gpu.num Number of GPUs to be used, only relevant if multiple_gpu is true
+#' @param merge.on.cpu True on default, false recommend if the server supports NVlink, only relevant if use.multiple.gpu is true
+#' @param vocabulary.size Number of unique chars in training set
+#' @param epochs Number of full iterations over the dataset
+#' @param max.queue.size Queue on fit_generator()
+#' @param lr.plateau.factor Factor of decreasing learning rate when plateau is reached
+#' @param patience Number of epochs waiting for decrease in loss before reducing learningrate
+#' @param cooldown Number of epochs without changing learningrate
+#' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
+#' @param step frequency of sampling steps
+#' @param randomFiles TRUE/FALSE go through files sequentially or shuffle beforehand
+#' @param seqStart Insert character at beginning of sequence
+#' @param seqEnd Insert character at end of sequence
+#' @param withinFile Insert characters within sequences
+#' @param vocabulary vector of allowed characters, samples with other chars get discarded
+#' @param tensorboard.log Path to tensorboard log directory
+#' @param period Interval (number of epochs) between checkpoints
+#' @param initial_epoch Epoch at which to start training 
+#' @param compile Whether to compile the model after loading
+#' @export
+resumeTraining <- function(model_path,
+                           checkpoint_path,
+                           step = 1,
+                           path,
+                           path.val,
+                           dataset,
+                           validation.split = .05,
+                           run.name,
+                           batch.size ,
+                           epochs,
+                           max.queue.size = 10,
+                           lr.plateau.factor = .1,
+                           patience = 5,
+                           cooldown = 5,
+                           steps.per.epoch,
+                           seqStart = "l",
+                           seqEnd= "l",
+                           withinFile = "p",
+                           vocabulary = c("l","p","a", "c", "g", "t"),
+                           tensorboard.log = "/scratch/tensorboard",
+                           initial_epoch,
+                           compile = TRUE,
+                           solver,
+                           randomFiles,
+                           learning.rate){
+  
+  if (dir.exists(file.path(tensorboard.log, run.name))) {
+    stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
+  }
+  
+  # epochs arguments can be misleading 
+  if (initial_epoch >= epochs){
+    stop("networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+  }
+  
+  # extract initial_epoch from filename if no argument is given
+  if (missing(initial_epoch)){
+    epochFromFilename <- stringr::str_extract(a,"Ep.\\d+")
+    initial_epoch <- as.integer(substring(b, 4, nchar(epochFromFilename)))
+  }
+  
+  # load model
+  model <- keras::load_model_hdf5(model_path, compile = compile)
+  
+  if (compile & (!missing(learning.rate)|!missing(solver))){
+    warning("Arguments for solver and learning rate will be ignored. Set compile to FALSE to use costum solver and learning rate.")
+  }
+  
+  if (!compile){
+    # choose optimization method
+    if (solver == "adam")
+      optimizer <-
+        keras::optimizer_adam(lr = learning.rate)
+    if (solver == "adagrad")
+      optimizer <-
+        keras::optimizer_adagrad(lr = learning.rate)
+    if (solver == "rmsprop")
+      optimizer <-
+        keras::optimizer_rmsprop(lr = learning.rate)
+    if (solver == "sgd")
+      optimizer <-
+        keras::optimizer_sgd(lr = learning.rate)
+    
+    model %>% keras::compile(loss = "categorical_crossentropy",
+                             optimizer = optimizer, metrics = c("acc"))
+  }
+  
+  checkpoint_dir <- paste0(run.name, "_checkpoints")
+  dir.create(checkpoint_dir, showWarnings = FALSE)
+  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
+  
+  # print model layout to screen, should be done before multi_gpu_model
+  summary(model) 
+  
+  # if no dataset is supplied, external fasta generator will generate batches
+  if (missing(dataset)) {
+    message("Starting fasta generator ...")
+    maxlen <- model$input$shape[1] # extract maxlen from previous model
+    # generator for training
+    gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
+                              maxlen = maxlen, step = step, randomFiles = randomFiles,
+                              seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                              vocabulary = vocabulary)
+    
+    # generator for validation
+    gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
+                                  maxlen = maxlen, step = step, randomFiles = randomFiles,
+                                  seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                                  vocabulary = vocabulary)
+    
+    # training
+    message("Start training ...")
+    history <-
+      model %>% keras::fit_generator(
+        generator = gen,
+        validation_data = gen.val,
+        validation_steps = ceiling(steps.per.epoch/20),
+        steps_per_epoch = steps.per.epoch,
+        max_queue_size = max.queue.size,
+        epochs = epochs,
+        initial_epoch = initial_epoch,
+        callbacks = list(
+          keras::callback_model_checkpoint(filepath = filepath_checkpoints,
+                                           save_weights_only = FALSE,
+                                           verbose = 1),
+          keras::callback_reduce_lr_on_plateau(
+            monitor = "loss",
+            factor = lr.plateau.factor,
+            patience = patience,
+            cooldown = cooldown)  ,
+          keras::callback_tensorboard(file.path(tensorboard.log, run.name),
+                                      write_graph = TRUE, 
+                                      histogram_freq = 1,
+                                      write_images = TRUE,
+                                      write_grads = TRUE
+          ),
+          keras::callback_csv_logger(
+            paste0(run.name, "_log.csv"),
+            separator = ";",
+            append = TRUE)
+        )
+      )
+    
+  } else {
+    message("Start training ...")
+    history <- model %>% keras::fit(
+      dataset$X,
+      dataset$Y,
+      batch_size = batch.size,
+      validation_split = validation.split,
+      epochs = epochs,
+      callbacks = list(
+        keras::callback_model_checkpoint(filepath = filepath_checkpoints,
+                                         save_weights_only = FALSE,
+                                         verbose = 1),
+        keras::callback_reduce_lr_on_plateau(
+          monitor = "loss",
+          factor = lr.plateau.factor,
+          patience = patience,
+          cooldown = cooldown
+        ),
+        keras::callback_tensorboard(file.path(tensorboard.log, run.name),
+                                    write_graph = TRUE, 
+                                    histogram_freq = 1,
+                                    write_images = TRUE,
+                                    write_grads = TRUE),
+        keras::callback_csv_logger(
+          paste0(run.name, "_log.csv"),
+          separator = ";",
+          append = TRUE)
+      )
+    )
+  }
+  return(history)
+}
+
 
