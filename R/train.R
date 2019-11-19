@@ -36,6 +36,7 @@
 #' @param seqEnd insert character at end of sequence
 #' @param withinFile insert characters within sequences
 #' @param tensorboard.log path to tensorboard log directory
+#' @param bidirectional Use bidirectional option for lstm layers
 #' @export
 trainNetwork <- function(path,
                          path.val,
@@ -69,7 +70,8 @@ trainNetwork <- function(path,
                          seqEnd= "l",
                          withinFile = "p",
                          vocabulary = c("l","p","a", "c", "g", "t"),
-                         tensorboard.log = "/scratch/tensorboard") {
+                         tensorboard.log = "/scratch/tensorboard",
+                         bidirectional = FALSE) {
   
   stopifnot(maxlen > 0)
   stopifnot(dropout <= 1 & dropout >= 0)
@@ -113,32 +115,77 @@ trainNetwork <- function(path,
   
   # following layers
   if (use.cudnn) {
-    for (i in 1:(layers.lstm - 1)) {
-      model %>%
-        keras::layer_cudnn_lstm(
-          layer.size,
-          input_shape = c(maxlen, vocabulary.size),
-          return_sequences = T
-        ) 
+    if (bidirectional){
+      for (i in 1:(layers.lstm - 1)) {
+        model %>%
+          keras::bidirectional(
+            keras::layer_cudnn_lstm(
+              layer.size,
+              input_shape = c(maxlen, vocabulary.size),
+              return_sequences = TRUE
+            ) 
+          )
+      } 
+      
+    } else {
+      
+      for (i in 1:(layers.lstm - 1)) {
+        model %>%
+          keras::layer_cudnn_lstm(
+            layer.size,
+            input_shape = c(maxlen, vocabulary.size),
+            return_sequences = TRUE
+            
+          )
+      } 
     }
     # last LSTM layer
-    model %>%
-      keras::layer_cudnn_lstm(layer.size) 
+    if (bidirectional){
+      model %>%
+        keras::bidirectional(
+          keras::layer_cudnn_lstm(layer.size)
+        )
+    } else {
+      model %>% keras::layer_cudnn_lstm(layer.size)
+    }
+    
   } else {
     # non-cudnn
-    for (i in 1:(layers.lstm - 1)) {
-      model %>%
-        keras::layer_lstm(
-          layer.size,
-          input_shape = c(maxlen, vocabulary.size),
-          return_sequences = T,
-          dropout = dropout,
-          recurrent_dropout = recurrent_dropout
-        )
+    if (bidirectional){
+      for (i in 1:(layers.lstm - 1)) {
+        model %>%
+          keras::bidirectional(
+            keras::layer_lstm(
+              layer.size,
+              input_shape = c(maxlen, vocabulary.size),
+              return_sequences = TRUE,
+              dropout = dropout,
+              recurrent_dropout = recurrent_dropout
+            )
+          )
+      } 
+    } else {
+      for (i in 1:(layers.lstm - 1)) {
+        model %>%
+          keras::layer_lstm(
+            layer.size,
+            input_shape = c(maxlen, vocabulary.size),
+            return_sequences = TRUE,
+            dropout = dropout,
+            recurrent_dropout = recurrent_dropout
+          )
+      } 
     }
     # last LSTM layer
-    model %>%
-      keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
+    if (bidirectional){
+      keras::bidirectional(
+        model %>%
+          keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
+      )
+    } else {
+      model %>%
+        keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
+    }
   }
   
   model %>% keras::layer_dense(vocabulary.size) %>%
@@ -178,18 +225,12 @@ trainNetwork <- function(path,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
                               seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
                               vocabulary = vocabulary)
-
+    
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
                                   maxlen = maxlen, step = step, randomFiles = randomFiles,
                                   seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
                                   vocabulary = vocabulary)
-
-    # generate data for embedding browser
-    # seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
-    #  embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
-    #  embedding.data <- embedding.data.raw$X
-    
     
     # training
     message("Start training ...")
