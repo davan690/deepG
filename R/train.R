@@ -116,14 +116,13 @@ trainNetwork <- function(path,
   # following layers
   if (use.cudnn) {
     if (bidirectional){
-      
       for (i in 1:(layers.lstm - 1)) {
         model %>%
           keras::bidirectional(
             keras::layer_cudnn_lstm(
               layer.size,
               input_shape = c(maxlen, vocabulary.size),
-              return_sequences = T
+              return_sequences = TRUE
             ) 
           )
       } 
@@ -132,12 +131,11 @@ trainNetwork <- function(path,
       
       for (i in 1:(layers.lstm - 1)) {
         model %>%
-          keras::bidirectional(
-            keras::layer_cudnn_lstm(
-              layer.size,
-              input_shape = c(maxlen, vocabulary.size),
-              return_sequences = T
-            ) 
+          keras::layer_cudnn_lstm(
+            layer.size,
+            input_shape = c(maxlen, vocabulary.size),
+            return_sequences = TRUE
+            
           )
       } 
     }
@@ -149,12 +147,10 @@ trainNetwork <- function(path,
         )
     } else {
       model %>% keras::layer_cudnn_lstm(layer.size)
-      
     }
     
   } else {
     # non-cudnn
-    
     if (bidirectional){
       for (i in 1:(layers.lstm - 1)) {
         model %>%
@@ -168,7 +164,7 @@ trainNetwork <- function(path,
             )
           )
       } 
-    }  else {
+    } else {
       for (i in 1:(layers.lstm - 1)) {
         model %>%
           keras::layer_lstm(
