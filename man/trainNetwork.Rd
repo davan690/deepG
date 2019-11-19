@@ -4,17 +4,23 @@
 \alias{trainNetwork}
 \title{Trains a (mostly) Long short-term memory (LSTM) model on genomic data. Designed for developing genome based language models (GenomeNet)}
 \usage{
-trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
-  maxlen = 250, dropout.rate = 0.3, layer.size = 2048,
-  batch.size = 512, layers.lstm = 4, solver = "adam",
-  use.codon.cnn = FALSE, learning.rate = 0.001, use.cudnn = FALSE,
+trainNetwork(path, path.val, dataset, validation.split = 0.05,
+  run.name = "run", maxlen = 250, dropout = 0,
+  recurrent_dropout = 0, layer.size = 2048, batch.size = 512,
+  layers.lstm = 4, solver = "adam", use.codon.cnn = FALSE,
+  learning.rate = 0.001, use.cudnn = FALSE,
   use.multiple.gpus = FALSE, merge.on.cpu = TRUE, gpu.num = 2,
-  vocabulary.size = 5, epochs = 10, max.queue.size = 100,
-  lr.plateau.factor = 0.1, patience = 5, cooldown = 5,
-  steps.per.epoch = "auto")
+  vocabulary.size = 6, label.vocabulary.size = 3, epochs = 10,
+  max.queue.size = 100, lr.plateau.factor = 0.1, patience = 5,
+  cooldown = 5, steps.per.epoch = 10000, step = 1,
+  randomFiles = FALSE, seqStart = "l", seqEnd = "l",
+  withinFile = "p", vocabulary = c("l", "p", "a", "c", "g", "t"),
+  tensorboard.log = "/scratch/tensorboard")
 }
 \arguments{
-\item{path}{Path to folder where individual or multiple FASTA files are located}
+\item{path}{Path to folder where individual or multiple FASTA files are located for training}
+
+\item{path.val}{Path to folder where individual or multiple FASTA files are located for validation}
 
 \item{dataset}{Dataframe holding training samples in RAM instead of using generator}
 
@@ -24,7 +30,9 @@ trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
 
 \item{maxlen}{Time steps to unroll for (e.g. length of semi-redundant chunks)}
 
-\item{dropout.rate}{Dropout rate for LSTM cells}
+\item{dropout}{Fraction of the units to drop for inputs}
+
+\item{recurrent_dropout}{Fraction of the units to drop for recurrent state}
 
 \item{layer.size}{Number of cells per network layer}
 
@@ -59,6 +67,18 @@ trainNetwork(path, dataset, validation.split = 0.05, run.name = "run",
 \item{cooldown}{Number of epochs without changing learningrate}
 
 \item{steps.per.epoch}{Number of training samples divided by the batch.size, is 20139934 on SGB dataset}
+
+\item{step}{frequency of sampling steps}
+
+\item{randomFiles}{TRUE/FALSE go through files sequentially or shuffle beforehand}
+
+\item{seqStart}{insert character at beginning of sequence}
+
+\item{seqEnd}{insert character at end of sequence}
+
+\item{withinFile}{insert characters within sequences}
+
+\item{tensorboard.log}{path to tensorboard log directory}
 }
 \description{
 Depth and number of neurons per layer of the netwok can be specified. First layer can be a Convolutional Neural Network (CNN) that is designed to capture codons.

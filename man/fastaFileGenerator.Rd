@@ -5,9 +5,11 @@
 \title{custom generator for fasta files, will produce chunks in size of batch.size
 by iterating over the input files.}
 \usage{
-fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 512,
-  maxlen = 250, max_iter = 20, vocabulary = c("\\n", "a", "c", "g",
-  "t"), verbose = FALSE)
+fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
+  maxlen = 250, max_iter = 20, seqStart = "l", seqEnd = "l",
+  withinFile = "p", vocabulary = c("l", "p", "a", "c", "g", "t"),
+  verbose = FALSE, randomFiles = FALSE, step = 1,
+  showWarnings = FALSE)
 }
 \arguments{
 \item{corpus.dir}{input directory where .fasta files are located}
@@ -20,7 +22,19 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 512,
 
 \item{max_iter}{stop after max_iter number of iterations failed to produce new sample}
 
+\item{seqStart}{insert character at beginning of sequence}
+
+\item{seqEnd}{insert character at end of sequence}
+
+\item{withinFile}{insert characters within sequence}
+
 \item{verbose}{TRUE/FALSE show information about files and running time}
+
+\item{randomFiles}{TRUE/FALSE, whether to go through files randomly or sequential}
+
+\item{step}{how often to take a sample#'}
+
+\item{showWarnings}{TRUE/FALSE, give warning if character outside vocabulary appears}
 }
 \description{
 custom generator for fasta files, will produce chunks in size of batch.size

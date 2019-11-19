@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Wrapper of the preprocessSemiRedundant()-function — preprocessFasta • deepG</title>
+<title>Helper function for fastaFileGenerator — splitSequence • deepG</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,8 @@
 
 
 
-<meta property="og:title" content="Wrapper of the preprocessSemiRedundant()-function — preprocessFasta" />
-<meta property="og:description" content="It called on the genomic contents of one
-FASTA file. Multiple entries are combined with newline characters." />
+<meta property="og:title" content="Helper function for fastaFileGenerator — splitSequence" />
+<meta property="og:description" content="splits a character sequences into vector of sequences" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -101,38 +100,31 @@ FASTA file. Multiple entries are combined with newline characters." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Wrapper of the preprocessSemiRedundant()-function</h1>
+    <h1>Helper function for fastaFileGenerator</h1>
     
-    <div class="hidden name"><code>preprocessFasta.Rd</code></div>
+    <div class="hidden name"><code>splitSequence.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>It called on the genomic contents of one
-FASTA file. Multiple entries are combined with newline characters.</p>
+    <p>splits a character sequences into vector of sequences</p>
     </div>
 
-    <pre class="usage"><span class='fu'>preprocessFasta</span>(<span class='no'>path</span>, <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='kw'>vocabulary</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"l"</span>, <span class='st'>"p"</span>, <span class='st'>"a"</span>, <span class='st'>"c"</span>,
-  <span class='st'>"g"</span>, <span class='st'>"t"</span>), <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
+    <pre class="usage"><span class='fu'>splitSequence</span>(<span class='no'>seq</span>, <span class='no'>vocabulary</span>, <span class='no'>maxlen</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>path</th>
-      <td><p>Path to the FASTA file</p></td>
-    </tr>
-    <tr>
-      <th>maxlen</th>
-      <td><p>Length of the semi-redundant sequences</p></td>
+      <th>seq</th>
+      <td><p>a character sequence</p></td>
     </tr>
     <tr>
       <th>vocabulary</th>
-      <td><p>Char contains the vocabulary from the input char, it should be sorted.
-If no vocabulary exists, it is generated from the input char</p></td>
+      <td><p>vector of allowed characters</p></td>
     </tr>
     <tr>
-      <th>verbose</th>
-      <td><p>TRUE/FALSE</p></td>
+      <th>maxlen</th>
+      <td><p>sequences in the output &lt; (maxlen + 1) get discarded</p></td>
     </tr>
     </table>
 
