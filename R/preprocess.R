@@ -236,7 +236,7 @@ fastaFileGenerator <- function(corpus.dir,
   filePath <- fasta.files[[file_index]]
   fasta.file <- Biostrings::readDNAStringSet(filePath)
   seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
-  
+ 
   # split seq around chars not in vocabulary
   seq_split <- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
   current_seq <- seq_split[1]
