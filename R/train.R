@@ -38,7 +38,6 @@
 #' @param withinFile insert characters within sequences
 #' @param vocabulary vector of allowed characters, samples with other chars get discarded
 #' @param tensorboard.log path to tensorboard log directory
-#' @param checkpoint_folder path to checkpoint directory
 #' @param period Interval (number of epochs) between checkpoints
 #' @export
 trainNetwork <- function(path,
@@ -75,8 +74,7 @@ trainNetwork <- function(path,
                          withinFile = "p",
                          vocabulary = c("l","p","a", "c", "g", "t"),
                          tensorboard.log = "/scratch/tensorboard",
-                         checkpoint_folder,
-                         period = NULL) {  # TODO: Should be created with run.name
+                         period = NULL) {  
   
   stopifnot(maxlen > 0)
   stopifnot(dropout <= 1 & dropout >= 0)
@@ -88,10 +86,12 @@ trainNetwork <- function(path,
   
   ## create folder for checkpoints using run.name
   ## filenames contain epoch and validation loss 
-  # checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
-  # dir.create(checkpoint_dir, showWarnings = FALSE)
-  # filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
-  
+  if (!missing(checkpoint_path)){
+    checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
+    dir.create(checkpoint_dir, showWarnings = FALSE)
+    filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
+  }
+   
   if (dir.exists(file.path(tensorboard.log, run.name))) {
     stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
   }
