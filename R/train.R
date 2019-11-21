@@ -8,7 +8,7 @@
 #' @param path Path to folder where individual or multiple FASTA files are located for training
 #' @param path.val Path to folder where individual or multiple FASTA files are located for validation
 #' @param dataset Dataframe holding training samples in RAM instead of using generator 
-#' @param checkpoint_path Path to where function creates a new folder (using run.name) for checkpoints 
+#' @param checkpoint_path Path to checkpoints folder 
 #' @param validation.split Defines the fraction of the batches that will be used for validation
 #' @param run.name Name of the run (without file ending)
 #' @param maxlen Time steps to unroll for (e.g. length of semi-redundant chunks)
@@ -38,7 +38,6 @@
 #' @param withinFile insert characters within sequences
 #' @param vocabulary vector of allowed characters, samples with other chars get discarded
 #' @param tensorboard.log path to tensorboard log directory
-#' @param period Interval (number of epochs) between checkpoints
 #' @export
 trainNetwork <- function(path,
                          path.val,
@@ -73,8 +72,7 @@ trainNetwork <- function(path,
                          seqEnd= "l",
                          withinFile = "p",
                          vocabulary = c("l","p","a", "c", "g", "t"),
-                         tensorboard.log = "/scratch/tensorboard",
-                         period = NULL) {  
+                         tensorboard.log = "/scratch/tensorboard") {  
   
   stopifnot(maxlen > 0)
   stopifnot(dropout <= 1 & dropout >= 0)
@@ -86,11 +84,10 @@ trainNetwork <- function(path,
   
   ## create folder for checkpoints using run.name
   ## filenames contain epoch and validation loss 
-  if (!missing(checkpoint_path)){
-    checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
-    dir.create(checkpoint_dir, showWarnings = FALSE)
-    filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
-  }
+  checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
+  dir.create(checkpoint_dir, showWarnings = FALSE)
+  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
+ 
    
   if (dir.exists(file.path(tensorboard.log, run.name))) {
     stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
@@ -185,7 +182,7 @@ trainNetwork <- function(path,
   
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
-    message("Starting fasta generator ...")
+    message("Starting fasta generator...")
     # generator for training
     gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
@@ -204,7 +201,7 @@ trainNetwork <- function(path,
       model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
-        validation_steps = floor(steps.per.epoch/20),
+        validation_steps = max(ceiling(steps.per.epoch/20),1),
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
@@ -308,7 +305,7 @@ resumeTraining <- function(model_path,
                            dataset,
                            validation.split = .05,
                            run.name,
-                           batch.size ,
+                           batch.size,
                            epochs,
                            max.queue.size = 10,
                            lr.plateau.factor = .1,
@@ -323,7 +320,7 @@ resumeTraining <- function(model_path,
                            initial_epoch,
                            compile = TRUE,
                            solver,
-                           randomFiles,
+                           randomFiles = FALSE,
                            learning.rate){
   
   if (dir.exists(file.path(tensorboard.log, run.name))) {
@@ -331,14 +328,16 @@ resumeTraining <- function(model_path,
   }
   
   # epochs arguments can be misleading 
-  if (initial_epoch >= epochs){
-    stop("networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+  if (!missing(initial_epoch)){
+    if (initial_epoch > epochs){
+      stop("networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+    }
   }
   
   # extract initial_epoch from filename if no argument is given
   if (missing(initial_epoch)){
-    epochFromFilename <- stringr::str_extract(a,"Ep.\\d+")
-    initial_epoch <- as.integer(substring(b, 4, nchar(epochFromFilename)))
+    epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
+    initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
   }
   
   # load model
