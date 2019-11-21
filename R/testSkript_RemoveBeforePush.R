@@ -40,36 +40,4 @@ resumeTraining(model_path = "/home/rmreches/resumeTraining/checkpoints/runPar1_c
                tensorboard.log = "/home/rmreches/resumeTraining/tb",
                compile = TRUE)
 
-  path = "/home/rmreches/resumeTraining/parenthesis_as_fasta/train"
-path.val = "/home/rmreches/resumeTraining/parenthesis_as_fasta/validation"
-checkpoint_path <- "/home/rmreches/resumeTraining"
-validation.split = .05
-run.name = "runPar"
-maxlen = 25
-dropout = 0.2
-recurrent_dropout = 0.2
-layer.size = 32
-batch.size = 16
-layers.lstm = 2
-solver = "adam"
-use.codon.cnn = FALSE
-learning.rate = .001
-use.cudnn = FALSE
-use.multiple.gpus = FALSE
-merge.on.cpu = TRUE
-gpu.num = 2
-vocabulary.size = 7
-label.vocabulary.size = 3
-epochs = 5
-max.queue.size = 10
-lr.plateau.factor = .1
-patience = 5
-cooldown = 5
-steps.per.epoch = 10
-step = 10
-randomFiles = FALSE
-seqStart = ""
-seqEnd= ""
-withinFile = ""
-vocabulary = c("a","c","g", "t", "m", "n","r")
-tensorboard.log = "/home/rmreches/resumeTraining/tb"
+
