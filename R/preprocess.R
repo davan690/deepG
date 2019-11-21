@@ -322,3 +322,4 @@ fastaFileGenerator <- function(corpus.dir,
     list(X = x, Y = y)
   }
 }
+

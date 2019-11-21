@@ -254,12 +254,10 @@ trainNetwork <- function(path,
 
 # TODO: 
 # 1) epochs variable is misleading, better epoch = epoch + initial_epoch ?
-# 2) better handling of plots
-# 3) model has no memory of past learning rates etc., important for cooldown, patience ?
-# 4) Option to resume training by run.name + epoch, not model_path 
-# 5) model continues with different files ?
-# 6) Option to use metric other than val_loss
-# 7) Option not to save/create checkpoints for trainNetwork and resumeTraining
+# 2) model has no memory of past learning rates etc., important for cooldown, patience ?
+# 3) model continues with different files ?
+# 4) Option to use metric other than val_loss
+# 5) Option not to save/create checkpoints for trainNetwork and resumeTraining
 
 
 #' @title Takes a pretrained model and continues training 
@@ -273,8 +271,8 @@ trainNetwork <- function(path,
 #' @param run.name Name of the run (without file ending)
 #' @param batch.size Number of samples that are used for one network update
 #' @param layers.lstm Number of LSTM layers
-#' @param solver Optimizer on default adam (options: "adam", "adagrad", "rmsprop", "sgd")
-#' @param learning.rate Learning rate for optimizer
+#' @param solver Optimizer on default adam (options: "adam", "adagrad", "rmsprop", "sgd"), ignored when compile = TRUE
+#' @param learning.rate Learning rate for optimizer, ignored when compile = TRUE
 #' @param use.cudnn If true, using layer_cudnn_lstm() instead of layer_lstm() which is if GPU supports cudnn
 #' @param use.multiple.gpus If true, multi_gpu_model() will be used based on gpu_num
 #' @param gpu.num Number of GPUs to be used, only relevant if multiple_gpu is true
@@ -293,12 +291,11 @@ trainNetwork <- function(path,
 #' @param withinFile Insert characters within sequences
 #' @param vocabulary vector of allowed characters, should be equal to original model's vocabulary
 #' @param tensorboard.log Path to tensorboard log directory
-#' @param period Interval (number of epochs) between checkpoints
 #' @param initial_epoch Epoch at which to start training 
 #' @param compile Whether to compile the model after loading
 #' @export
 resumeTraining <- function(model_path,
-                           checkpoint_path,
+                           checkpoint_path = "/scratch/checkpoint",
                            step = 1,
                            path,
                            path.val,
