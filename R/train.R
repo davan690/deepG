@@ -177,7 +177,7 @@ trainNetwork <- function(path,
     gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
                               seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                              vocabulary = vocabulary, run.name = run.name)
+                              vocabulary = vocabulary)
 
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
@@ -197,7 +197,7 @@ trainNetwork <- function(path,
       model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
-        validation_steps = floor(steps.per.epoch/20),
+        validation_steps = ceiling(steps.per.epoch/20),
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
