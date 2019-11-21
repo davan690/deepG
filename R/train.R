@@ -177,7 +177,7 @@ trainNetwork <- function(path,
     gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
                               seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                              vocabulary = vocabulary)
+                              vocabulary = vocabulary, run.name = run.name)
 
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
