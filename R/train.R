@@ -197,7 +197,7 @@ trainNetwork <- function(path,
       model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
-        validation_steps = ceiling(steps.per.epoch/20),
+        validation_steps = ceiling(steps.per.epoch * validation.split),
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
