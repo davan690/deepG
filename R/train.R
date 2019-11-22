@@ -42,7 +42,7 @@
 trainNetwork <- function(path,
                          path.val,
                          dataset,
-                         checkpoint_path,
+                         checkpoint_path = "/scratch/checkpoint",
                          validation.split = .05,
                          run.name = "run",
                          maxlen = 250,
@@ -251,15 +251,6 @@ trainNetwork <- function(path,
   return(history)
 }
 
-
-# TODO: 
-# 1) epochs variable is misleading, better epoch = epoch + initial_epoch ?
-# 2) model has no memory of past learning rates etc., important for cooldown, patience ?
-# 3) model continues with different files ?
-# 4) Option to use metric other than val_loss
-# 5) Option not to save/create checkpoints for trainNetwork and resumeTraining
-
-
 #' @title Takes a pretrained model and continues training 
 #'
 #' @param model_path Path to a pretrained model
@@ -320,85 +311,117 @@ resumeTraining <- function(model_path,
                            randomFiles = FALSE,
                            learning.rate){
   
-  if (dir.exists(file.path(tensorboard.log, run.name))) {
-    stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
-  }
-  
-  # epochs arguments can be misleading 
-  if (!missing(initial_epoch)){
-    if (initial_epoch > epochs){
-      stop("networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+  if (!missing(model_path)){
+    
+    if (dir.exists(file.path(tensorboard.log, run.name))) {
+      stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
     }
-  }
-  
-  # extract initial_epoch from filename if no argument is given
-  if (missing(initial_epoch)){
-    epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
-    initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
-  }
-  
-  # load model
-  model <- keras::load_model_hdf5(model_path, compile = compile)
-  
-  if (compile & (!missing(learning.rate)|!missing(solver))){
-    warning("Arguments for solver and learning rate will be ignored. Set compile to FALSE to use costum solver and learning rate.")
-  }
-  
-  if (!compile){
-    # choose optimization method
-    if (solver == "adam")
-      optimizer <-
-        keras::optimizer_adam(lr = learning.rate)
-    if (solver == "adagrad")
-      optimizer <-
-        keras::optimizer_adagrad(lr = learning.rate)
-    if (solver == "rmsprop")
-      optimizer <-
-        keras::optimizer_rmsprop(lr = learning.rate)
-    if (solver == "sgd")
-      optimizer <-
-        keras::optimizer_sgd(lr = learning.rate)
     
-    model %>% keras::compile(loss = "categorical_crossentropy",
-                             optimizer = optimizer, metrics = c("acc"))
-  }
-  
-  # create folder for checkpoints using run.name
-  # filenames contain epoch and validation loss 
-  checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
-  dir.create(checkpoint_dir, showWarnings = FALSE)
-  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
-  
-  # print model layout to screen, should be done before multi_gpu_model
-  summary(model) 
-  
-  # if no dataset is supplied, external fasta generator will generate batches
-  if (missing(dataset)) {
-    message("Starting fasta generator ...")
-    maxlen <- model$input$shape[1] # extract maxlen from previous model
-    # generator for training
-    gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
-                              maxlen = maxlen, step = step, randomFiles = randomFiles,
-                              seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                              vocabulary = vocabulary)
+    # epochs arguments can be misleading 
+    if (!missing(initial_epoch)){
+      if (initial_epoch > epochs){
+        stop("networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+      }
+    }
     
-    # generator for validation
-    gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
-                                  maxlen = maxlen, step = step, randomFiles = randomFiles,
-                                  seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                                  vocabulary = vocabulary)
+    # extract initial_epoch from filename if no argument is given
+    if (missing(initial_epoch)){
+      epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
+      initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
+    }
     
-    # training
-    message("Start training ...")
-    history <-
-      model %>% keras::fit_generator(
-        generator = gen,
-        validation_data = gen.val,
-        validation_steps = ceiling(steps.per.epoch/20),
-        steps_per_epoch = steps.per.epoch,
-        max_queue_size = max.queue.size,
+    # load model
+    model <- keras::load_model_hdf5(model_path, compile = compile)
+    
+    if (compile & (!missing(learning.rate)|!missing(solver))){
+      warning("Arguments for solver and learning rate will be ignored. Set compile to FALSE to use costum solver and learning rate.")
+    }
+    
+    if (!compile){
+      # choose optimization method
+      if (solver == "adam")
+        optimizer <-
+          keras::optimizer_adam(lr = learning.rate)
+      if (solver == "adagrad")
+        optimizer <-
+          keras::optimizer_adagrad(lr = learning.rate)
+      if (solver == "rmsprop")
+        optimizer <-
+          keras::optimizer_rmsprop(lr = learning.rate)
+      if (solver == "sgd")
+        optimizer <-
+          keras::optimizer_sgd(lr = learning.rate)
+      
+      model %>% keras::compile(loss = "categorical_crossentropy",
+                               optimizer = optimizer, metrics = c("acc"))
+    }
+    
+    # create folder for checkpoints using run.name
+    # filenames contain epoch and validation loss 
+    checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
+    dir.create(checkpoint_dir, showWarnings = FALSE)
+    filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
+    
+    # print model layout to screen, should be done before multi_gpu_model
+    summary(model) 
+    
+    # if no dataset is supplied, external fasta generator will generate batches
+    if (missing(dataset)) {
+      message("Starting fasta generator ...")
+      maxlen <- model$input$shape[1] # extract maxlen from previous model
+      # generator for training
+      gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
+                                maxlen = maxlen, step = step, randomFiles = randomFiles,
+                                seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                                vocabulary = vocabulary)
+      
+      # generator for validation
+      gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
+                                    maxlen = maxlen, step = step, randomFiles = randomFiles,
+                                    seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
+                                    vocabulary = vocabulary)
+      
+      # training
+      message("Start training ...")
+      history <-
+        model %>% keras::fit_generator(
+          generator = gen,
+          validation_data = gen.val,
+          validation_steps = ceiling(steps.per.epoch/20),
+          steps_per_epoch = steps.per.epoch,
+          max_queue_size = max.queue.size,
+          epochs = epochs,
+          initial_epoch = initial_epoch,
+          callbacks = list(
+            keras::callback_model_checkpoint(filepath = filepath_checkpoints,
+                                             save_weights_only = FALSE,
+                                             verbose = 1),
+            keras::callback_reduce_lr_on_plateau(
+              monitor = "loss",
+              factor = lr.plateau.factor,
+              patience = patience,
+              cooldown = cooldown)  ,
+            keras::callback_tensorboard(file.path(tensorboard.log, run.name),
+                                        write_graph = TRUE, 
+                                        histogram_freq = 1,
+                                        write_images = TRUE,
+                                        write_grads = TRUE
+            ),
+            keras::callback_csv_logger(
+              paste0(run.name, "_log.csv"),
+              separator = ";",
+              append = TRUE)
+          )
+        )
+      
+    } else {
+      message("Start training ...")
+      history <- model %>% keras::fit(
+        dataset$X,
+        dataset$Y,
+        batch_size = batch.size,
+        validation_split = validation.split,
         epochs = epochs,
-        initial_epoch = initial_epoch,
         callbacks = list(
           keras::callback_model_checkpoint(filepath = filepath_checkpoints,
                                            save_weights_only = FALSE,
@@ -407,51 +430,23 @@ resumeTraining <- function(model_path,
             monitor = "loss",
             factor = lr.plateau.factor,
             patience = patience,
-            cooldown = cooldown)  ,
+            cooldown = cooldown
+          ),
           keras::callback_tensorboard(file.path(tensorboard.log, run.name),
                                       write_graph = TRUE, 
                                       histogram_freq = 1,
                                       write_images = TRUE,
-                                      write_grads = TRUE
-          ),
+                                      write_grads = TRUE),
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
             separator = ";",
             append = TRUE)
         )
       )
-    
-  } else {
-    message("Start training ...")
-    history <- model %>% keras::fit(
-      dataset$X,
-      dataset$Y,
-      batch_size = batch.size,
-      validation_split = validation.split,
-      epochs = epochs,
-      callbacks = list(
-        keras::callback_model_checkpoint(filepath = filepath_checkpoints,
-                                         save_weights_only = FALSE,
-                                         verbose = 1),
-        keras::callback_reduce_lr_on_plateau(
-          monitor = "loss",
-          factor = lr.plateau.factor,
-          patience = patience,
-          cooldown = cooldown
-        ),
-        keras::callback_tensorboard(file.path(tensorboard.log, run.name),
-                                    write_graph = TRUE, 
-                                    histogram_freq = 1,
-                                    write_images = TRUE,
-                                    write_grads = TRUE),
-        keras::callback_csv_logger(
-          paste0(run.name, "_log.csv"),
-          separator = ";",
-          append = TRUE)
-      )
-    )
+    }
+    return(history)
   }
-  return(history)
 }
+
 
 
