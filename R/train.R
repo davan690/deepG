@@ -38,6 +38,7 @@
 #' @param withinFile insert characters within sequences
 #' @param vocabulary vector of allowed characters, samples with other chars get discarded
 #' @param tensorboard.log path to tensorboard log directory
+#' @param bidirectional Use bidirectional option for lstm layers
 #' @export
 trainNetwork <- function(path,
                          path.val,
@@ -72,113 +73,202 @@ trainNetwork <- function(path,
                          seqEnd= "l",
                          withinFile = "p",
                          vocabulary = c("l","p","a", "c", "g", "t"),
-                         tensorboard.log = "/scratch/tensorboard") {  
-  
-  stopifnot(maxlen > 0)
-  stopifnot(dropout <= 1 & dropout >= 0)
-  stopifnot(recurrent_dropout <= 1 & recurrent_dropout >= 0)
-  stopifnot(layer.size > 1)
-  stopifnot(layers.lstm > 1)
-  stopifnot(batch.size > 1)
-  stopifnot(steps.per.epoch > 0)
+                         tensorboard.log = "/scratch/tensorboard",
+                         bidirectional = FALSE) {  
   
   ## create folder for checkpoints using run.name
   ## filenames contain epoch and validation loss 
   checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
   dir.create(checkpoint_dir, showWarnings = FALSE)
   filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-{val_loss:.2f}.hdf5")
- 
-   
+  
+  # Check if run.name is unique
   if (dir.exists(file.path(tensorboard.log, run.name))) {
     stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
   }
   
-  if (use.cudnn & (recurrent_dropout > 0 | recurrent_dropout > 0)){
-    warning("Dropout is not supported by cuDNN and will be ignored")
-  } 
-  
-  message("Initialize model. This can take a few minutes.")
-  if (use.multiple.gpus) {
-    # init template model under a CPU device scope
-    with(tf$device("/cpu:0"), {
+  # No pretrained model given
+  if (missing(model_path)){ 
+    
+    stopifnot(maxlen > 0)
+    stopifnot(dropout <= 1 & dropout >= 0)
+    stopifnot(recurrent_dropout <= 1 & recurrent_dropout >= 0)
+    stopifnot(layer.size > 1)
+    stopifnot(layers.lstm > 1)
+    stopifnot(batch.size > 1)
+    stopifnot(steps.per.epoch > 0)
+    
+    if (use.cudnn & (recurrent_dropout > 0 | recurrent_dropout > 0)){
+      warning("Dropout is not supported by cuDNN and will be ignored")
+    } 
+    
+    message("Initialize model. This can take a few minutes.")
+    if (use.multiple.gpus) {
+      # init template model under a CPU device scope
+      with(tf$device("/cpu:0"), {
+        model <- keras::keras_model_sequential()
+      })
+    } else {
       model <- keras::keras_model_sequential()
-    })
-  } else {
-    model <- keras::keras_model_sequential()
-  }
-  
-  if (use.codon.cnn) {
-    model %<>%
-      keras::layer_conv_1d(
-        kernel_size = 3,
-        # 3 charactes are representing a codon
-        padding = "same",
-        activation = "relu",
-        filters = 81,
-        input_shape = c(maxlen, vocabulary.size)
-      )  %>%
-      keras::layer_max_pooling_1d(pool_size = 3)  %>%
-      keras::layer_batch_normalization(momentum = .8)
-  }
-  
-  # following layers
-  if (use.cudnn) {
-    for (i in 1:(layers.lstm - 1)) {
-      model %>%
-        keras::layer_cudnn_lstm(
-          layer.size,
-          input_shape = c(maxlen, vocabulary.size),
-          return_sequences = T
-        ) 
     }
-    # last LSTM layer
-    model %>%
-      keras::layer_cudnn_lstm(layer.size) 
-  } else {
-    # non-cudnn
-    for (i in 1:(layers.lstm - 1)) {
-      model %>%
-        keras::layer_lstm(
-          layer.size,
-          input_shape = c(maxlen, vocabulary.size),
-          return_sequences = T,
-          dropout = dropout,
-          recurrent_dropout = recurrent_dropout
+    
+    if (use.codon.cnn) {
+      model %<>%
+        keras::layer_conv_1d(
+          kernel_size = 3,
+          # 3 charactes are representing a codon
+          padding = "same",
+          activation = "relu",
+          filters = 81,
+          input_shape = c(maxlen, vocabulary.size)
+        )  %>%
+        keras::layer_max_pooling_1d(pool_size = 3)  %>%
+        keras::layer_batch_normalization(momentum = .8)
+    }
+    
+    # following layers
+    if (use.cudnn) {
+      if (bidirectional){
+        for (i in 1:(layers.lstm - 1)) {
+          model %>%
+            keras::bidirectional(
+              keras::layer_cudnn_lstm(
+                layer.size,
+                input_shape = c(maxlen, vocabulary.size),
+                return_sequences = TRUE
+              ) 
+            )
+        } 
+        
+      } else {
+        
+        for (i in 1:(layers.lstm - 1)) {
+          model %>%
+            keras::layer_cudnn_lstm(
+              layer.size,
+              input_shape = c(maxlen, vocabulary.size),
+              return_sequences = TRUE
+              
+            )
+        } 
+      }
+      # last LSTM layer
+      if (bidirectional){
+        model %>%
+          keras::bidirectional(
+            keras::layer_cudnn_lstm(layer.size)
+          )
+      } else {
+        model %>% keras::layer_cudnn_lstm(layer.size)
+      }
+      
+    } else {
+      # non-cudnn
+      if (bidirectional){
+        for (i in 1:(layers.lstm - 1)) {
+          model %>%
+            keras::bidirectional(
+              keras::layer_lstm(
+                layer.size,
+                input_shape = c(maxlen, vocabulary.size),
+                return_sequences = TRUE,
+                dropout = dropout,
+                recurrent_dropout = recurrent_dropout
+              )
+            )
+        } 
+      } else {
+        for (i in 1:(layers.lstm - 1)) {
+          model %>%
+            keras::layer_lstm(
+              layer.size,
+              input_shape = c(maxlen, vocabulary.size),
+              return_sequences = TRUE,
+              dropout = dropout,
+              recurrent_dropout = recurrent_dropout
+            )
+        } 
+      }
+      # last LSTM layer
+      if (bidirectional){
+        keras::bidirectional(
+          model %>%
+            keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
         )
+      } else {
+        model %>%
+          keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
+      }
     }
-    # last LSTM layer
-    model %>%
-      keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
+    
+    model %>% keras::layer_dense(vocabulary.size) %>%
+      keras::layer_activation("softmax")
+    
+    # print model layout to screen, should be done before multi_gpu_model
+    summary(model)
+    
+    if (use.multiple.gpus) {
+      model <- keras::multi_gpu_model(model,
+                                      gpus = gpu.num,
+                                      cpu_merge = merge.on.cpu)
+    }
+    
+    # choose optimization method
+    if (solver == "adam")
+      optimizer <-
+      keras::optimizer_adam(lr = learning.rate)
+    if (solver == "adagrad")
+      optimizer <-
+      keras::optimizer_adagrad(lr = learning.rate)
+    if (solver == "rmsprop")
+      optimizer <-
+      keras::optimizer_rmsprop(lr = learning.rate)
+    if (solver == "sgd")
+      optimizer <-
+      keras::optimizer_sgd(lr = learning.rate)
+    
+    model %>% keras::compile(loss = "categorical_crossentropy",
+                             optimizer = optimizer, metrics = c("acc"))
+    
+    # Use pretrained model     
+  } else { 
+    # epochs arguments can be misleading 
+    if (!missing(initial_epoch)){
+      if (initial_epoch > epochs){
+        stop("networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+      }
+    }
+    
+    # extract initial_epoch from filename if no argument is given
+    if (missing(initial_epoch)){
+      epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
+      initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
+    }
+    
+    # load model
+    model <- keras::load_model_hdf5(model_path, compile = compile)
+    
+    if (compile & (!missing(learning.rate)|!missing(solver))){
+      warning("Arguments for solver and learning rate will be ignored. Set compile to FALSE to use costum solver and learning rate.")
+    }
+    
+    if (!compile){
+      # choose optimization method
+      if (solver == "adam")
+        optimizer <-
+          keras::optimizer_adam(lr = learning.rate)
+      if (solver == "adagrad")
+        optimizer <-
+          keras::optimizer_adagrad(lr = learning.rate)
+      if (solver == "rmsprop")
+        optimizer <-
+          keras::optimizer_rmsprop(lr = learning.rate)
+      if (solver == "sgd")
+        optimizer <-
+          keras::optimizer_sgd(lr = learning.rate) 
+      
+    }
   }
-  
-  model %>% keras::layer_dense(vocabulary.size) %>%
-    keras::layer_activation("softmax")
-  
-  # print model layout to screen, should be done before multi_gpu_model
-  summary(model)
-  
-  if (use.multiple.gpus) {
-    model <- keras::multi_gpu_model(model,
-                                    gpus = gpu.num,
-                                    cpu_merge = merge.on.cpu)
-  }
-  
-  # choose optimization method
-  if (solver == "adam")
-    optimizer <-
-    keras::optimizer_adam(lr = learning.rate)
-  if (solver == "adagrad")
-    optimizer <-
-    keras::optimizer_adagrad(lr = learning.rate)
-  if (solver == "rmsprop")
-    optimizer <-
-    keras::optimizer_rmsprop(lr = learning.rate)
-  if (solver == "sgd")
-    optimizer <-
-    keras::optimizer_sgd(lr = learning.rate)
-  
-  model %>% keras::compile(loss = "categorical_crossentropy",
-                           optimizer = optimizer, metrics = c("acc"))
   
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
@@ -201,7 +291,7 @@ trainNetwork <- function(path,
       model %>% keras::fit_generator(
         generator = gen,
         validation_data = gen.val,
-        validation_steps = max(ceiling(steps.per.epoch/20),1),
+        validation_steps = ceiling(steps.per.epoch * validation.split),
         steps_per_epoch = steps.per.epoch,
         max_queue_size = max.queue.size,
         epochs = epochs,
