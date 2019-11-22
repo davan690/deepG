@@ -319,9 +319,6 @@ fastaFileGenerator <- function(corpus.dir,
     sequence_vector_index <<- 1
     num_samples <<- 0
     
-    write.table( data.frame(filePath, substring(seq, 1, min(nchar(seq),10))), file = paste0(run.name, "_Info.csv"),
-                 row.names = FALSE, col.names = c("x", "y"), append = TRUE)
-   
     list(X = x, Y = y)
   }
 }
