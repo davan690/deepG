@@ -206,14 +206,12 @@ fastaFileGenerator <- function(corpus.dir,
                                randomFiles = FALSE,
                                step = 1, 
                                showWarnings = FALSE,
-                               run.name){
+                               run.name = ""){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary) & i!="")
       stop("seqStart, seqEnd and withinFile variables must be in vocabulary")
   }  
-  
-  if (!missing(run.name)) info_df <- data.frame(file_name = character(), start_of_seq = character())
   
   fasta.files <- list.files(
     path = xfun::normalize_path(corpus.dir),
@@ -274,7 +272,6 @@ fastaFileGenerator <- function(corpus.dir,
           current_seq <<- seq_split[1]
           length_current_seq <<- nchar(current_seq) 
           num_sub_seq <<- length(seq_split)
-          rbind(info_df, c(filePath, substring(seq, 1, 10)))
           # test for chars outside vocabulary
           if (showWarnings){
             charsOutsideVoc <- stringr::str_detect(stringr::str_to_lower(seq), pattern)  
@@ -322,10 +319,9 @@ fastaFileGenerator <- function(corpus.dir,
     sequence_vector_index <<- 1
     num_samples <<- 0
     
-    if (!missing(run.name)) {
-      write.csv(x = info_df, run.name = paste0(run.name, ".csv"), append = TRUE)
-    }
-      
+    write.table( data.frame(filePath, substring(seq, 1, min(nchar(seq),10))), file = paste0(run.name, "_Info.csv"),
+                 row.names = FALSE, col.names = c("x", "y"), append = TRUE)
+   
     list(X = x, Y = y)
   }
 }
