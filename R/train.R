@@ -55,7 +55,6 @@ trainNetwork <- function(path,
                          use.multiple.gpus = FALSE,
                          merge.on.cpu = TRUE,
                          gpu.num = 2,
-                         vocabulary.size = 6,
                          label.vocabulary.size = 3,
                          epochs = 10,
                          max.queue.size = 100,
@@ -78,6 +77,8 @@ trainNetwork <- function(path,
   stopifnot(layers.lstm > 1)
   stopifnot(batch.size > 1)
   stopifnot(steps.per.epoch > 0)
+  
+  vocabulary.size <- length(vocabulary)
   
   if (dir.exists(file.path(tensorboard.log, run.name))) {
     stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
