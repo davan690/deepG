@@ -6,106 +6,19 @@
 
 deepG is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets of genomic and human readable languages for testing.
 
-## Installation
+## Installation & Usage
 
-### Dependencies
+Please see our Wiki for further installation instructions. It covers also usage instructions for multi-GPU machines
+- [Installation on a desktop machine](https://github.com/hiddengenome/deepG/wiki/Installation-of-deepG-on-desktop)
+- [Training of GenomeNet](https://github.com/hiddengenome/deepG/wiki/Howto-train-GenomeNet)
 
-For model saving, this package requires the `hdf5r` library which is based on hdf5 binaries. You can install it from source using the following commands. 
-
-``` bash
-wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz
-tar xvzf hdf5-1.10.5.tar.gz
-cd hdf5-1.10.5
-./configure --prefix=/usr --enable-fortran --enable-cxx
-make
-make check
-sudo make install
-```
-
-``` r
-install.packages("hdf5r", configure.args="--with-hdf5=/usr/bin/h5cc")
-```
-
-## Library 
-
-``` r
-install.packages("devtools")
-devtools::install_github("hiddengenome/deepG")
-```
-
-### Enable GPU support
-
-On default, Keras will be installed without GPU support. To support GPUs reinstall Keras via
-
-``` r
-install.packages("keras")
-keras::install_keras(tensorflow = "gpu")
-```
-
-on AWS instances the GPU version can be installed via `conda create -y --name r-tensorflow tensorflow-gpu python=3.6.8` 
-
-# Usage
-
-## Generating of GenomeNet 
-
-### Generate a genomic language model from a collection of FASTA files
-
-``` r
-history <- trainNetwork(path = "input_dir")
-```
-
-The following settings are helpful for testing the training on CPU. The used FASTA files are located in example_files/fasta.
-
-``` r
-history <- trainNetwork(path = "input_dir",  use.cudnn = F, maxlen = 50, batch.size = 80, epochs = 5, steps.per.epoch = 100, layers.lstm = 3, max.queue.size = 500, dropout.rate = 0.35, layer.size = 1028)
-```
-
-When you have multiple GPUs available you can run:
-
-``` r
-history <- trainNetwork(path = "input_dir", use.cudnn = T, use.multiple.gpus = T, gpu.num = 1:8, run.name= "GenomeNet", epochs = 100, steps.per.epoch = 10000)
-```
-
-See the `?trainNetwork` for further information how to setup file names and network size.
-
-### Generate a genomic language model using data held in the RAM
-
-``` r
-# load example dataset
-data(crispr_sample)
-
-# generate one-hot encoding of 30-nucleotide sized chunks
-crispr_preprocessed <- preprocessSemiRedundant(crispr_sample)
-history <- trainNetwork(dataset = crispr_preprocessed)
-```
-
-## Train a deep network for multiclass prediction
-
-Here the FASTA files are located as individual files in `input_dir/` and labels are defined in `fasta-like` files in `fasta_label_dir/` with a `.txt` ending.
-
-example file `file1.fasta` in `input_dir/`:
-
-```
->fasta_header
-ACGTGAGAGAGAGACAGAGATAGACAGAGATTATAA
-```
-
-example label file `file1.txt` in `fasta_label_dir/`, where {A,B,C} are the class labels.
-
-```
->fasta_header
-AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC
-```
-
-``` r
-history <- trainNetwork(path = "input_dir", labels = "fasta_label_dir/", label.vocabulary.size = 3)
-```
+See the help files `?deepG` to get startet. 
 
 ## Datasets
 
 The library comes with three different datasets for testing. 
 
-- The set `data(parenthesis)` contains 100k charakters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.  
+- The set `data(parenthesis)` contains 1M characters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.  
 - The set `data(crispr_full)` containging all CRISPR loci found in NCBI representative genomes with neighbor nucleotides up and downstream.
 - The set `data(crispr_sample)` containging a subset of `crispr_full`
 

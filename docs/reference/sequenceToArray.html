@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Returns the vocabulary from character string — getVocabulary • deepG</title>
+<title>Helper function for fastaFileGenerator — sequenceToArray • deepG</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Returns the vocabulary from character string — getVocabulary" />
-<meta property="og:description" content="Use this function with a character string." />
+<meta property="og:title" content="Helper function for fastaFileGenerator — sequenceToArray" />
+<meta property="og:description" content="Helper function for fastaFileGenerator" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,27 +100,42 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Returns the vocabulary from character string</h1>
+    <h1>Helper function for fastaFileGenerator</h1>
     
-    <div class="hidden name"><code>getVocabulary.Rd</code></div>
+    <div class="hidden name"><code>sequenceToArray.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Use this function with a character string.</p>
+    <p>Helper function for fastaFileGenerator</p>
     </div>
 
-    <pre class="usage"><span class='fu'>getVocabulary</span>(<span class='no'>char</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
+    <pre class="usage"><span class='fu'>sequenceToArray</span>(<span class='no'>sequence</span>, <span class='no'>maxlen</span>, <span class='no'>vocabulary</span>, <span class='no'>step</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>char</th>
-      <td><p>Character string of text with the length of one</p></td>
+      <th>sequence</th>
+      <td><p>character sequence</p></td>
     </tr>
     <tr>
-      <th>verbose</th>
-      <td><p>TRUE/FALSE</p></td>
+      <th>maxlen</th>
+      <td><p>length of one sample</p></td>
+    </tr>
+    <tr>
+      <th>vocabulary</th>
+      <td><p>set of characters to encode</p></td>
+    </tr>
+    <tr>
+      <th>step</th>
+      <td><p>how often to take a sample
+Returns one hot encoding for every sequence  
+For example: sequence = "acatg", maxlen = 4, vocabulary = c("p","a", "c", "g", "t"), step = 1  leads to
+X = (0 1 0 0 0  
+     0 0 1 0 0
+     0 1 0 0 0
+     0 0 0 0 1)
+Y = (0 0 0 1 0)</p></td>
     </tr>
     </table>
 

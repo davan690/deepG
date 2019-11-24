@@ -34,14 +34,14 @@ test_that("Sucessful training from a dummy model", {
  expect_type(trainedNetwork[1], "list")
  expect_equal(length(trainedNetwork[[1]]),7)
  expect_type(trainedNetwork[2], "list")
- expect_equal(length(trainedNetwork[[2]]),2)
+ expect_equal(length(trainedNetwork[[2]]),4)
 
  expect_type(trainedNetwork[[1]][["batch_size"]],"integer")
  expect_equal(trainedNetwork[[1]][["batch_size"]],10)
  expect_type(trainedNetwork[[1]][["epochs"]],"integer")
  expect_equal(trainedNetwork[[1]][["epochs"]],1)
  expect_type(trainedNetwork[[1]][["metrics"]],"character")
- expect_equal(trainedNetwork[[1]][["metrics"]],c("loss","val_loss"))
+ expect_equal(trainedNetwork[[1]][["metrics"]],c("loss","acc", "val_loss", "val_acc"))
 
  expect_type(trainedNetwork[[2]][["loss"]],"double")
  expect_type(trainedNetwork[[2]][["val_loss"]],"double")

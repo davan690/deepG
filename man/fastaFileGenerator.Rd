@@ -3,16 +3,40 @@
 \name{fastaFileGenerator}
 \alias{fastaFileGenerator}
 \title{custom generator for fasta files, will produce chunks in size of batch.size
-by iterating over the input files. If the input file is smaller than the
-batch.size, batch size will be reduced to the maximal size. So the last batch
-of a file is usually smaller.}
+by iterating over the input files.}
 \usage{
-fastaFileGenerator(corpus.dir, labels.dir, format = "fasta",
-  batch.size = 512, maxlen = 250, verbose = F)
+fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
+  maxlen = 250, max_iter = 20, seqStart = "l", seqEnd = "l",
+  withinFile = "p", vocabulary = c("l", "p", "a", "c", "g", "t"),
+  verbose = FALSE, randomFiles = FALSE, step = 1,
+  showWarnings = FALSE)
 }
 \arguments{
-\item{directory}{input directory where .fasta files are located}
+\item{corpus.dir}{input directory where .fasta files are located}
+
+\item{format}{file format}
+
+\item{batch.size}{number of samples}
+
+\item{maxlen}{length of one sample}
+
+\item{max_iter}{stop after max_iter number of iterations failed to produce new sample}
+
+\item{seqStart}{insert character at beginning of sequence}
+
+\item{seqEnd}{insert character at end of sequence}
+
+\item{withinFile}{insert characters within sequence}
+
+\item{verbose}{TRUE/FALSE show information about files and running time}
+
+\item{randomFiles}{TRUE/FALSE, whether to go through files randomly or sequential}
+
+\item{step}{how often to take a sample#'}
+
+\item{showWarnings}{TRUE/FALSE, give warning if character outside vocabulary appears}
 }
 \description{
-see https://github.com/bagasbgy/kerasgenerator/blob/master/R/timeseries_generator.R
+custom generator for fasta files, will produce chunks in size of batch.size
+by iterating over the input files.
 }

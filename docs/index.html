@@ -66,80 +66,22 @@
 <a href="#overview" class="anchor"></a>Overview</h2>
 <p>deepG is a package for generating LSTM models from genomic text and provides scripts for various common tasks such as the extraction of cell responses. It also comes with example datasets of genomic and human readable languages for testing.</p>
 </div>
-<div id="installation" class="section level2">
+<div id="installation-usage" class="section level2">
 <h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<div id="dependencies" class="section level3">
-<h3 class="hasAnchor">
-<a href="#dependencies" class="anchor"></a>Dependencies</h3>
-<p>For model saving, this package requires the <code>hdf5r</code> library which is based on hdf5 binaries. You can install it from source using the following commands.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="fu">wget</span> https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="fu">tar</span> xvzf hdf5-1.10.5.tar.gz</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="bu">cd</span> hdf5-1.10.5</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="ex">./configure</span> --prefix=/usr --enable-fortran --enable-cxx</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="fu">make</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="fu">make</span> check</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="fu">sudo</span> make install</a></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"hdf5r"</span>, <span class="dt">configure.args=</span><span class="st">"--with-hdf5=/usr/bin/h5cc"</span>)</a></code></pre></div>
-</div>
-</div>
-<div id="library" class="section level2">
-<h2 class="hasAnchor">
-<a href="#library" class="anchor"></a>Library</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"hiddengenome/deepG"</span>)</a></code></pre></div>
-<div id="enable-gpu-support" class="section level3">
-<h3 class="hasAnchor">
-<a href="#enable-gpu-support" class="anchor"></a>Enable GPU support</h3>
-<p>On default, Keras will be installed without GPU support. To support GPUs reinstall Keras via</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"keras"</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">keras<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/keras/man/install_keras.html">install_keras</a></span>(<span class="dt">tensorflow =</span> <span class="st">"gpu"</span>)</a></code></pre></div>
-<p>on AWS instances the GPU version can be installed via <code>conda create -y --name r-tensorflow tensorflow-gpu python=3.6.8</code></p>
-</div>
-</div>
-<div id="usage" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h1></div>
-<div id="generating-of-genomenet" class="section level2">
-<h2 class="hasAnchor">
-<a href="#generating-of-genomenet" class="anchor"></a>generating of GenomeNet</h2>
-<div id="generate-a-genomic-language-model-from-a-collection-of-fasta-files" class="section level3">
-<h3 class="hasAnchor">
-<a href="#generate-a-genomic-language-model-from-a-collection-of-fasta-files" class="anchor"></a>Generate a genomic language model from a collection of FASTA files</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">path =</span> <span class="st">"input_dir"</span>)</a></code></pre></div>
-<p>When you have multiple GPUs available you can run</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">path =</span> <span class="st">"input_dir"</span>, <span class="dt">cudnn =</span> T, <span class="dt">multiple_gpu =</span> T, <span class="dt">gpu_num =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, <span class="dt">run_name=</span> <span class="st">"GenomeNet"</span>, <span class="dt">epochs =</span> <span class="dv">100</span>, <span class="dt">steps_per_epoch =</span> <span class="dv">10000</span>)</a></code></pre></div>
-<p>See the <code><a href="reference/trainNetwork.html">?trainNetwork</a></code> for further information how to setup file names and network size.</p>
-</div>
-<div id="generate-a-genomic-language-model-using-data-held-in-the-ram" class="section level3">
-<h3 class="hasAnchor">
-<a href="#generate-a-genomic-language-model-using-data-held-in-the-ram" class="anchor"></a>Generate a genomic language model using data held in the RAM</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># load example dataset</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(crispr_sample)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co"># generate one-hot encoding of 30-nucleotide sized chunks</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">crispr_preprocessed &lt;-<span class="st"> </span><span class="kw"><a href="reference/preprocessSemiRedundant.html">preprocessSemiRedundant</a></span>(crispr_sample)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">dataset =</span> crispr_preprocessed)</a></code></pre></div>
-</div>
-</div>
-<div id="train-a-deep-network-for-multiclass-prediction" class="section level2">
-<h2 class="hasAnchor">
-<a href="#train-a-deep-network-for-multiclass-prediction" class="anchor"></a>Train a deep network for multiclass prediction</h2>
-<p>here the FASTA files are located as individual files in <code>input_dir/</code> and labels are defined in <code>fasta-like</code> files in <code>fasta_label_dir/</code> with a <code>.txt</code> ending.</p>
-<p>example file <code>file1.fasta</code> in <code>input_dir/</code>:</p>
-<pre><code>&gt;fasta_header
-ACGTGAGAGAGAGACAGAGATAGACAGAGATTATAA</code></pre>
-<p>example label file <code>file1.txt</code> in <code>fasta_label_dir/</code>, where {A,B,C} are the class labels.</p>
-<pre><code>&gt;fasta_header
-AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">history &lt;-<span class="st"> </span><span class="kw"><a href="reference/trainNetwork.html">trainNetwork</a></span>(<span class="dt">path =</span> <span class="st">"input_dir"</span>, <span class="dt">labels =</span> <span class="st">"fasta_label_dir/"</span>, <span class="dt">label.vocabulary.size =</span> <span class="dv">3</span>)</a></code></pre></div>
+<a href="#installation-usage" class="anchor"></a>Installation &amp; Usage</h2>
+<p>Please see our Wiki for further installation instructions. It covers also usage instructions for multi-GPU machines</p>
+<ul>
+<li><a href="https://github.com/hiddengenome/deepG/wiki/Installation-of-deepG-on-desktop">Installation on a desktop machine</a></li>
+<li><a href="https://github.com/hiddengenome/deepG/wiki/Howto-train-GenomeNet">Training of GenomeNet</a></li>
+</ul>
+<p>See the help files <code><a href="reference/deepG.html">?deepG</a></code> to get startet.</p>
 </div>
 <div id="datasets" class="section level2">
 <h2 class="hasAnchor">
 <a href="#datasets" class="anchor"></a>Datasets</h2>
 <p>The library comes with three different datasets for testing.</p>
 <ul>
-<li>The set <code><a href="https://rdrr.io/r/utils/data.html">data(parenthesis)</a></code> contains 100k charakters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.<br>
+<li>The set <code><a href="https://rdrr.io/r/utils/data.html">data(parenthesis)</a></code> contains 1M characters of the parenthesis synthetic language generated from a very simple counting language with a parenthesis and letter alphabet Σ = {( ) 0 1 2 3 4 }. The language is constrained to match parentheses, and nesting is limited to at most 4 levels deep. Each opening parenthesis increases and each closing parenthesis decreases the nesting level, respectively. Numbers are generated randomly, but are constrained to indicate the nesting level at their position.<br>
 </li>
 <li>The set <code><a href="https://rdrr.io/r/utils/data.html">data(crispr_full)</a></code> containging all CRISPR loci found in NCBI representative genomes with neighbor nucleotides up and downstream.</li>
 <li>The set <code><a href="https://rdrr.io/r/utils/data.html">data(crispr_sample)</a></code> containging a subset of <code>crispr_full</code>
@@ -150,14 +92,13 @@ AAAAAAABBBBBBBAAAAAACCCCCCCCCCCCCCCC</code></pre>
 <h2 class="hasAnchor">
 <a href="#license-and-copyright" class="anchor"></a>License and copyright</h2>
 <p>Copyright 2019 Philipp Münch</p>
-<p>Source code to deepG is made available under the terms of the <a href="LICENSE.txt">GNU Affero General Public License</a> (AGPL). deepG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.</p>
+<p>Source code to deepG is made available under the terms of the GNU Affero General Public License (AGPL). deepG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.</p>
 </div>
 <div id="supported-by" class="section level2">
 <h2 class="hasAnchor">
 <a href="#supported-by" class="anchor"></a>Supported by</h2>
 <p float="left">
   <img src="reference/figures/hzi.jpg" width="200"><img src="reference/figures/dfg.jpg" width="200"><img src="reference/figures/bmbf.jpeg" width="100"><img src="reference/figures/aws.png" width="100"></p>
-</div>
 </div>
 
   </div>
