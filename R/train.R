@@ -46,7 +46,7 @@ trainNetwork <- function(model_path,
                          path,
                          path.val,
                          dataset,
-                         checkpoint_path = "/scratch/checkpoints",
+                         checkpoint_path = "/scratch/checkpoints", 
                          validation.split = .05,
                          run.name = "run",
                          maxlen,
@@ -76,16 +76,16 @@ trainNetwork <- function(model_path,
                          seqEnd= "l",
                          withinFile = "p",
                          initial_epoch,
-                         vocabulary = c("l","p","a", "c", "g", "t"),
+                         vocabulary = c("l", "p", "a", "c", "g", "t"),
                          tensorboard.log = "/scratch/tensorboard",
                          bidirectional = FALSE,
                          compile = TRUE) {  
   
   ## create folder for checkpoints using run.name
-  ## filenames contain epoch and validation loss 
+  ## filenames contain epoch, validation loss and validation accuracy 
   checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
   dir.create(checkpoint_dir, showWarnings = FALSE)
-  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-val_loss{val_loss:.2f}-val_acc{val_loss:.3f}.hdf5")
+  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-val_loss:{val_loss:.2f}-val_acc:{val_acc:.3f}.hdf5")
   
   # Check if run.name is unique
   if (dir.exists(file.path(tensorboard.log, run.name))) {
@@ -241,10 +241,10 @@ trainNetwork <- function(model_path,
   } else { 
     
     # message for ignored arguments
-    if (!missing(maxlen) | !missing(dropout) | !missing(recurrent_dropout) | !missing(layer.size) |
+    if (!missing(maxlen) | !missing(dropout) | !missing(recurrent_dropout) | !missing(layer.size) | !missing(use.cudnn) |
         !missing(layers.lstm) | !missing(use.codon.cnn) | !missing(vocabulary.size) | !missing(bidirectional)){
       message("The following parameters are predetermined by the loaded model (duplicate arguments in function will be ignored): 
-              maxlen, dropout, recurrent_dropout, layer.size, layers.lstm, use.codon.cnn, vocabulary.size, bidirectional")
+              maxlen, dropout, recurrent_dropout, layer.size, use.cudnn, layers.lstm, use.codon.cnn, vocabulary.size, bidirectional")
     }
     
     # epochs arguments can be misleading 
