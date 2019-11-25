@@ -5,7 +5,9 @@ Version: 0.2.0
 Encoding: UTF-8
 Author: Philipp C. Muench
 Authors@R: c(
-    person("Philipp", "Muench" , "pmu15@helmholtz-hzi.de", c("aut", "cre")))
+    person(given = "Philipp Muench",
+    role = c("aut", "cre"), 
+    email = "pmu15@helmholtz-hzi.de"))
 Maintainer: Philipp Muench <pmu15@helmholtz-hzi.de>
 Description: deepG is a R library that contains a collection of scripts required for model generation and model analysis.
 License: AGPL_3 + file LICENSE
@@ -30,7 +32,9 @@ Imports:
     hdf5r,
     xfun,
     Biostrings,
-    Rtsne
+    Rtsne,
+    plyr,
+    ggplot2
 biocViews:
     Biostrings
 NeedsCompilation: yes

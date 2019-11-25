@@ -8,11 +8,11 @@ preprocessFasta(path, maxlen = 250, vocabulary = c("l", "p", "a", "c",
   "g", "t"), verbose = F)
 }
 \arguments{
-\item{path}{Path to the FASTA file}
+\item{path}{path to the FASTA file}
 
-\item{maxlen}{Length of the semi-redundant sequences}
+\item{maxlen}{length of the semi-redundant sequences}
 
-\item{vocabulary}{Char contains the vocabulary from the input char, it should be sorted.
+\item{vocabulary}{char contains the vocabulary from the input char
 If no vocabulary exists, it is generated from the input char}
 
 \item{verbose}{TRUE/FALSE}

@@ -4,20 +4,25 @@
 \alias{replaceChar}
 \title{Replaces specific nucleotides in a sequence}
 \usage{
-replaceChar(sequence, model, char = "X", vocabulary = c("\\n", "a",
-  "c", "g", "t"))
+replaceChar(sequence, model, char = "X", vocabulary = c("l", "a", "c",
+  "g", "t"))
 }
 \arguments{
-\item{sequence}{Input sequence, length should be in sync with the model.
+\item{sequence}{input sequence, length should be in sync with the model.
 If length exceeds input.shape of model then only the right side of the
 sequence will be used.}
 
-\item{model}{Trained model from the function \code{trainNetwork()}}
+\item{model}{trained model from the function \code{trainNetwork()}}
 
-\item{char}{Character in the sequence that will be replaced}
+\item{char}{character in the sequence that will be replaced}
 
-\item{vocabulary}{Ordered vocabulary of input sequence}
+\item{vocabulary}{ordered vocabulary of input sequence}
 }
 \description{
 Replaces specific nucleotides in a sequence
+}
+\examples{
+\dontrun{
+example.model <- keras::load_model_hdf5("example_model.hdf5")
+replaceChar(sequence = sequence, model = example.model)}
 }

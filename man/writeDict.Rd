@@ -2,15 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{writeDict}
 \alias{writeDict}
-\title{generates dictionary for LSTMVis}
+\title{Generates dictionary for LSTMVis}
 \usage{
 writeDict(dat, filename = "train.dict")
 }
 \arguments{
-\item{dat}{character}
-
 \item{dat}{filename where dict file is written to}
+
+\item{filename}{file name}
 }
 \description{
-generates dictionary for LSTMVis
+Generates dictionary for LSTMVis
 }

@@ -4,12 +4,11 @@
 #' @param filename filename where hdf5 file is written to
 #' @param verbose TRUE/FALSE
 #' @export
-writeHdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
-	require(dplyr)
-	require(plyr)
-	require(hdf5r)
-	tokenized <- dat %>%
-		tokenizers::tokenize_characters(strip_non_alphanum = FALSE,
+writeHdf5 <- function(dat, 
+                      filename = "train.hdf5", 
+                      verbose = F) {
+
+	tokenized <- tokenizers::tokenize_characters(dat, strip_non_alphanum = FALSE,
 																		simplify = TRUE)
 	# get sorted vocabulary
 	charset <- sort(unique(unlist(dat_tokenized)))
@@ -19,10 +18,10 @@ writeHdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
 	names(charset_index) <- charset
 
 	# replace character by character index
-	tokenized_index <- mapvalues(tokenized, from = charset,
+	tokenized_index <- plyr::mapvalues(tokenized, from = charset,
 															 to = charset_index)
 
-	if (verbose) print("saving states...")
+	if (verbose) print("Saving states...")
 	file <- hdf5r::H5File$new(filename, mode = "a")
 	file.grp <- hdf5r::file.h5$create_group("words")
 	file.grp <- array(tokenized_index)
@@ -30,17 +29,14 @@ writeHdf5 <- function(dat, filename = "train.hdf5", verbose = F) {
 }
 
 
-#' generates dictionary for LSTMVis
+#' Generates dictionary for LSTMVis
 #'
-#' @param dat character
 #' @param dat filename where dict file is written to
+#' @param filename file name
 #' @export
 writeDict <- function(dat, filename = "train.dict") {
-	require(dplyr)
-	require(plyr)
 
-	tokenized <- dat %>%
-		tokenizers::tokenize_characters(strip_non_alphanum = FALSE,
+	tokenized <- tokenizers::tokenize_characters(dat, strip_non_alphanum = FALSE,
 																		simplify = TRUE)
 	# get sorted vocabulary
 	charset <- sort(unique(unlist(dat_tokenized)))
@@ -51,23 +47,21 @@ writeDict <- function(dat, filename = "train.dict") {
 							col.names = F, sep = " ")
 }
 
-#' wrapper for message(sprintf)
-#'
+#' Wrapper for message(sprintf)
+#' @param ... text input
+#' @param newline print in new line 
 #' @export
-messagef <- function (..., .newline = TRUE) 
+messagef <- function (..., newline = TRUE) 
 {
-  message(sprintf(...), appendLF = .newline)
+  message(sprintf(...), appendLF = newline)
 }
 
-#' prints TF version
-#'
+#' Prints TF version
+#' @param x text input
 #' @export
-print.tf.version <- function() {
-  message(paste("Tensoflow", tensorflow::tf$`__version__`, "found."))
-}
-
-ensure.loaded <- function() {
-  invisible(tensorflow::tf$`__version__`)
+print.tf.version <- function(x) 
+{
+  message(paste("Tensorflow", tensorflow::tf$`__version__`, "found."))
 }
 
 #' Calculate the steps per epoch
@@ -86,8 +80,7 @@ calculateStepsPerEpoch <-
            maxlen = 250,
            format = "fasta",
            verbose = F) {
-    library(xfun)
-    library(Biostrings)
+
     steps.per.epoch <- 0
     fasta.files <- list.files(
       path = xfun::normalize_path(dir),
@@ -101,4 +94,13 @@ calculateStepsPerEpoch <-
         steps.per.epoch + ceiling((nchar(seq) - maxlen - 1) / batch.size)
     }
     return(steps.per.epoch)
+  }
+
+
+#' Tests if Keras is available for the unit tests
+#' @param version required keras version 
+#' @export
+skip_if_no_keras <- function(version = NULL){
+  if(!is_keras_available(version))
+    skip("Required keras version not avaible for testing!")
 }

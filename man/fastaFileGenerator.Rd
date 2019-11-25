@@ -2,7 +2,7 @@
 % Please edit documentation in R/preprocess.R
 \name{fastaFileGenerator}
 \alias{fastaFileGenerator}
-\title{custom generator for fasta files, will produce chunks in size of batch.size
+\title{Custom generator for fasta files, will produce chunks in size of batch.size
 by iterating over the input files.}
 \usage{
 fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
@@ -28,15 +28,17 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
 
 \item{withinFile}{insert characters within sequence}
 
+\item{vocabulary}{set of characters to encode}
+
 \item{verbose}{TRUE/FALSE show information about files and running time}
 
 \item{randomFiles}{TRUE/FALSE, whether to go through files randomly or sequential}
 
-\item{step}{how often to take a sample#'}
+\item{step}{how often to take a sample}
 
 \item{showWarnings}{TRUE/FALSE, give warning if character outside vocabulary appears}
 }
 \description{
-custom generator for fasta files, will produce chunks in size of batch.size
+Custom generator for fasta files, will produce chunks in size of batch.size
 by iterating over the input files.
 }

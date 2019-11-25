@@ -7,10 +7,14 @@
 getVocabulary(char, verbose = F)
 }
 \arguments{
-\item{char}{Character string of text with the length of one}
+\item{char}{character string of text with the length of one}
 
 \item{verbose}{TRUE/FALSE}
 }
 \description{
 Use this function with a character string.
+}
+\examples{
+getVocabulary(data(crispr_sample))
+getVocabulary("abcd")
 }

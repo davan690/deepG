@@ -23,7 +23,7 @@ generateStatesFromFolder(fasta.folder = "example_files/fasta",
 
 \item{output.folder}{path to output folder with tailing "/"}
 
-\item{verbose}{write outut to screen}
+\item{verbose}{TRUE/FALSE}
 
 \item{exact}{keep exact values and dont round}
 }

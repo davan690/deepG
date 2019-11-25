@@ -2,10 +2,10 @@
 % Please edit documentation in R/gpu-management.R
 \name{end_gpu_session}
 \alias{end_gpu_session}
-\title{Ends the GPU sesstion}
+\title{Ends the GPU session}
 \usage{
 end_gpu_session()
 }
 \description{
-Ends the GPU sesstion
+Ends the GPU session
 }
