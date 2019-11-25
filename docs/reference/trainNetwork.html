@@ -124,7 +124,7 @@ is recommended for big training sets. Alternative, a dataset can be supplied tha
   <span class='kw'>cooldown</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>steps.per.epoch</span> <span class='kw'>=</span> <span class='fl'>10000</span>, <span class='kw'>step</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>randomFiles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>seqStart</span> <span class='kw'>=</span> <span class='st'>"l"</span>, <span class='kw'>seqEnd</span> <span class='kw'>=</span> <span class='st'>"l"</span>,
   <span class='kw'>withinFile</span> <span class='kw'>=</span> <span class='st'>"p"</span>, <span class='kw'>vocabulary</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"l"</span>, <span class='st'>"p"</span>, <span class='st'>"a"</span>, <span class='st'>"c"</span>, <span class='st'>"g"</span>, <span class='st'>"t"</span>),
-  <span class='kw'>tensorboard.log</span> <span class='kw'>=</span> <span class='st'>"/scratch/tensorboard"</span>)</pre>
+  <span class='kw'>tensorboard.log</span> <span class='kw'>=</span> <span class='st'>"/scratch/tensorboard"</span>, <span class='kw'>bidirectional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -252,6 +252,10 @@ is recommended for big training sets. Alternative, a dataset can be supplied tha
     <tr>
       <th>tensorboard.log</th>
       <td><p>path to tensorboard log directory</p></td>
+    </tr>
+    <tr>
+      <th>bidirectional</th>
+      <td><p>Use bidirectional option for lstm layers</p></td>
     </tr>
     </table>
 

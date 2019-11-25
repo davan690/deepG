@@ -15,7 +15,7 @@ trainNetwork(path, path.val, dataset, validation.split = 0.05,
   cooldown = 5, steps.per.epoch = 10000, step = 1,
   randomFiles = FALSE, seqStart = "l", seqEnd = "l",
   withinFile = "p", vocabulary = c("l", "p", "a", "c", "g", "t"),
-  tensorboard.log = "/scratch/tensorboard")
+  tensorboard.log = "/scratch/tensorboard", bidirectional = FALSE)
 }
 \arguments{
 \item{path}{Path to folder where individual or multiple FASTA files are located for training}
@@ -79,6 +79,8 @@ trainNetwork(path, path.val, dataset, validation.split = 0.05,
 \item{withinFile}{insert characters within sequences}
 
 \item{tensorboard.log}{path to tensorboard log directory}
+
+\item{bidirectional}{Use bidirectional option for lstm layers}
 }
 \description{
 Depth and number of neurons per layer of the netwok can be specified. First layer can be a Convolutional Neural Network (CNN) that is designed to capture codons.
