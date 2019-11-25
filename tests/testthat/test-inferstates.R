@@ -1,6 +1,9 @@
 context("infer-states")
 
 test_that("Check Cell States", {
+  
+  skip_if_no_keras()
+  
   expect_error(getStates())
   expect_error(getStates(model.path = ""))
   expect_error(getStates(x = ""))
@@ -8,5 +11,8 @@ test_that("Check Cell States", {
 })
 
 test_that("Check Cell States from FASTA files", {
+  
+  skip_if_no_keras()
+  
   expect_error(getStatesFromFasta())
 })
