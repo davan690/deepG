@@ -155,7 +155,6 @@ trainNetwork <- function(model_path,
               layer.size,
               input_shape = c(maxlen, vocabulary.size),
               return_sequences = TRUE
-              
             )
         } 
       }
@@ -250,7 +249,7 @@ trainNetwork <- function(model_path,
     # epochs arguments can be misleading 
     if (!missing(initial_epoch)){
       if (initial_epoch > epochs){
-        stop("networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+        stop("Networks trains (epochs - initial_epochs) times overall, NOT epochs times")
       }
     }
     
