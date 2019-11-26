@@ -243,7 +243,7 @@ trainNetwork <- function(path,
         max_queue_size = max.queue.size,
         epochs = epochs,
         callbacks = list(
-          keras::callback_model_checkpoint(paste0(run.name, "_checkpoints.h5")),
+          keras::callback_model_checkpoint(paste0(run.name, "_checkpoints.hdf5")),
           keras::callback_reduce_lr_on_plateau(
             monitor = "loss",
             factor = lr.plateau.factor,
