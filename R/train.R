@@ -77,7 +77,7 @@ trainNetwork <- function(path,
   stopifnot(dropout <= 1 & dropout >= 0)
   stopifnot(recurrent_dropout <= 1 & recurrent_dropout >= 0)
   stopifnot(layer.size > 1)
-  stopifnot(layers.lstm > 1)
+  stopifnot(layers.lstm >= 1)
   stopifnot(batch.size > 1)
   stopifnot(steps.per.epoch > 0)
   
@@ -120,7 +120,7 @@ trainNetwork <- function(path,
         model %>%
           keras::bidirectional(
             keras::layer_cudnn_lstm(
-              layer.size,
+              units = layer.size,
               input_shape = c(maxlen, vocabulary.size),
               return_sequences = TRUE
             ) 
@@ -143,7 +143,7 @@ trainNetwork <- function(path,
     if (bidirectional){
       model %>%
         keras::bidirectional(
-          keras::layer_cudnn_lstm(layer.size)
+          keras::layer_cudnn_lstm(units = layer.size)
         )
     } else {
       model %>% keras::layer_cudnn_lstm(layer.size)
@@ -156,7 +156,7 @@ trainNetwork <- function(path,
         model %>%
           keras::bidirectional(
             keras::layer_lstm(
-              layer.size,
+              units = layer.size,
               input_shape = c(maxlen, vocabulary.size),
               return_sequences = TRUE,
               dropout = dropout,
@@ -178,10 +178,10 @@ trainNetwork <- function(path,
     }
     # last LSTM layer
     if (bidirectional){
-      keras::bidirectional(
-        model %>%
-          keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
-      )
+      model %>%
+        keras::bidirectional(
+          keras::layer_lstm(units = layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
+        )
     } else {
       model %>%
         keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
@@ -192,7 +192,7 @@ trainNetwork <- function(path,
     keras::layer_activation("softmax")
   
   # print model layout to screen, should be done before multi_gpu_model
-  summary(model)
+  if (!bidirectional) summary(model) 
   
   if (use.multiple.gpus) {
     model <- keras::multi_gpu_model(model,
