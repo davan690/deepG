@@ -9,7 +9,7 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
   maxlen = 250, max_iter = 20, seqStart = "l", seqEnd = "l",
   withinFile = "p", vocabulary = c("l", "p", "a", "c", "g", "t"),
   verbose = FALSE, randomFiles = FALSE, step = 1,
-  showWarnings = FALSE)
+  showWarnings = FALSE, run.name = "")
 }
 \arguments{
 \item{corpus.dir}{input directory where .fasta files are located}
