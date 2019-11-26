@@ -141,6 +141,6 @@ test_that("Checking the generator for the Fasta files", {
                                               withinFile = "", vocabulary = c("a", "c", "g"), showWarnings = TRUE))
   
   
-  expect_type(gen()[[1]], "integer")
-  expect_type(gen()[[2]], "integer")
+  expect_type(gen()[[1]], "double")
+  expect_type(gen()[[2]], "double")
 })
