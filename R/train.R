@@ -281,9 +281,11 @@ trainNetwork <- function(model_path,
       if (solver == "sgd")
         optimizer <-
           keras::optimizer_sgd(lr = learning.rate) 
+      
+      model %>% keras::compile(loss = "categorical_crossentropy",
+                               optimizer = optimizer, metrics = c("acc"))
     }
-    model %>% keras::compile(loss = "categorical_crossentropy",
-                             optimizer = optimizer, metrics = c("acc"))
+    
   }
   
   # if no dataset is supplied, external fasta generator will generate batches
