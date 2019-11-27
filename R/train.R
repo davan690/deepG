@@ -243,17 +243,20 @@ trainNetwork <- function(model_path,
       message("The following parameters are predetermined by the loaded model (duplicate arguments in function will be ignored): 
               maxlen, dropout, recurrent_dropout, layer.size, use.cudnn, layers.lstm, use.codon.cnn, vocabulary.size, bidirectional")
     }
+   
+    # epochs arguments can be misleading 
+    if (!missing(initial_epoch)){
+      if (initial_epoch > epochs){
+        stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds. Increase epochs or decrease initial_epoch.")
+      }
+    }
     
     # extract initial_epoch from filename if no argument is given
     if (missing(initial_epoch)){
       epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
       initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
-    }
-    
-    # epochs arguments can be misleading 
-    if (!missing(initial_epoch)){
       if (initial_epoch > epochs){
-        stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds. Increase epochs or decrease initial_epoch")
+        stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds. Increase epochs or decrease initial_epoch.")
       }
     }
     
