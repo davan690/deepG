@@ -141,17 +141,17 @@ sequenceToArray <- function(sequence, maxlen, vocabulary, step){
   # len_seq should be n * step + maxlen + 1 for some integer n
   # how many samples can be extracted from sequence
   numberOfSamples <- ((len_seq - maxlen - 1)/step) + 1  
-  z <- array(0L, dim=c(len_seq * len_voc))  
+  z <- array(0, dim=c(len_seq * len_voc))  
   tokenizer <- keras::fit_text_tokenizer(keras::text_tokenizer(char_level = TRUE, lower = TRUE), vocabulary) 
   sequence_int <- keras::texts_to_sequences(tokenizer, sequence) 
   seq_unlist <- sequence_int[[1]]
   adjust <- len_voc*(seq(0, len_seq - 1))
   
   # every row in z one-hot encodes one character in sequence
-  z[adjust + seq_unlist] <- 1L
+  z[adjust + seq_unlist] <- 1
   z <- keras::array_reshape(z, dim=c(len_seq, len_voc))
   
-  x <- array(0L, dim = c(numberOfSamples, maxlen, len_voc))
+  x <- array(0, dim = c(numberOfSamples, maxlen, len_voc))
   for (i in 1:numberOfSamples){
     start <- 1 + (i - 1) * step
     end <- start + maxlen - 1
@@ -206,7 +206,8 @@ fastaFileGenerator <- function(corpus.dir,
                                verbose = FALSE,
                                randomFiles = FALSE,
                                step = 1, 
-                               showWarnings = FALSE){
+                               showWarnings = FALSE,
+                               run.name = ""){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary) & i!="")
