@@ -253,7 +253,7 @@ trainNetwork <- function(model_path,
     # epochs arguments can be misleading 
     if (!missing(initial_epoch)){
       if (initial_epoch > epochs){
-        stop("Networks trains (epochs - initial_epochs) times overall, NOT epochs times")
+        stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds")
       }
     }
     
@@ -265,7 +265,7 @@ trainNetwork <- function(model_path,
     maxlen <- model$input$shape[1] 
     
     if (compile & (!missing(learning.rate)|!missing(solver))){
-      warning("Arguments for solver and learning rate will be ignored. Set compile to FALSE to use costum solver and learning rate.")
+      message("Arguments for solver and learning rate will be ignored. Set compile to FALSE to use costum solver and learning rate.")
     }
     
     if (!compile){
