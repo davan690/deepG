@@ -139,16 +139,15 @@ trainNetwork <- function(model_path,
         for (i in 1:(layers.lstm - 1)) {
           model %>%
             keras::bidirectional(
+              input_shape = c(maxlen, vocabulary.size),
               keras::layer_cudnn_lstm(
-                layer.size,
-                input_shape = c(maxlen, vocabulary.size),
+                units = layer.size,
                 return_sequences = TRUE
               ) 
             )
         } 
         
       } else {
-        
         for (i in 1:(layers.lstm - 1)) {
           model %>%
             keras::layer_cudnn_lstm(
@@ -162,7 +161,7 @@ trainNetwork <- function(model_path,
       if (bidirectional){
         model %>%
           keras::bidirectional(
-            keras::layer_cudnn_lstm(layer.size)
+            keras::layer_cudnn_lstm(units = layer.size)
           )
       } else {
         model %>% keras::layer_cudnn_lstm(layer.size)
@@ -174,9 +173,9 @@ trainNetwork <- function(model_path,
         for (i in 1:(layers.lstm - 1)) {
           model %>%
             keras::bidirectional(
+              input_shape = c(maxlen, vocabulary.size),
               keras::layer_lstm(
-                layer.size,
-                input_shape = c(maxlen, vocabulary.size),
+                units = layer.size,
                 return_sequences = TRUE,
                 dropout = dropout,
                 recurrent_dropout = recurrent_dropout
@@ -189,18 +188,17 @@ trainNetwork <- function(model_path,
             keras::layer_lstm(
               layer.size,
               input_shape = c(maxlen, vocabulary.size),
-              return_sequences = TRUE,
-              dropout = dropout,
-              recurrent_dropout = recurrent_dropout
+              return_sequences = TRUE
+              
             )
         } 
       }
       # last LSTM layer
       if (bidirectional){
-        keras::bidirectional(
-          model %>%
-            keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
-        )
+        model %>%
+          keras::bidirectional(
+            keras::layer_lstm(units = layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
+          )
       } else {
         model %>%
           keras::layer_lstm(layer.size, dropout = dropout, recurrent_dropout = recurrent_dropout)
@@ -210,7 +208,7 @@ trainNetwork <- function(model_path,
     model %>% keras::layer_dense(vocabulary.size) %>%
       keras::layer_activation("softmax")
     
-    # print model layout to screen, should be done before multi_gpu_model
+    # print model layout to screen, should be done before multi_gpu_model 
     summary(model)
     
     if (use.multiple.gpus) {
@@ -246,17 +244,17 @@ trainNetwork <- function(model_path,
               maxlen, dropout, recurrent_dropout, layer.size, use.cudnn, layers.lstm, use.codon.cnn, vocabulary.size, bidirectional")
     }
     
+    # extract initial_epoch from filename if no argument is given
+    if (missing(initial_epoch)){
+      epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
+      initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
+    }
+    
     # epochs arguments can be misleading 
     if (!missing(initial_epoch)){
       if (initial_epoch > epochs){
         stop("Networks trains (epochs - initial_epochs) times overall, NOT epochs times")
       }
-    }
-    
-    # extract initial_epoch from filename if no argument is given
-    if (missing(initial_epoch)){
-      epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
-      initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
     }
     
     # load model
@@ -283,10 +281,9 @@ trainNetwork <- function(model_path,
       if (solver == "sgd")
         optimizer <-
           keras::optimizer_sgd(lr = learning.rate) 
-      
-      model %>% keras::compile(loss = "categorical_crossentropy",
-                               optimizer = optimizer, metrics = c("acc"))
     }
+    model %>% keras::compile(loss = "categorical_crossentropy",
+                             optimizer = optimizer, metrics = c("acc"))
   }
   
   # if no dataset is supplied, external fasta generator will generate batches
@@ -319,6 +316,7 @@ trainNetwork <- function(model_path,
           keras::callback_model_checkpoint(filepath = filepath_checkpoints,
                                            save_weights_only = FALSE,
                                            verbose = 1),
+          
           keras::callback_reduce_lr_on_plateau(
             monitor = "loss",
             factor = lr.plateau.factor,
