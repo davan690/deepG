@@ -253,7 +253,7 @@ trainNetwork <- function(model_path,
     # epochs arguments can be misleading 
     if (!missing(initial_epoch)){
       if (initial_epoch > epochs){
-        stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds")
+        stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds. Increase epochs or decrease initial_epoch")
       }
     }
     
