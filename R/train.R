@@ -259,6 +259,7 @@ trainNetwork <- function(model_path,
     
     # load model
     model <- keras::load_model_hdf5(model_path, compile = compile)
+    summary(model)
     
     # extract maxlen
     maxlen <- model$input$shape[1] 
