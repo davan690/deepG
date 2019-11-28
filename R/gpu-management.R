@@ -21,7 +21,7 @@ startGPUSession <- function(gpu.number, growth = T, env = F) {
 }
 
 list.local.devices <- function(){
-  message(tensorflow::tensorflow::tf$config$experimental$get_visible_devices('GPU'))
+  message(tensorflow::tf$config$experimental$get_visible_devices('GPU'))
 }
 
 is.gpu.available <- function() {
