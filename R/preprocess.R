@@ -206,8 +206,7 @@ fastaFileGenerator <- function(corpus.dir,
                                verbose = FALSE,
                                randomFiles = FALSE,
                                step = 1, 
-                               showWarnings = FALSE,
-                               run.name = ""){
+                               showWarnings = FALSE){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary) & i!="")
