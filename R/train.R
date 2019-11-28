@@ -40,6 +40,7 @@
 #' @param vocabulary Vector of allowed characters, samples with other chars get discarded
 #' @param tensorboard.log Path to tensorboard log directory
 #' @param bidirectional Use bidirectional option for lstm layers
+#' @param save_best_only Only save model that improved on best val_loss score 
 #' @param compile Whether to compile the model after loading
 #' @export
 trainNetwork <- function(model_path,
@@ -79,6 +80,7 @@ trainNetwork <- function(model_path,
                          vocabulary = c("l", "p", "a", "c", "g", "t"),
                          tensorboard.log = "/scratch/tensorboard",
                          bidirectional = FALSE,
+                         save_best_only = FALSE,
                          compile = TRUE) {  
   
   ## create folder for checkpoints using run.name
@@ -321,6 +323,7 @@ trainNetwork <- function(model_path,
         callbacks = list(
           keras::callback_model_checkpoint(filepath = filepath_checkpoints,
                                            save_weights_only = FALSE,
+                                           save_best_only = save_best_only,
                                            verbose = 1),
           
           keras::callback_reduce_lr_on_plateau(
