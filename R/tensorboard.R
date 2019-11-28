@@ -4,8 +4,8 @@
 #' @export
 ecoliEvaluation <- function(model,
                             genome = "ecoli_small",
-                            maxlen = 80,
-                            vocabulary = c("-", "|", "a", "c", "g", "t")) {
+                            maxlen,
+                            vocabulary) {
   # load amino acid sequence 
   if (genome == "ecoli") {
     data(ecoli)
@@ -37,15 +37,17 @@ ecoliEvaluation <- function(model,
 }
 
 #' Custom lambda callback that shows accuacy scores for the E. coli genome in Rensorobard
-ecoliCustomScalar <-
+#' @export
+ecoliCustomScalar <- function(model, vocabulary = c("-", "|", "a", "c", "g", "t"), maxlen){
   keras::callback_lambda(
     on_epoch_end = function(epoch, logs) {
-      char.acc <- EcoliEvaluation(model)
-      tensorflow::tf$summary$scalar(paste("Ecoli", vocabulary[1]), data = char.acc[[1]], step = epoch)
-      tensorflow::tf$summary$scalar(paste("Ecoli", vocabulary[2]), data = char.acc[[2]], step = epoch)
-      tensorflow::tf$summary$scalar(paste("Ecoli", vocabulary[3]), data = char.acc[[3]], step = epoch)
-      tensorflow::tf$summary$scalar(paste("Ecoli", vocabulary[4]), data = char.acc[[4]], step = epoch)
-      tensorflow::tf$summary$scalar(paste("Ecoli", vocabulary[5]), data = char.acc[[5]], step = epoch)
-      tensorflow::tf$summary$scalar(paste("Ecoli", vocabulary[6]), data = char.acc[[6]], step = epoch)
+      char.acc <- ecoliEvaluation(model, vocabulary, maxlen)
+      tensorflow::tf$summary$scalar(name = paste0("Ecoli", vocabulary[1]), data = char.acc[[1]], step = epoch)
+      tensorflow::tf$summary$scalar(name = paste0("Ecoli", vocabulary[2]), data = char.acc[[2]], step = epoch)
+      tensorflow::tf$summary$scalar(name = paste0("Ecoli", vocabulary[3]), data = char.acc[[3]], step = epoch)
+      tensorflow::tf$summary$scalar(name = paste0("Ecoli", vocabulary[4]), data = char.acc[[4]], step = epoch)
+      tensorflow::tf$summary$scalar(name = paste0("Ecoli", vocabulary[5]), data = char.acc[[5]], step = epoch)
+      tensorflow::tf$summary$scalar(name = paste0("Ecoli", vocabulary[6]), data = char.acc[[6]], step = epoch)
     }
   )
+}
