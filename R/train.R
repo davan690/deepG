@@ -156,6 +156,10 @@ trainNetwork <- function(path,
     optimizer <-
     keras::optimizer_sgd(lr = learning.rate)
   
+  # start TB file writer 
+  file.writer <- tensorflow::tf$summary$create_file_writer(file.path(tensorboard.log, run.name))
+  file.writer$set_as_default()
+  
   model %>% keras::compile(loss = "categorical_crossentropy",
                            optimizer = optimizer, metrics = c("acc"))
   
@@ -168,12 +172,6 @@ trainNetwork <- function(path,
     # generator for validation
     gen.val <-
       fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size, maxlen = maxlen)
-    
-    # generate data for embedding browser
-    # seq <- "AAAAAAAAAAACCCCCCCCCCCCCCCCCCCCCTTTTTTTTTTTTTTTTTTTTTTTTTGGGGGGGGGGGGGGGGGGGGGGG"
-    #  embedding.data.raw <- preprocessSemiRedundant(seq, maxlen = maxlen, vocabulary = c("-", "|", "a", "c", "g", "t"))
-    #  embedding.data <- embedding.data.raw$X
-    
     
     # training
     message("Start training ...")
@@ -193,13 +191,12 @@ trainNetwork <- function(path,
             patience = patience,
             cooldown = cooldown
           ),
+          ecoliCustomScalar(model, vocabulary= vocabulary, maxlen = maxlen),
           keras::callback_tensorboard(file.path(tensorboard.log, run.name),
                                       write_graph = T, 
                                       histogram_freq = 1,
                                       write_images = T,
                                       write_grads = T
-                                      # embeddings_data = embedding.data,
-                                      #embeddings_freq = 1
           ),
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
