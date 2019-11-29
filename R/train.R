@@ -87,7 +87,7 @@ trainNetwork <- function(model_path,
   ## filenames contain epoch, validation loss and validation accuracy 
   checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
   dir.create(checkpoint_dir, showWarnings = FALSE)
-  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-val_loss:{val_loss:.2f}-val_acc:{val_acc:.3f}.hdf5")
+  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-val_loss{val_loss:.2f}-val_acc{val_acc:.3f}.hdf5")
   
   # Check if run.name is unique
   if (dir.exists(file.path(tensorboard.log, run.name))) {
