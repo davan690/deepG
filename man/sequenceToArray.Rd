@@ -4,23 +4,13 @@
 \alias{sequenceToArray}
 \title{Helper function for fastaFileGenerator}
 \usage{
-sequenceToArray(sequence, maxlen, vocabulary, step)
+sequenceToArray(sequence, maxlen, vocabulary = c("\\n", "a", "c", "g",
+  "t"))
 }
 \arguments{
 \item{sequence}{character sequence}
 
 \item{maxlen}{length of one sample}
-
-\item{vocabulary}{set of characters to encode}
-
-\item{step}{how often to take a sample
-Returns one hot encoding for every sequence  
-For example: sequence = "acatg", maxlen = 4, vocabulary = c("p","a", "c", "g", "t"), step = 1  leads to
-X = (0 1 0 0 0  
-     0 0 1 0 0
-     0 1 0 0 0
-     0 0 0 0 1)
-Y = (0 0 0 1 0)}
 }
 \description{
 Helper function for fastaFileGenerator

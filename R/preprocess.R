@@ -189,6 +189,7 @@ splitSequence <- function(seq, vocabulary, maxlen){
 #' @param seqStart insert character at beginning of sequence
 #' @param seqEnd insert character at end of sequence
 #' @param withinFile insert characters within sequence
+#' @param vocabulary vector of allowed characters, samples with other chars get discarded
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
 #' @param step how often to take a sample#'
 #' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
@@ -205,8 +206,7 @@ fastaFileGenerator <- function(corpus.dir,
                                verbose = FALSE,
                                randomFiles = FALSE,
                                step = 1, 
-                               showWarnings = FALSE,
-                               run.name = ""){
+                               showWarnings = FALSE){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary) & i!="")
@@ -237,7 +237,7 @@ fastaFileGenerator <- function(corpus.dir,
   filePath <- fasta.files[[file_index]]
   fasta.file <- Biostrings::readDNAStringSet(filePath)
   seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
-  
+ 
   # split seq around chars not in vocabulary
   seq_split <- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
   current_seq <- seq_split[1]
@@ -322,3 +322,4 @@ fastaFileGenerator <- function(corpus.dir,
     list(X = x, Y = y)
   }
 }
+
