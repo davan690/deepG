@@ -31,14 +31,17 @@
 #' @param patience Number of epochs waiting for decrease in loss before reducing learningrate
 #' @param cooldown Number of epochs without changing learningrate
 #' @param steps.per.epoch Number of training samples divided by the batch.size, is 20139934 on SGB dataset
-#' @param step frequency of sampling steps
+#' @param step Frequency of sampling steps
 #' @param randomFiles TRUE/FALSE go through files sequentially or shuffle beforehand
-#' @param seqStart insert character at beginning of sequence
-#' @param seqEnd insert character at end of sequence
-#' @param withinFile insert characters within sequences
-#' @param vocabulary set of characters to encode  
-#' @param tensorboard.log path to tensorboard log directory
+#' @param seqStart Insert character at beginning of sequence
+#' @param seqEnd Insert character at end of sequence
+#' @param withinFile Insert characters within sequences
+#' @param initial_epoch Epoch at which to start training, set to 0 if no model_path given
+#' @param vocabulary Vector of allowed characters, samples with other chars get discarded
+#' @param tensorboard.log Path to tensorboard log directory
 #' @param bidirectional Use bidirectional option for lstm layers
+#' @param save_best_only Only save model that improved on best val_loss score 
+#' @param compile Whether to compile the model after loading
 #' @export
 trainNetwork <- function(path,
                          path.val,

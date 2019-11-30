@@ -23,7 +23,6 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
 \item{max_iter}{stop after max_iter number of iterations failed to produce new sample}
 
 \item{verbose}{TRUE/FALSE show information about files and running time}
-
 }
 \description{
 Custom generator for fasta files, will produce chunks in size of batch.size
