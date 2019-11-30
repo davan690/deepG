@@ -2,79 +2,81 @@
 #' 
 #' The output is a S4 class.
 #'
-#' @param sequence Input sequence, length should be in sync with the model.
+#' @param sequence input sequence, length should be in sync with the model.
 #' If length exceeds input.shape of model then only the right side of the
 #' sequence will be used.
-#' @param model Trained model from the function \code{trainNetwork()}
-#' @param vocabulary Ordered vocabulary of input sequence
+#' @param model trained model from the function \code{trainNetwork()}
+#' @param vocabulary vocabulary of input sequence
+#' @param verbose TRUE/FALSE
+#' @examples 
+#' \dontrun{
+#' example.model <- keras::load_model_hdf5("example_model.hdf5")
+#' sequence <- strrep("A", 100)
+#' perdictNextNucleotide(sequence, example.model)}
 #' @export
 predictNextNucleotide <- function(sequence,
                                     model,
-                                    vocabulary = c("\n", "a", "c", "g", "t")){
+                                    vocabulary =  c("l", "a", "c", "g", "t"),
+                                    verbose = F){
   
   stopifnot(!missing(sequence))
   stopifnot(!missing(model))
   stopifnot(nchar(sequence) >= model$input_shape[2])
   
-  require(keras)
-  require(dplyr)
-  require(tokenizers)
-  
-  setClass(Class = "prediction",
-           representation(
-             next_char = "character",
-             probability = "numeric",
-             index = "numeric",
-             alternative_probabilty = "matrix",
-             solution = "character"
-           )
-  )
   substringright <- function(x, n){
     substr(x, nchar(x)- n + 1, nchar(x))
   }
   # sequence can be longer then model input shape
   # if so just use the last input_shape chars
-  sentence <- substringright(sequence, as.numeric(model$input_shape[2])) %>%
-    stringr::str_to_lower() %>%
-    tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
+  
+  sentence <- tokenizers::tokenize_characters(
+    stringr::str_to_lower(substringright(sequence, as.numeric(model$input_shape[2]))),
+    strip_non_alphanum = FALSE, simplify = TRUE)
+  
   x <- sapply(vocabulary, function(x){
-    as.integer(x == sentence)
+    as.numeric(x == sentence)
   })
-  x <- array_reshape(x, c(1, dim(x)))
+  x <- keras::array_reshape(x, c(1, dim(x)))
 
+  if(verbose) {
+    message("Prediction ...")}
+  
   preds <- keras::predict_proba(model, x)
   next_index <- which.max(preds)
   next_char <- vocabulary[next_index]
-  # retrun a S4 class
+  # return a S4 class
   return(new("prediction",
              next_char = next_char,
              probability = preds[next_index],
              index = next_index,
-             alternative_probabilty = preds,
+             alternative_probability = preds,
              solution = paste0(sequence, next_char)))
 }
 
 
 #' Replaces specific nucleotides in a sequence
 #' 
-#' @param sequence Input sequence, length should be in sync with the model.
+#' @param sequence input sequence, length should be in sync with the model.
 #' If length exceeds input.shape of model then only the right side of the
 #' sequence will be used.
-#' @param model Trained model from the function \code{trainNetwork()}
-#' @param char Character in the sequence that will be replaced
-#' @param vocabulary Ordered vocabulary of input sequence
+#' @param model trained model from the function \code{trainNetwork()}
+#' @param char character in the sequence that will be replaced
+#' @param vocabulary ordered vocabulary of input sequence
+#' @examples 
+#' \dontrun{
+#' example.model <- keras::load_model_hdf5("example_model.hdf5")
+#' replaceChar(sequence = sequence, model = example.model)}
 #' @export
 replaceChar <- function(sequence,
                          model,
                          char = "X",
-                         vocabulary = c("\n", "a", "c", "g", "t")){
-  require(stringr)
+                         vocabulary =  c("l", "a", "c", "g", "t")){
   
   stopifnot(!missing(sequence))
   stopifnot(!missing(model))
   stopifnot(nchar(sequence) >= model$input_shape[2])
 
-  while (str_detect(sequence, char)) {
+  while (stringr::str_detect(sequence, char)) {
     # get the position
     next_position <- stringr::str_locate_all(pattern = 'X', sequence)[[1]][[1]]
     # seed text for model is the most-right chunk of text

@@ -1,3 +1,6 @@
+# deepG <img src="man/figures/logo.png" width="131px" height="140px" align="right" style="padding-left:10px;background-color:white;" />
+
+
 [![Build Status](https://travis-ci.org/hiddengenome/deepG.svg?branch=master)](https://travis-ci.org/hiddengenome/deepG)
 [![codecov](https://codecov.io/gh/hiddengenome/deepG/branch/master/graph/badge.svg)](https://codecov.io/gh/hiddengenome/deepG)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -8,7 +11,7 @@ deepG is a package for generating LSTM models from genomic text and provides scr
 
 ## Installation & Usage
 
-Please see our Wiki for further installation instructions. It covers also usage instructions for multi-GPU machines
+Please see our [Wiki](https://github.com/hiddengenome/deepG/wiki) for further installation instructions. It covers also usage instructions for multi-GPU machines
 - [Installation on a desktop machine](https://github.com/hiddengenome/deepG/wiki/Installation-of-deepG-on-desktop)
 - [Training of GenomeNet](https://github.com/hiddengenome/deepG/wiki/Howto-train-GenomeNet)
 

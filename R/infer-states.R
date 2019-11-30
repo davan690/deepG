@@ -1,13 +1,14 @@
 #' Get cell states of semi-redundant chunks
 #'
-#' @param model_path Path to keras model in hdf5 format
-#' @param x Semi-redundant chunks (one-hot)
-#' @param maxlen Time steps to unroll for
-#' @param batch_size How many samples are trained in parallel
-#' @param run_name Name of output files without ending
-#' @param type Save-type, will save as hdf5 if type is set to 'hdf5' (default .csv)
+#' @param model.path path to keras model in hdf5 format
+#' @param x semi-redundant chunks (one-hot)
+#' @param maxlen time steps to unroll for
+#' @param batch.size how many samples are trained in parallel
+#' @param run.name name of output files without ending
+#' @param type save-type, will save as hdf5 if type is set to 'hdf5' (default .csv)
 #' @param verbose TRUE/FALSE
 #' @export
+
 getStates <- function(model.path,
                       x,
                       maxlen = 30,
@@ -15,18 +16,15 @@ getStates <- function(model.path,
                       run.name = "output",
                       type = "csv",
                       verbose = F){
-  require(dplyr)
-  require(hdf5r)
-  require(keras)
   
   stopifnot(maxlen > 0)
   stopifnot(batch.size > 0)
 
-  model <- load_model_hdf5(model.path)
+  model <- keras::load_model_hdf5(model.path)
   # Remove the last 2 layers
   keras::pop_layer(model)
   keras::pop_layer(model)
-  states <- predict(model, x, batch_size = batch.size)
+  states <- keras::predict(model, x, batch_size = batch.size)
   # we dont have predictions in the beginning so create some empty cell response (set it zero)
   states.begining <- states[1:maxlen,] * 0
   states.final <- rbind(states.begining, states)
@@ -57,9 +55,9 @@ getStates <- function(model.path,
 #' @export
 getStatesFromFasta <- function(model = NULL,
                                fasta.path = "example_files/fasta/a.fasta",
-                      maxlen = 80,
-                      batch.size = 100,
-                      verbose = F){
+                               maxlen = 80,
+                               batch.size = 100,
+                               verbose = F){
   if (verbose)
     message("Preprocess ...")  
   # prepare fasta

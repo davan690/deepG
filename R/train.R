@@ -25,6 +25,7 @@
 #' @param gpu.num Number of GPUs to be used, only relevant if multiple_gpu is true
 #' @param merge.on.cpu True on default, false recommend if the server supports NVlink, only relevant if use.multiple.gpu is true
 #' @param vocabulary.size Number of unique chars in training set
+#' @param label.vocabulary.size number of unique chars in the label dataset
 #' @param epochs Number of full iterations over the dataset
 #' @param max.queue.size Queue on fit_generator()
 #' @param lr.plateau.factor Factor of decreasing learning rate when plateau is reached

@@ -23,16 +23,18 @@ NULL
 
 .onLoad <- function(libname, pkgname) {
   
- ensure.loaded()
-
-  message("The deepG package has been successfully loaded. Please see ?deepG for informations or the Wiki to get startet https://github.com/hiddengenome/deepG/wiki")
+  ensure.loaded <- function(x) {
+    invisible(tensorflow::tf$`__version__`)
+  }
+  
+  packageStartupMessage("The deepG package has been successfully loaded. Please see ?deepG for informations or the Wiki to get started https://github.com/hiddengenome/deepG/wiki")
 
   # check for GPU support
   if (is.gpu.available() & is.cuda.build()) {
-    message("To use GPUs, please run startGPUSession()")
+    packageStartupMessage("To use GPUs, please run startGPUSession()")
   } else if (is.gpu.available() & !is.cuda.build()) {
-    message("GPUs are available, but Tensorflow is not supporting CUDA, please see Wiki (ttps://github.com/hiddengenome/deepG/wiki) for installation instructions")
+    packageStartupMessage("GPUs are available, but Tensorflow is not supporting CUDA, please see Wiki (ttps://github.com/hiddengenome/deepG/wiki) for installation instructions")
     } else {
-      message("GPUs not found - deepG runs without GPU support!")
+      packageStartupMessage("GPUs not found - deepG runs without GPU support!")
     }
   }

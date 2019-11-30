@@ -2,7 +2,7 @@
 % Please edit documentation in R/preprocess.R
 \name{fastaFileGenerator}
 \alias{fastaFileGenerator}
-\title{custom generator for fasta files, will produce chunks in size of batch.size
+\title{Custom generator for fasta files, will produce chunks in size of batch.size
 by iterating over the input files.}
 \usage{
 fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 512,
@@ -23,6 +23,6 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 512,
 \item{verbose}{TRUE/FALSE show information about files and running time}
 }
 \description{
-custom generator for fasta files, will produce chunks in size of batch.size
+Custom generator for fasta files, will produce chunks in size of batch.size
 by iterating over the input files.
 }

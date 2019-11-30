@@ -2,7 +2,7 @@
 % Please edit documentation in R/tSNE.R
 \name{extractCellFromStates}
 \alias{extractCellFromStates}
-\title{prepare states for tSNE}
+\title{Preparing states for tSNE}
 \usage{
 extractCellFromStates(states.list = NULL,
   states.folder = "example_files/states", cell.number = 2,
@@ -18,5 +18,5 @@ extractCellFromStates(states.list = NULL,
 \item{flatten}{if true, all cells will be used}
 }
 \description{
-prepare states for tSNE
+Preparing states for tSNE
 }

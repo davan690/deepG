@@ -4,14 +4,15 @@
 \alias{preprocessSemiRedundant}
 \title{Preprocess string to semi-redundant one-hot vector}
 \usage{
-preprocessSemiRedundant(char, maxlen = 250, vocabulary, verbose = F)
+preprocessSemiRedundant(char, maxlen = 250, vocabulary = c("l", "p",
+  "a", "c", "g", "t"), verbose = F)
 }
 \arguments{
-\item{char}{Character input string of text with the length of one}
+\item{char}{character input string of text with the length of one}
 
-\item{maxlen}{Length of the semi-redundant sequences}
+\item{maxlen}{length of the semi-redundant sequences}
 
-\item{vocabulary}{Char contains the vocabulary from the input char, it should be sorted.
+\item{vocabulary}{char contains the vocabulary from the input char
 If no vocabulary exists, it is generated from the input char}
 
 \item{verbose}{TRUE/FALSE}

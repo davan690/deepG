@@ -2,10 +2,13 @@
 % Please edit documentation in R/utils.R
 \name{print.tf.version}
 \alias{print.tf.version}
-\title{prints TF version}
+\title{Prints TF version}
 \usage{
-\method{print}{tf.version}()
+\method{print}{tf.version}(x)
+}
+\arguments{
+\item{x}{text input}
 }
 \description{
-prints TF version
+Prints TF version
 }

@@ -1,0 +1,10 @@
+context("utlis")
+
+test_that("Check the functions in utlis", {
+  expect_error(writeHdf5())
+  expect_error(writeHdf5(""))
+  expect_error(writeDict())
+  expect_error(writeDict(""))
+  expect_error(messagef())
+  expect_error(calculateStepsPerEpoch())
+})

@@ -2,8 +2,11 @@
 #'
 #' Use this function with a character string.
 #'
-#' @param char Character string of text with the length of one
+#' @param char character string of text with the length of one
 #' @param verbose TRUE/FALSE
+#' @examples 
+#' getVocabulary(data(crispr_sample))
+#' getVocabulary("abcd")
 #' @export
 getVocabulary <- function(char, verbose = F) {
   
@@ -29,16 +32,17 @@ getVocabulary <- function(char, verbose = F) {
 #' X(3): CDEFG and Y(3): H;
 #' X(4): DEFGH and Y(4): I
 #' 
-#' @param char Character input string of text with the length of one
-#' @param maxlen Length of the semi-redundant sequences
-#' @param vocabulary Char contains the vocabulary from the input char, it should be sorted.
+#' @param char character input string of text with the length of one
+#' @param maxlen length of the semi-redundant sequences
+#' @param vocabulary char contains the vocabulary from the input char
 #' If no vocabulary exists, it is generated from the input char
 #' @param verbose TRUE/FALSE
-#' @example preprocessSemiRedudant("abcd",maxlen=2,verbose=F)
+#' @example
+#' preprocessSemiRedundant("abcd",maxlen=2,verbose=F)
 #' @export
 preprocessSemiRedundant <- function(char,
                                     maxlen = 250,
-                                    vocabulary,
+                                    vocabulary = c("l", "p", "a", "c", "g", "t"),
                                     verbose = F) {
   
   stopifnot(!is.null(char))
@@ -96,9 +100,9 @@ preprocessSemiRedundant <- function(char,
 #' 
 #' It called on the genomic contents of one
 #' FASTA file. Multiple entries are combined with newline characters.
-#' @param path Path to the FASTA file
-#' @param maxlen Length of the semi-redundant sequences
-#' @param vocabulary Char contains the vocabulary from the input char, it should be sorted.
+#' @param path path to the FASTA file
+#' @param maxlen length of the semi-redundant sequences
+#' @param vocabulary char contains the vocabulary from the input char
 #' If no vocabulary exists, it is generated from the input char
 #' @param verbose TRUE/FALSE
 #' @export
@@ -123,6 +127,7 @@ preprocessFasta <- function(path,
 
 
 #' Helper function for fastaFileGenerator
+#' 
 #' @param sequence character sequence 
 #' @param maxlen length of one sample
 #' @param vocabulary set of characters to encode  
@@ -135,7 +140,11 @@ preprocessFasta <- function(path,
 #'      0 0 0 0 1)
 #' Y = (0 0 0 1 0)       
 #' @export
-sequenceToArray <- function(sequence, maxlen, vocabulary, step){
+sequenceToArray <- function(sequence, 
+                            maxlen, 
+                            vocabulary, 
+                            step){
+  
   len_voc <- length(vocabulary)
   len_seq <- nchar(sequence)
   # len_seq should be n * step + maxlen + 1 for some integer n
@@ -178,20 +187,19 @@ splitSequence <- function(seq, vocabulary, maxlen){
   subSeq
 }
 
-#' custom generator for fasta files, will produce chunks in size of batch.size
+#' Custom generator for fasta files, will produce chunks in size of batch.size
 #' by iterating over the input files. 
 #' @param corpus.dir input directory where .fasta files are located
 #' @param format file format
 #' @param batch.size number of samples  
 #' @param maxlen length of one sample 
 #' @param max_iter stop after max_iter number of iterations failed to produce new sample 
-#' @param verbose TRUE/FALSE show information about files and running time  
 #' @param seqStart insert character at beginning of sequence
 #' @param seqEnd insert character at end of sequence
 #' @param withinFile insert characters within sequence
 #' @param vocabulary vector of allowed characters, samples with other chars get discarded
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
-#' @param step how often to take a sample#'
+#' @param step how often to take a sample
 #' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
 #' @export
 fastaFileGenerator <- function(corpus.dir,
@@ -249,7 +257,7 @@ fastaFileGenerator <- function(corpus.dir,
     if (charsOutsideVoc) warning("file ", filePath, " contains characters outside vocabulary")
   }
   
-  if (verbose) message("initializing")
+  if (verbose) message("Initializing ...")
   
   function() {
     iter <- 1

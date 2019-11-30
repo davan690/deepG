@@ -2,10 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{messagef}
 \alias{messagef}
-\title{wrapper for message(sprintf)}
+\title{Wrapper for message(sprintf)}
 \usage{
-messagef(..., .newline = TRUE)
+messagef(..., newline = TRUE)
+}
+\arguments{
+\item{...}{text input}
+
+\item{newline}{print in new line}
 }
 \description{
-wrapper for message(sprintf)
+Wrapper for message(sprintf)
 }

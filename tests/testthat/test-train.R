@@ -1,6 +1,9 @@
 context("training")
 
 test_that("Sucessful training from a dummy model", {
+  
+ skip_if_no_keras()
+  
  data("parenthesis")
  maxlen <- 30
  batch.size <- 10
@@ -21,12 +24,13 @@ test_that("Sucessful training from a dummy model", {
  expect_error(trainNetwork(dataset = preprocessed, batch.size  = 1))
  expect_error(trainNetwork(dataset = "", path = ""))
 
+ skip_on_travis()
  trainedNetwork <- trainNetwork(dataset = preprocessed,
                                 vocabulary.size = 7,
                                 batch.size = batch.size,
                                 maxlen = maxlen,
                                 layers.lstm = 2,
-                                layer.size = 10,
+                                layer.size = 2,
                                 epochs = 1)
 
  expect_type(trainedNetwork, "list")
