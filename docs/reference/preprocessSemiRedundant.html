@@ -8,6 +8,13 @@
 
 <title>Preprocess string to semi-redundant one-hot vector — preprocessSemiRedundant • deepG</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -44,6 +51,7 @@ X(1): ABCDE and Y(1): F;
 X(2): BCDEF and Y(2): G;
 X(3): CDEFG and Y(3): H;
 X(4): DEFGH and Y(4): I" />
+<meta property="og:image" content="https://hiddengenome.github.io/deepG/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,22 +131,23 @@ X(3): CDEFG and Y(3): H;
 X(4): DEFGH and Y(4): I</p>
     </div>
 
-    <pre class="usage"><span class='fu'>preprocessSemiRedundant</span>(<span class='no'>char</span>, <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='no'>vocabulary</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
+    <pre class="usage"><span class='fu'>preprocessSemiRedundant</span>(<span class='no'>char</span>, <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='kw'>vocabulary</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"l"</span>, <span class='st'>"p"</span>,
+  <span class='st'>"a"</span>, <span class='st'>"c"</span>, <span class='st'>"g"</span>, <span class='st'>"t"</span>), <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>char</th>
-      <td><p>Character input string of text with the length of one</p></td>
+      <td><p>character input string of text with the length of one</p></td>
     </tr>
     <tr>
       <th>maxlen</th>
-      <td><p>Length of the semi-redundant sequences</p></td>
+      <td><p>length of the semi-redundant sequences</p></td>
     </tr>
     <tr>
       <th>vocabulary</th>
-      <td><p>Char contains the vocabulary from the input char, it should be sorted.
+      <td><p>char contains the vocabulary from the input char
 If no vocabulary exists, it is generated from the input char</p></td>
     </tr>
     <tr>
@@ -161,7 +170,7 @@ If no vocabulary exists, it is generated from the input char</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by .</p>
+  <p>Developed by Philipp Muench.</p>
 </div>
 
 <div class="pkgdown">

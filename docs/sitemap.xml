@@ -61,6 +61,9 @@
     <loc>https://hiddengenome.github.io/deepG//reference/predictNextNucleotide.html</loc>
   </url>
   <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/prediction-class.html</loc>
+  </url>
+  <url>
     <loc>https://hiddengenome.github.io/deepG//reference/preprocessFasta.html</loc>
   </url>
   <url>
@@ -71,6 +74,15 @@
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/replaceChar.html</loc>
+  </url>
+  <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/sequenceToArray.html</loc>
+  </url>
+  <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/skip_if_no_keras.html</loc>
+  </url>
+  <url>
+    <loc>https://hiddengenome.github.io/deepG//reference/splitSequence.html</loc>
   </url>
   <url>
     <loc>https://hiddengenome.github.io/deepG//reference/startGPUSession.html</loc>

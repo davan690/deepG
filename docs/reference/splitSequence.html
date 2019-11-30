@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis) — parenthesis • deepG</title>
+<title>Helper function for fastaFileGenerator — splitSequence • deepG</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,10 +42,8 @@ Can be loaded to workspace via data(parenthesis) — parenthesis • deepG</titl
 
 
 
-<meta property="og:title" content="Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis) — parenthesis" />
-<meta property="og:description" content="Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis)" />
+<meta property="og:title" content="Helper function for fastaFileGenerator — splitSequence" />
+<meta property="og:description" content="splits a character sequences into vector of sequences" />
 <meta property="og:image" content="https://hiddengenome.github.io/deepG/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -111,33 +108,40 @@ Can be loaded to workspace via data(parenthesis)" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis)</h1>
+    <h1>Helper function for fastaFileGenerator</h1>
     
-    <div class="hidden name"><code>parenthesis.Rd</code></div>
+    <div class="hidden name"><code>splitSequence.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis)</p>
+    <p>splits a character sequences into vector of sequences</p>
     </div>
 
-    <pre class="usage"><span class='no'>parenthesis</span></pre>
+    <pre class="usage"><span class='fu'>splitSequence</span>(<span class='no'>seq</span>, <span class='no'>vocabulary</span>, <span class='no'>maxlen</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>seq</th>
+      <td><p>a character sequence</p></td>
+    </tr>
+    <tr>
+      <th>vocabulary</th>
+      <td><p>vector of allowed characters</p></td>
+    </tr>
+    <tr>
+      <th>maxlen</th>
+      <td><p>sequences in the output &lt; (maxlen + 1) get discarded</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
-
-    <p>Large character of 4.9 Mb</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p><a href='http://github.com/philippmuench'>http://github.com/philippmuench</a></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#format">Format</a></li>
-      <li><a href="#references">References</a></li>
+      <li><a href="#arguments">Arguments</a></li>
     </ul>
 
   </div>

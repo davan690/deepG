@@ -8,6 +8,13 @@
 
 <title>Get cell states of semi-redundant chunks — getStates • deepG</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -37,6 +44,7 @@
 
 <meta property="og:title" content="Get cell states of semi-redundant chunks — getStates" />
 <meta property="og:description" content="Get cell states of semi-redundant chunks" />
+<meta property="og:image" content="https://hiddengenome.github.io/deepG/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,32 +124,32 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>model.path</th>
+      <td><p>path to keras model in hdf5 format</p></td>
+    </tr>
+    <tr>
       <th>x</th>
-      <td><p>Semi-redundant chunks (one-hot)</p></td>
+      <td><p>semi-redundant chunks (one-hot)</p></td>
     </tr>
     <tr>
       <th>maxlen</th>
-      <td><p>Time steps to unroll for</p></td>
+      <td><p>time steps to unroll for</p></td>
+    </tr>
+    <tr>
+      <th>batch.size</th>
+      <td><p>how many samples are trained in parallel</p></td>
+    </tr>
+    <tr>
+      <th>run.name</th>
+      <td><p>name of output files without ending</p></td>
     </tr>
     <tr>
       <th>type</th>
-      <td><p>Save-type, will save as hdf5 if type is set to 'hdf5' (default .csv)</p></td>
+      <td><p>save-type, will save as hdf5 if type is set to 'hdf5' (default .csv)</p></td>
     </tr>
     <tr>
       <th>verbose</th>
       <td><p>TRUE/FALSE</p></td>
-    </tr>
-    <tr>
-      <th>model_path</th>
-      <td><p>Path to keras model in hdf5 format</p></td>
-    </tr>
-    <tr>
-      <th>batch_size</th>
-      <td><p>How many samples are trained in parallel</p></td>
-    </tr>
-    <tr>
-      <th>run_name</th>
-      <td><p>Name of output files without ending</p></td>
     </tr>
     </table>
 
@@ -159,7 +167,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by .</p>
+  <p>Developed by Philipp Muench.</p>
 </div>
 
 <div class="pkgdown">

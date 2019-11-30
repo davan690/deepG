@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis) — parenthesis • deepG</title>
+<title>An S4 class for the prediction — prediction-class • deepG</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,10 +42,8 @@ Can be loaded to workspace via data(parenthesis) — parenthesis • deepG</titl
 
 
 
-<meta property="og:title" content="Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis) — parenthesis" />
-<meta property="og:description" content="Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis)" />
+<meta property="og:title" content="An S4 class for the prediction — prediction-class" />
+<meta property="og:description" content="An S4 class for the prediction" />
 <meta property="og:image" content="https://hiddengenome.github.io/deepG/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -111,33 +108,39 @@ Can be loaded to workspace via data(parenthesis)" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis)</h1>
+    <h1>An S4 class for the prediction</h1>
     
-    <div class="hidden name"><code>parenthesis.Rd</code></div>
+    <div class="hidden name"><code>prediction-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Training dataset of synthetic parenthesis language
-Can be loaded to workspace via data(parenthesis)</p>
+    <p>An S4 class for the prediction</p>
     </div>
 
-    <pre class="usage"><span class='no'>parenthesis</span></pre>
 
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
-    <p>Large character of 4.9 Mb</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+    
 
-    <p><a href='http://github.com/philippmuench'>http://github.com/philippmuench</a></p>
+<dl class='dl-horizontal'>
+<dt><code>next_char</code></dt><dd><p>Next predicted char</p></dd>
+
+<dt><code>probability</code></dt><dd><p>probability for the predicted char</p></dd>
+
+<dt><code>index</code></dt><dd><p>index</p></dd>
+
+<dt><code>alternative_probability</code></dt><dd><p>all probabilities for the possible chars</p></dd>
+
+<dt><code>solution</code></dt><dd><p>sequence with the predicted char</p></dd>
+
+</dl>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#format">Format</a></li>
-      <li><a href="#references">References</a></li>
+      <li><a href="#slots">Slots</a></li>
     </ul>
 
   </div>

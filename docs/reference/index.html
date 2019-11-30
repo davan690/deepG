@@ -8,6 +8,13 @@
 
 <title>Function reference • deepG</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -36,6 +43,8 @@
 
 
 <meta property="og:title" content="Function reference" />
+<meta property="og:image" content="https://hiddengenome.github.io/deepG/logo.png" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -178,19 +187,20 @@ Can be loaded to workspace via data(ecoli_small)</p></td>
         <td>
           <p><code><a href="end_gpu_session.html">end_gpu_session()</a></code> </p>
         </td>
-        <td><p>Ends the GPU sesstion</p></td>
+        <td><p>Ends the GPU session</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="extractCellFromStates.html">extractCellFromStates()</a></code> </p>
         </td>
-        <td><p>prepare states for tSNE</p></td>
+        <td><p>Preparing states for tSNE</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="fastaFileGenerator.html">fastaFileGenerator()</a></code> </p>
         </td>
-        <td><p>Custom generator for FASTA files</p></td>
+        <td><p>Custom generator for fasta files, will produce chunks in size of batch.size
+by iterating over the input files.</p></td>
       </tr><tr>
         
         <td>
@@ -221,7 +231,7 @@ it is expected that the length of each fasta file is equal</p></td>
         <td>
           <p><code><a href="messagef.html">messagef()</a></code> </p>
         </td>
-        <td><p>wrapper for message(sprintf)</p></td>
+        <td><p>Wrapper for message(sprintf)</p></td>
       </tr><tr>
         
         <td>
@@ -244,6 +254,12 @@ Can be loaded to workspace via data(parenthesis)</p></td>
       </tr><tr>
         
         <td>
+          <p><code><a href="prediction-class.html">prediction-class</a></code> </p>
+        </td>
+        <td><p>An S4 class for the prediction</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="preprocessFasta.html">preprocessFasta()</a></code> </p>
         </td>
         <td><p>Wrapper of the preprocessSemiRedundant()-function</p></td>
@@ -258,13 +274,31 @@ Can be loaded to workspace via data(parenthesis)</p></td>
         <td>
           <p><code><a href="print.tf.version.html">print(<i>&lt;tf.version&gt;</i>)</a></code> </p>
         </td>
-        <td><p>prints TF version</p></td>
+        <td><p>Prints TF version</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="replaceChar.html">replaceChar()</a></code> </p>
         </td>
         <td><p>Replaces specific nucleotides in a sequence</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="sequenceToArray.html">sequenceToArray()</a></code> </p>
+        </td>
+        <td><p>Helper function for fastaFileGenerator</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="skip_if_no_keras.html">skip_if_no_keras()</a></code> </p>
+        </td>
+        <td><p>Tests if Keras is available for the unit tests</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="splitSequence.html">splitSequence()</a></code> </p>
+        </td>
+        <td><p>Helper function for fastaFileGenerator</p></td>
       </tr><tr>
         
         <td>
@@ -282,7 +316,7 @@ Can be loaded to workspace via data(parenthesis)</p></td>
         <td>
           <p><code><a href="writeDict.html">writeDict()</a></code> </p>
         </td>
-        <td><p>generates dictionary for LSTMVis</p></td>
+        <td><p>Generates dictionary for LSTMVis</p></td>
       </tr><tr>
         
         <td>
@@ -305,7 +339,7 @@ Can be loaded to workspace via data(parenthesis)</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by .</p>
+  <p>Developed by Philipp Muench.</p>
 </div>
 
 <div class="pkgdown">
