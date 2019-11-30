@@ -99,7 +99,6 @@ calculateStepsPerEpoch <-
 
 #' Tests if Keras is available for the unit tests
 #' @param version required keras version 
-#' @export
 skip_if_no_keras <- function(version = NULL){
   if(!is_keras_available(version))
     skip("Required keras version not avaible for testing!")

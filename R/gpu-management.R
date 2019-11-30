@@ -4,6 +4,7 @@
 #' @param growth memory consumption of GPU grows and will not be blocked
 #' @export
 startGPUSession <- function(gpus = "0", growth = T){
+  
   require(tensorflow)
   tf$reset_default_graph()
   sess_config <- list()
@@ -17,7 +18,7 @@ startGPUSession <- function(gpus = "0", growth = T){
   return(sess)
 }
 
-#' Ends the GPU sesstion
+#' Ends the GPU session
 #'
 #' @export
 end_gpu_session <- function(){

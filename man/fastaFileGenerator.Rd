@@ -22,21 +22,8 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
 
 \item{max_iter}{stop after max_iter number of iterations failed to produce new sample}
 
-\item{seqStart}{insert character at beginning of sequence}
-
-\item{seqEnd}{insert character at end of sequence}
-
-\item{withinFile}{insert characters within sequence}
-
-\item{vocabulary}{set of characters to encode}
-
 \item{verbose}{TRUE/FALSE show information about files and running time}
 
-\item{randomFiles}{TRUE/FALSE, whether to go through files randomly or sequential}
-
-\item{step}{how often to take a sample}
-
-\item{showWarnings}{TRUE/FALSE, give warning if character outside vocabulary appears}
 }
 \description{
 Custom generator for fasta files, will produce chunks in size of batch.size

@@ -70,21 +70,6 @@ trainNetwork(path, path.val, dataset, validation.split = 0.05,
 
 \item{steps.per.epoch}{Number of training samples divided by the batch.size, is 20139934 on SGB dataset}
 
-\item{step}{frequency of sampling steps}
-
-\item{randomFiles}{TRUE/FALSE go through files sequentially or shuffle beforehand}
-
-\item{seqStart}{insert character at beginning of sequence}
-
-\item{seqEnd}{insert character at end of sequence}
-
-\item{withinFile}{insert characters within sequences}
-
-\item{vocabulary}{set of characters to encode}
-
-\item{tensorboard.log}{path to tensorboard log directory}
-
-\item{bidirectional}{Use bidirectional option for lstm layers}
 }
 \description{
 Depth and number of neurons per layer of the netwok can be specified. First layer can be a Convolutional Neural Network (CNN) that is designed to capture codons.
