@@ -201,6 +201,7 @@ splitSequence <- function(seq, vocabulary, maxlen){
 #' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
 #' @param step how often to take a sample
 #' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
+#' @param seed argument for set.seed function, for reproducible results    
 #' @export
 fastaFileGenerator <- function(corpus.dir,
                                format = "fasta",
@@ -214,7 +215,8 @@ fastaFileGenerator <- function(corpus.dir,
                                verbose = FALSE,
                                randomFiles = FALSE,
                                step = 1, 
-                               showWarnings = FALSE){
+                               showWarnings = FALSE,
+                               seed = 1234){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary) & i!="")
@@ -227,6 +229,7 @@ fastaFileGenerator <- function(corpus.dir,
     full.names = TRUE)
   num_files <- length(fasta.files)
   
+  set.seed(seed)
   if (randomFiles) fasta.files <- sample(fasta.files, replace = FALSE)
   
   # regular expression for chars outside vocabulary
