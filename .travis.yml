@@ -24,6 +24,7 @@ env:
   matrix:
   - HDF5_VERSION=1.10.1
 before_install:
+  - sudo apt-get update
   - chmod +x travis_setup.sh
   - "./travis_setup.sh"
   - R -e "install.packages(c('hdf5r', 'devtools','pkgload', 'pkgdown', 'covr', 'tensorflow'))"
