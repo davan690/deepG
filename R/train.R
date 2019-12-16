@@ -249,7 +249,7 @@ trainNetwork <- function(model_path,
    
     # epochs arguments can be misleading 
     if (!missing(initial_epoch)){
-      if (initial_epoch > epochs){
+      if (initial_epoch >= epochs){
         stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds. Increase epochs or decrease initial_epoch.")
       }
     }
@@ -258,7 +258,7 @@ trainNetwork <- function(model_path,
     if (missing(initial_epoch)){
       epochFromFilename <- stringr::str_extract(model_path, "Ep.\\d+")
       initial_epoch <- as.integer(substring(epochFromFilename, 4, nchar(epochFromFilename)))
-      if (initial_epoch > epochs){
+      if (initial_epoch >= epochs){
         stop("Networks trains (epochs - initial_epochs) rounds overall, NOT epochs rounds. Increase epochs or decrease initial_epoch.")
       }
     }
