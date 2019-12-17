@@ -133,7 +133,8 @@ is recommended for big training sets. Alternative, a dataset can be supplied tha
   <span class='kw'>randomFiles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>seqStart</span> <span class='kw'>=</span> <span class='st'>"l"</span>, <span class='kw'>seqEnd</span> <span class='kw'>=</span> <span class='st'>"l"</span>,
   <span class='kw'>withinFile</span> <span class='kw'>=</span> <span class='st'>"p"</span>, <span class='no'>initial_epoch</span>, <span class='kw'>vocabulary</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"l"</span>, <span class='st'>"p"</span>, <span class='st'>"a"</span>, <span class='st'>"c"</span>,
   <span class='st'>"g"</span>, <span class='st'>"t"</span>), <span class='kw'>tensorboard.log</span> <span class='kw'>=</span> <span class='st'>"/scratch/tensorboard"</span>,
-  <span class='kw'>bidirectional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>save_best_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>compile</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>bidirectional</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>save_best_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>compile</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>1234</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -293,6 +294,10 @@ is recommended for big training sets. Alternative, a dataset can be supplied tha
     <tr>
       <th>compile</th>
       <td><p>Whether to compile the model after loading</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>sets seed for fastaFileGenerator if randomFiles = TRUE</p></td>
     </tr>
     </table>
 
