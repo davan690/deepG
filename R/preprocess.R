@@ -121,6 +121,64 @@ preprocessFasta <- function(path,
   return(seq.processed)
 }
 
+#' Helper function for fastaFileGenerator, extracts the start positions of all potential samples (considering step size and vocabulary)
+#' @param fasta.path path to a fasta file
+#' @param sequence character sequence 
+#' @param maxlen length of one sample 
+#' @param step how often to take a sample
+#' @param vocabulary vector of allowed characters in samples
+#' @param seqStart insert character at beginning of sequence
+#' @param withinFile insert characters within sequence
+#' @param seqEnd insert character at end of sequence
+#' @param ambTargetsAllowed whether to take a sample if target variable is not in vocabulary 
+#' @export
+extractStartIndices <- function(fasta.path, sequence, maxlen, step, vocabulary, seqStart, withinFile, seqEnd, ambTargetsAllowed = TRUE){
+  
+  if (!missing(sequence)){
+    seq <- sequence
+  } else {  
+    fasta.file <- Biostrings::readDNAStringSet(fasta.path)
+    seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd) %>% stringr::str_to_lower()
+  }
+  
+  len_seq <- nchar(seq)
+  if (!ambTargetsAllowed) maxlen <- maxlen + 1
+  stopifnot(len_seq >= maxlen)
+  # regular expressions for allowed characters
+  voc_pattern <- paste0("[^", paste0(vocabulary, collapse = ""), "]")
+  
+  pos_of_amb_nucleotides <- stringr::str_locate_all(seq, pattern = voc_pattern)[[1]][,1]
+  non_start_index <-  pos_of_amb_nucleotides - maxlen + 1
+  
+  # define range of unallowed start indices   
+  non_start_index <- purrr::map(non_start_index, ~(.x:(.x + maxlen - 1))) %>% 
+    unlist() %>% union((len_seq - maxlen + 1):len_seq) %>% unique() # TODO: go to end or where last prediction possible 
+  # drop non-positive values 
+  if (length(non_start_index[non_start_index < 1])){
+    non_start_index <- unique(c(1, non_start_index[non_start_index >= 1]))
+  }
+  
+  allowed_start <- setdiff(1:len_seq, non_start_index)
+  len_start_vector <- length(allowed_start) 
+  
+  # only keep indices with sufficient distance, as defined by step 
+  if (len_start_vector < 1) {
+    message("Can not extract a single sampling point with current settings.")
+    return(NULL)
+  }
+  index <- allowed_start[1]
+  start_indices <- vector("integer")
+  start_indices[1] <- allowed_start[1]
+  count <- 1
+  for (i in 1:len_start_vector-1){
+    if (allowed_start[i + 1] - index >=step){
+      count <- count + 1  
+      start_indices[count] <- allowed_start[i + 1]
+      index <- allowed_start[i + 1]
+    }
+  }
+  start_indices
+}
 
 #' Helper function for fastaFileGenerator
 #' @param sequence character sequence 
@@ -157,26 +215,208 @@ sequenceToArray <- function(sequence, maxlen, vocabulary, step){
     end <- start + maxlen - 1
     x[i, , ] <- z[start:end, ] 
   }
-  y <- z[1 + step * (0:(numberOfSamples-1)) + maxlen, ]
+  y <- z[1 + step * (0:(numberOfSamples - 1)) + maxlen, ]
   list(x, y)
 }
 
-
-#' Helper function for fastaFileGenerator 
-#' 
-#' splits a character sequences into vector of sequences
-#' @param seq a character sequence
-#' @param vocabulary vector of allowed characters
-#' @param maxlen sequences in the output < (maxlen + 1) get discarded    
-#' @export 
-splitSequence <- function(seq, vocabulary, maxlen){
-  seq <- stringr::str_to_lower(seq)
-  voc_pattern = paste0("[^", paste0(vocabulary, collapse = ""), "]")
-  subSeq  <- stringr::str_split(seq, voc_pattern)[[1]]
-  # only keep sequences that are long enough for one sample 
-  subSeq <- subSeq[nchar(subSeq) > maxlen] 
-  subSeq
+#' Helper function for fastaFileGenerator
+#' @param sequence character sequence 
+#' @param maxlen length of one sample
+#' @param vocabulary set of characters to encode  
+#' @param startInd vector containing start index of every sample
+#' Returns one hot encoding for every sequence  
+#' For example: sequence = "acatg", maxlen = 4, vocabulary = c("p","a", "c", "g", "t"), step = 1  leads to
+#' X = (0 1 0 0 0  
+#'      0 0 1 0 0
+#'      0 1 0 0 0
+#'      0 0 0 0 1)
+#' Y = (0 0 0 1 0)       
+#' @export
+sequenceToArray_withStartInd <- function(sequence, maxlen, vocabulary, startInd){
+  startInd <- startInd - startInd[1] + 1
+  len_voc <- length(vocabulary)
+  len_seq <- nchar(sequence)
+  numberOfSamples <- length(startInd)  
+  z <- array(0, dim=c(len_seq * len_voc))  
+  tokenizer <- keras::fit_text_tokenizer(keras::text_tokenizer(char_level = TRUE, lower = TRUE), vocabulary) 
+  seq_int <- keras::texts_to_sequences(tokenizer, sequence)[[1]]
+  adjust <- len_voc * (seq(0, length(seq_int) - 1))
+  
+  # every row in z one-hot encodes one character in sequence
+  z[adjust + seq_int] <- 1
+  z <- keras::array_reshape(z, dim=c(len_seq, len_voc))
+  x <- array(0, dim = c(numberOfSamples, maxlen, len_voc))
+  j <- 1
+  for (i in startInd){
+    x[j, , ] <- z[i:(i + maxlen - 1), ]
+    j <- j + 1
+  }
+  y <- z[startInd + maxlen, ]
+  list(x, y)
 }
+
+#' custom generator for fasta files, will produce chunks in size of batch.size
+#' by iterating over the input files. 
+#' @param corpus.dir input directory where .fasta files are located or a fasta file if predict is TRUE
+#' @param format file format
+#' @param batch.size number of samples  
+#' @param maxlen length of one sample 
+#' @param max_iter stop after max_iter number of iterations failed to produce new sample 
+#' @param verbose TRUE/FALSE show information about files and running time  
+#' @param seqStart insert character at beginning of sequence
+#' @param seqEnd insert character at end of sequence
+#' @param withinFile insert characters within sequence
+#' @param vocabulary vector of allowed characters, samples with other chars get discarded
+#' @param randomFiles TRUE/FALSE, whether to go through files randomly or sequential 
+#' @param step how often to take a sample
+#' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
+#' @param genPredictions if TRUE output only predictors, can contain samples with ambiguous targets     
+#' @export
+fastaFileGenerator_withStartInd <- function(corpus.dir,
+                                            format = "fasta",
+                                            batch.size = 256,
+                                            maxlen = 250,
+                                            max_iter = 20,
+                                            seqStart = "l",
+                                            seqEnd= "l",
+                                            withinFile = "p",
+                                            vocabulary = c("l","p","a", "c", "g", "t"),
+                                            verbose = FALSE,
+                                            randomFiles = FALSE,
+                                            step = 1, 
+                                            showWarnings = FALSE,
+                                            genPredictions = FALSE){
+  
+  for (i in c(seqStart, seqStart, withinFile)) {
+    if(!(i %in% vocabulary) & i!="")
+      stop("seqStart, seqEnd and withinFile variables must be in vocabulary")
+  }  
+  
+  start_index_list <- vector("list")
+  file_index <- 1
+  num_samples <- 0
+  start_index <- 1
+  
+  # regular expression for chars outside vocabulary
+  pattern <- paste0("[^", paste0(vocabulary, collapse = ""), "]")
+  
+  # use just one file if genPredictions = TRUE
+  if (genPredictions) {
+    fasta.file <- Biostrings::readDNAStringSet(corpus.dir)
+    seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)
+    num_files <- 1 
+    fasta.files <- corpus.dir   
+  } else {
+    fasta.files <- list.files(
+      path = xfun::normalize_path(corpus.dir),
+      pattern = paste0("*.", format),
+      full.names = TRUE)
+    num_files <- length(fasta.files)
+    
+    if (randomFiles) fasta.files <- sample(fasta.files, replace = FALSE)
+    
+    # pre-load the first file
+    filePath <- fasta.files[[file_index]]
+    fasta.file <- Biostrings::readDNAStringSet(filePath)
+    seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
+  }
+  
+  seq <- stringr::str_to_lower(seq)
+  start_indices <- extractStartIndices(sequence = seq, maxlen = maxlen, step = step, vocabulary = vocabulary, 
+                                       seqStart = seqStart, withinFile = withinFile, seqEnd = seqEnd, ambTargetsAllowed = genPredictions) 
+  
+  # sequence vector collects strings until one batch can be created   
+  sequence_vector <- vector("character")
+  sequence_vector_index <- 1
+  
+  # test for chars outside vocabulary
+  if (showWarnings){
+    charsOutsideVoc <- stringr::str_detect(stringr::str_to_lower(seq), pattern)  
+    if (charsOutsideVoc) warning("file ", filePath, " contains characters outside vocabulary")
+  }
+  
+  if (verbose) message("initializing")
+  
+  function() {
+    iter <- 1
+    # loop until enough samples collected
+    while(num_samples < batch.size){  
+      # loop through sub-sequences/files until sequence of suitable length is found   
+      while((start_index > length(start_indices)) | length(start_indices) == 0){
+        
+        start_index <<- 1
+        
+        # go to next file 
+        file_index <<- file_index + 1 
+        if (file_index > length(fasta.files)) file_index <<- 1
+        filePath <<- fasta.files[[file_index]]
+        fasta.file <<- Biostrings::readDNAStringSet(filePath)
+        start_indices <<- extractStartIndices(sequence = seq, maxlen = maxlen, step = step, vocabulary = vocabulary, 
+                                              seqStart = seqStart, withinFile = withinFile, seqEnd = seqEnd, considerTargets = !genPredictions) 
+        # test for chars outside vocabulary
+        if (showWarnings){
+          charsOutsideVoc <- stringr::str_detect(stringr::str_to_lower(seq), pattern)  
+          if (charsOutsideVoc) warning("file ", filePath, " contains characters outside vocabulary")
+        }
+        if(iter > max_iter){
+          stop('exceeded max_iter value, try reducing maxlen parameter')
+          break
+        }
+        iter <- iter + 1
+      }
+      
+      # go as far as possible in sequence or stop when enough samples are collected 
+      remainingSamples <- batch.size - num_samples
+      end_index <- min(length(start_indices), start_index + remainingSamples  - 1)
+      
+      subsetStartIndices <- start_indices[start_index:end_index]
+      sequence_vector[sequence_vector_index] <- stringr::str_sub(seq, start = subsetStartIndices[1], 
+                                                                 end = subsetStartIndices[length(subsetStartIndices)] + maxlen)
+      start_index_list[[sequence_vector_index]] <- subsetStartIndices
+      sequence_vector_index <<- sequence_vector_index + 1
+      
+      num_new_samples <- end_index - start_index + 1   
+      num_samples <- num_samples + num_new_samples 
+      start_index <<- end_index + 1  
+    }
+    
+    # one hot encode strings collected in sequence_vector and connect arrays
+    # TODO: Huge bottleneck if step > maxlen
+    if (genPredictions){
+      # might contain ambiguous nucleotides, replace with dummy char from vocabulary (wont appear in output) 
+      sequence_vector <- stringr::str_replace_all(sequence_vector, pattern = pattern, replacement = vocabulary[1])
+      array_list <- purrr::map(1:length(sequence_vector),
+                               ~sequenceToArray_withStartInd(sequence_vector[.x],
+                                                             maxlen = maxlen, vocabulary = vocabulary,  startInd =  start_index_list[[.x]]))
+    } else {
+      array_list <- purrr::map(1:length(sequence_vector),
+                               ~sequenceToArray_withStartInd(sequence_vector[.x],
+                                                             maxlen = maxlen, vocabulary = vocabulary,  startInd =  start_index_list[[.x]]))
+    }
+    
+    x <- array_list[[1]][[1]]
+    y <- array_list[[1]][[2]]
+    if (length(array_list) > 1){
+      for (i in 2:length(array_list)){
+        x <- abind::abind(x, array_list[[i]][[1]], along = 1)
+        y <- rbind(y, array_list[[i]][[2]])
+      }
+    }
+    
+    # empty sequence_vector for next batch 
+    start_index_list <<- vector("list")
+    sequence_vector <<- vector("character")
+    sequence_vector_index <<- 1
+    num_samples <<- 0
+    if (genPredictions) {
+      list(X = x) # TODO: remove last rows 
+    } else {
+      list(X = x, Y = y)
+    }
+  }
+}
+
+
 
 #' custom generator for fasta files, will produce chunks in size of batch.size
 #' by iterating over the input files. 
