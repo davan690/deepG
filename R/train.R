@@ -86,24 +86,7 @@ trainNetwork <- function(model_path,
                          compile = TRUE,
                          seed = 1234) {  
   
-  hp <- reticulate::import("tensorboard.plugins.hparams.api")
-
-  hparams <- reticulate::dict(
-    HP_NUM_UNITS =  layer.size,
-    HP_DROPOUT = dropout,
-    HP_OPTIMIZER = solver,
-    HP_MAXLEN = maxlen,
-    HP_STEP = step,
-    HP_NUM_LAYERS = layers.lstm,
-    HP_BIDIRECTIONAL = bidirectional,
-    HP_BATCH.SIZE = batch.size,
-    HP_LEARNING.RATE = learning.rate,
-    HP_DROPOUT = dropout,
-    HP_RECURRENT_DROPOUT = recurrent_dropout,
-    HP_USE_CNN = use.codon.cnn
-  )
-  
-  ## create folder for checkpoints using run.name
+   ## create folder for checkpoints using run.name
   ## filenames contain epoch, validation loss and validation accuracy 
   checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
   dir.create(checkpoint_dir, showWarnings = FALSE)
@@ -314,6 +297,35 @@ trainNetwork <- function(model_path,
     
   }
   
+  hp <- reticulate::import("tensorboard.plugins.hparams.api")
+  
+  # list of hyperparameters
+  hparams <- reticulate::dict(
+    HP_DROPOUT = dropout,
+    HP_RECURRENT_DROPOUT = recurrent_dropout,
+    HP_LAYER.SIZE =  layer.size,
+    HP_OPTIMIZER = solver,
+    HP_MAXLEN = maxlen,
+    HP_USE.CUDNN = use.cudnn,
+    HP_USE.MULTIPLE.GPUS = use.multiple.gpus,
+    HP_MERGE.ON.CPU = merge.on.cpu,
+    HP_GPU.NUM = gpu.num,
+    HP_EPOCHS = epochs,
+    HP_MAX.QUEUE.SIZE = max.queue.size,
+    HP_LR.PLATEAU.FACTOR = lr.plateau.factor,
+    HP_NUM_LAYERS = layers.lstm,
+    HP_BATCH.SIZE = batch.size,
+    HP_LEARNING.RATE = learning.rate,
+    HP_DROPOUT = dropout,
+    HP_USE.CODON.CNN = use.codon.cnn,
+    HP_PATIENCE = patience,
+    HP_COOLDOWN = cooldown,
+    HP_SPEPS.PER.EPOCHE = steps.per.epoch,
+    HP_STEP = step,
+    HP_RANDOM.FILES = randomFiles,
+    HP_BIDIRECTIONAL = bidirectional
+  )
+  
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
     message("Starting fasta generator...")
@@ -361,7 +373,7 @@ trainNetwork <- function(model_path,
             paste0(run.name, "_log.csv"),
             separator = ";",
             append = TRUE),
-          hp$KerasCallback(file.path(tensorboard.log, run.name), hparams, trial_id= run.name)  # log hparams
+          hp$KerasCallback(file.path(tensorboard.log, run.name), hparams, trial_id = run.name)  # log hparams
         )
       )
   } else {
