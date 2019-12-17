@@ -84,6 +84,23 @@ trainNetwork <- function(model_path,
                          save_best_only = FALSE,
                          compile = TRUE) {  
   
+  hp <- reticulate::import("tensorboard.plugins.hparams.api")
+
+  hparams <- reticulate::dict(
+    HP_NUM_UNITS =  layer.size,
+    HP_DROPOUT = dropout,
+    HP_OPTIMIZER = solver,
+    HP_MAXLEN = maxlen,
+    HP_STEP = step,
+    HP_NUM_LAYERS = layers.lstm,
+    HP_BIDIRECTIONAL = bidirectional,
+    HP_BATCH.SIZE = batch.size,
+    HP_LEARNING.RATE = learning.rate,
+    HP_DROPOUT = dropout,
+    HP_RECURRENT_DROPOUT = recurrent_dropout,
+    HP_USE_CNN = use.codon.cnn
+  )
+  
   ## create folder for checkpoints using run.name
   ## filenames contain epoch, validation loss and validation accuracy 
   checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
@@ -103,9 +120,9 @@ trainNetwork <- function(model_path,
     stopifnot(maxlen > 0)
     stopifnot(dropout <= 1 & dropout >= 0)
     stopifnot(recurrent_dropout <= 1 & recurrent_dropout >= 0)
-    stopifnot(layer.size > 1)
-    stopifnot(layers.lstm > 1)
-    stopifnot(batch.size > 1)
+    stopifnot(layer.size > 0)
+    stopifnot(layers.lstm > 0)
+    stopifnot(batch.size > 0)
     stopifnot(steps.per.epoch > 0)
     
     if (use.cudnn & (recurrent_dropout > 0 | recurrent_dropout > 0)){
@@ -246,7 +263,7 @@ trainNetwork <- function(model_path,
       message("The following parameters are predetermined by the loaded model (duplicate arguments in function will be ignored): 
               maxlen, dropout, recurrent_dropout, layer.size, use.cudnn, layers.lstm, use.codon.cnn, vocabulary.size, bidirectional")
     }
-   
+    
     # epochs arguments can be misleading 
     if (!missing(initial_epoch)){
       if (initial_epoch >= epochs){
@@ -341,7 +358,8 @@ trainNetwork <- function(model_path,
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
             separator = ";",
-            append = TRUE)
+            append = TRUE),
+          hp$KerasCallback(file.path(tensorboard.log, run.name), hparams)  # log hparams
         )
       )
   } else {
