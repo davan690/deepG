@@ -265,7 +265,7 @@ trainNetwork <- function(model_path,
       }
     }
     
-    # load model
+    # load model  
     model <- keras::load_model_hdf5(model_path, compile = compile)
     summary(model)
     
