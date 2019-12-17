@@ -43,6 +43,7 @@
 #' @param bidirectional Use bidirectional option for lstm layers
 #' @param save_best_only Only save model that improved on best val_loss score 
 #' @param compile Whether to compile the model after loading
+#' @param seed sets seed for fastaFileGenerator if randomFiles = TRUE
 #' @export
 trainNetwork <- function(model_path,
                          path,
@@ -82,9 +83,10 @@ trainNetwork <- function(model_path,
                          tensorboard.log = "/scratch/tensorboard",
                          bidirectional = FALSE,
                          save_best_only = FALSE,
-                         compile = TRUE) {  
+                         compile = TRUE,
+                         seed = 1234) {  
   
-  ## create folder for checkpoints using run.name
+   ## create folder for checkpoints using run.name
   ## filenames contain epoch, validation loss and validation accuracy 
   checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
   dir.create(checkpoint_dir, showWarnings = FALSE)
@@ -103,9 +105,9 @@ trainNetwork <- function(model_path,
     stopifnot(maxlen > 0)
     stopifnot(dropout <= 1 & dropout >= 0)
     stopifnot(recurrent_dropout <= 1 & recurrent_dropout >= 0)
-    stopifnot(layer.size > 1)
-    stopifnot(layers.lstm > 1)
-    stopifnot(batch.size > 1)
+    stopifnot(layer.size > 0)
+    stopifnot(layers.lstm > 0)
+    stopifnot(batch.size > 0)
     stopifnot(steps.per.epoch > 0)
     
     if (use.cudnn & (recurrent_dropout > 0 | recurrent_dropout > 0)){
@@ -246,7 +248,7 @@ trainNetwork <- function(model_path,
       message("The following parameters are predetermined by the loaded model (duplicate arguments in function will be ignored): 
               maxlen, dropout, recurrent_dropout, layer.size, use.cudnn, layers.lstm, use.codon.cnn, vocabulary.size, bidirectional")
     }
-   
+    
     # epochs arguments can be misleading 
     if (!missing(initial_epoch)){
       if (initial_epoch >= epochs){
@@ -263,7 +265,7 @@ trainNetwork <- function(model_path,
       }
     }
     
-    # load model
+    # load model  
     model <- keras::load_model_hdf5(model_path, compile = compile)
     summary(model)
     
@@ -295,6 +297,35 @@ trainNetwork <- function(model_path,
     
   }
   
+  hp <- reticulate::import("tensorboard.plugins.hparams.api")
+  
+  # list of hyperparameters
+  hparams <- reticulate::dict(
+    HP_DROPOUT = dropout,
+    HP_RECURRENT_DROPOUT = recurrent_dropout,
+    HP_LAYER.SIZE =  layer.size,
+    HP_OPTIMIZER = solver,
+    HP_MAXLEN = maxlen,
+    HP_USE.CUDNN = use.cudnn,
+    HP_USE.MULTIPLE.GPUS = use.multiple.gpus,
+    HP_MERGE.ON.CPU = merge.on.cpu,
+    HP_GPU.NUM = gpu.num,
+    HP_EPOCHS = epochs,
+    HP_MAX.QUEUE.SIZE = max.queue.size,
+    HP_LR.PLATEAU.FACTOR = lr.plateau.factor,
+    HP_NUM_LAYERS = layers.lstm,
+    HP_BATCH.SIZE = batch.size,
+    HP_LEARNING.RATE = learning.rate,
+    HP_DROPOUT = dropout,
+    HP_USE.CODON.CNN = use.codon.cnn,
+    HP_PATIENCE = patience,
+    HP_COOLDOWN = cooldown,
+    HP_SPEPS.PER.EPOCHE = steps.per.epoch,
+    HP_STEP = step,
+    HP_RANDOM.FILES = randomFiles,
+    HP_BIDIRECTIONAL = bidirectional
+  )
+  
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
     message("Starting fasta generator...")
@@ -302,13 +333,13 @@ trainNetwork <- function(model_path,
     gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
                               seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                              vocabulary = vocabulary)
+                              vocabulary = vocabulary, seed = seed)
     
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
                                   maxlen = maxlen, step = step, randomFiles = randomFiles,
                                   seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                                  vocabulary = vocabulary)
+                                  vocabulary = vocabulary, seed = seed)
     
     # training
     message("Start training ...")
@@ -341,7 +372,8 @@ trainNetwork <- function(model_path,
           keras::callback_csv_logger(
             paste0(run.name, "_log.csv"),
             separator = ";",
-            append = TRUE)
+            append = TRUE),
+          hp$KerasCallback(file.path(tensorboard.log, run.name), hparams, trial_id = run.name)  # log hparams
         )
       )
   } else {
