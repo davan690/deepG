@@ -126,7 +126,7 @@ by iterating over the input files.</p>
   <span class='kw'>maxlen</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>seqStart</span> <span class='kw'>=</span> <span class='st'>"l"</span>, <span class='kw'>seqEnd</span> <span class='kw'>=</span> <span class='st'>"l"</span>,
   <span class='kw'>withinFile</span> <span class='kw'>=</span> <span class='st'>"p"</span>, <span class='kw'>vocabulary</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"l"</span>, <span class='st'>"p"</span>, <span class='st'>"a"</span>, <span class='st'>"c"</span>, <span class='st'>"g"</span>, <span class='st'>"t"</span>),
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>randomFiles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>step</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>showWarnings</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>showWarnings</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>1234</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -178,6 +178,10 @@ by iterating over the input files.</p>
     <tr>
       <th>showWarnings</th>
       <td><p>TRUE/FALSE, give warning if character outside vocabulary appears</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>argument for set.seed function, for reproducible results</p></td>
     </tr>
     </table>
 

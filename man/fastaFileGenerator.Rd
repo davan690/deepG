@@ -9,7 +9,7 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
   maxlen = 250, max_iter = 20, seqStart = "l", seqEnd = "l",
   withinFile = "p", vocabulary = c("l", "p", "a", "c", "g", "t"),
   verbose = FALSE, randomFiles = FALSE, step = 1,
-  showWarnings = FALSE)
+  showWarnings = FALSE, seed = 1234)
 }
 \arguments{
 \item{corpus.dir}{input directory where .fasta files are located}
@@ -35,6 +35,8 @@ fastaFileGenerator(corpus.dir, format = "fasta", batch.size = 256,
 \item{step}{how often to take a sample}
 
 \item{showWarnings}{TRUE/FALSE, give warning if character outside vocabulary appears}
+
+\item{seed}{argument for set.seed function, for reproducible results}
 }
 \description{
 Custom generator for fasta files, will produce chunks in size of batch.size

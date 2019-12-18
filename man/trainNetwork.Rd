@@ -16,7 +16,8 @@ trainNetwork(model_path, path, path.val, dataset,
   randomFiles = FALSE, seqStart = "l", seqEnd = "l",
   withinFile = "p", initial_epoch, vocabulary = c("l", "p", "a", "c",
   "g", "t"), tensorboard.log = "/scratch/tensorboard",
-  bidirectional = FALSE, save_best_only = FALSE, compile = TRUE)
+  bidirectional = FALSE, save_best_only = FALSE, compile = TRUE,
+  seed = 1234)
 }
 \arguments{
 \item{model_path}{Path to a pretrained model}
@@ -96,6 +97,8 @@ trainNetwork(model_path, path, path.val, dataset,
 \item{save_best_only}{Only save model that improved on best val_loss score}
 
 \item{compile}{Whether to compile the model after loading}
+
+\item{seed}{sets seed for fastaFileGenerator if randomFiles = TRUE}
 }
 \description{
 Depth and number of neurons per layer of the netwok can be specified. First layer can be a Convolutional Neural Network (CNN) that is designed to capture codons.
