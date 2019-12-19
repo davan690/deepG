@@ -202,6 +202,7 @@ splitSequence <- function(seq, vocabulary, maxlen){
 #' @param step how often to take a sample
 #' @param showWarnings TRUE/FALSE, give warning if character outside vocabulary appears   
 #' @param seed argument for set.seed function, for reproducible results    
+#' @param shuffleFastaEntries shuffle entries in every fasta file 
 #' @export
 fastaFileGenerator <- function(corpus.dir,
                                format = "fasta",
@@ -216,7 +217,8 @@ fastaFileGenerator <- function(corpus.dir,
                                randomFiles = FALSE,
                                step = 1, 
                                showWarnings = FALSE,
-                               seed = 1234){
+                               seed = 1234,
+                               shuffleFastaEntries = FALSE){
   
   for (i in c(seqStart, seqStart, withinFile)) {
     if(!(i %in% vocabulary) & i!="")
@@ -248,7 +250,14 @@ fastaFileGenerator <- function(corpus.dir,
   filePath <- fasta.files[[file_index]]
   fasta.file <- Biostrings::readDNAStringSet(filePath)
   seq <- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
- 
+  if (shuffleFastaEntries){
+    # split entries
+    subSeqVector <- stringi::stri_remove_empty(stringr::str_split(seq, withinFile)[[1]])
+    # shuffle entries
+    subSeqVector <- sample(subSeqVector)
+    seq <- paste(subSeqVector, collapse = withinFile)
+  }
+   
   # split seq around chars not in vocabulary
   seq_split <- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
   current_seq <- seq_split[1]
@@ -279,6 +288,13 @@ fastaFileGenerator <- function(corpus.dir,
           filePath <<- fasta.files[[file_index]]
           fasta.file <<- Biostrings::readDNAStringSet(filePath)
           seq <<- paste0(seqStart, paste(fasta.file, collapse = withinFile), seqEnd)  
+          if (shuffleFastaEntries){
+            # split entries
+            subSeqVector <<- stringi::stri_remove_empty(stringr::str_split(seq, withinFile)[[1]])
+            # shuffle entries
+            subSeqVector <<- sample(subSeqVector)
+            seq <<- paste(subSeqVector, collapse = withinFile)
+          }
           seq_split <<- splitSequence(seq = seq, vocabulary = vocabulary, maxlen = maxlen)
           current_seq <<- seq_split[1]
           length_current_seq <<- nchar(current_seq) 

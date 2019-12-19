@@ -45,6 +45,7 @@
 #' @param compile Whether to compile the model after loading
 #' @param max_iter stop after max_iter number of iterations failed to produce new sample 
 #' @param seed sets seed for fastaFileGenerator if randomFiles = TRUE
+#' @param shuffleFastaEntries shuffle entries in every fasta file 
 #' @export
 trainNetwork <- function(model_path,
                          path,
@@ -86,7 +87,8 @@ trainNetwork <- function(model_path,
                          save_best_only = FALSE,
                          compile = TRUE,
                          max_iter = 1000, 
-                         seed = 1234) {  
+                         seed = 1234,
+                         shuffleFastaEntries = FALSE) {  
 
    ## create folder for checkpoints using run.name
   ## filenames contain epoch, validation loss and validation accuracy 
@@ -335,14 +337,16 @@ trainNetwork <- function(model_path,
     gen <- fastaFileGenerator(corpus.dir = path, batch.size = batch.size,
                               maxlen = maxlen, step = step, randomFiles = randomFiles,
                               seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                              vocabulary = vocabulary, max_iter = max_iter, seed = seed)
+                              vocabulary = vocabulary, max_iter = max_iter, seed = seed,
+                              shuffleFastaEntries = shuffleFastaEntries)
 
     
     # generator for validation
     gen.val <- fastaFileGenerator(corpus.dir = path.val, batch.size = batch.size,
                                   maxlen = maxlen, step = step, randomFiles = randomFiles,
                                   seqStart = seqStart, seqEnd= seqEnd, withinFile = withinFile,
-                                  vocabulary = vocabulary, max_iter = max_iter, seed = seed)
+                                  vocabulary = vocabulary, max_iter = max_iter, seed = seed,
+                                  shuffleFastaEntries = shuffleFastaEntries)
 
     # training
     message("Start training ...")
