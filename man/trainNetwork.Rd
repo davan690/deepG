@@ -17,7 +17,7 @@ trainNetwork(model_path, path, path.val, dataset,
   withinFile = "p", initial_epoch, vocabulary = c("l", "p", "a", "c",
   "g", "t"), tensorboard.log = "/scratch/tensorboard",
   bidirectional = FALSE, save_best_only = FALSE, compile = TRUE,
-  max_iter = 1000, seed = 1234)
+  max_iter = 1000, seed = 1234, shuffleFastaEntries = FALSE)
 }
 \arguments{
 \item{model_path}{Path to a pretrained model}
@@ -101,6 +101,8 @@ trainNetwork(model_path, path, path.val, dataset,
 \item{max_iter}{stop after max_iter number of iterations failed to produce new sample}
 
 \item{seed}{sets seed for fastaFileGenerator if randomFiles = TRUE}
+
+\item{shuffleFastaEntries}{shuffle entries in every fasta file}
 }
 \description{
 Depth and number of neurons per layer of the netwok can be specified. First layer can be a Convolutional Neural Network (CNN) that is designed to capture codons.
