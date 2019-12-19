@@ -305,6 +305,7 @@ trainNetwork <- function(model_path,
   
   # list of hyperparameters
   hparams <- reticulate::dict(
+    HP_PATH = path,
     HP_DROPOUT = dropout,
     HP_RECURRENT_DROPOUT = recurrent_dropout,
     HP_LAYER.SIZE =  layer.size,
