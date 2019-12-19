@@ -17,7 +17,7 @@ trainNetwork(model_path, path, path.val, dataset,
   withinFile = "p", initial_epoch, vocabulary = c("l", "p", "a", "c",
   "g", "t"), tensorboard.log = "/scratch/tensorboard",
   bidirectional = FALSE, save_best_only = FALSE, compile = TRUE,
-  seed = 1234)
+  max_iter = 1000, seed = 1234)
 }
 \arguments{
 \item{model_path}{Path to a pretrained model}
@@ -97,6 +97,8 @@ trainNetwork(model_path, path, path.val, dataset,
 \item{save_best_only}{Only save model that improved on best val_loss score}
 
 \item{compile}{Whether to compile the model after loading}
+
+\item{max_iter}{stop after max_iter number of iterations failed to produce new sample}
 
 \item{seed}{sets seed for fastaFileGenerator if randomFiles = TRUE}
 }
