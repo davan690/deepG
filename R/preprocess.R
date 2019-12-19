@@ -152,7 +152,7 @@ extractStartIndices <- function(fasta.path, sequence, maxlen, step, vocabulary, 
   
   # define range of unallowed start indices   
   non_start_index <- purrr::map(non_start_index, ~(.x:(.x + maxlen - 1))) %>% 
-    unlist() %>% union((len_seq - maxlen + 1):len_seq) %>% unique() # TODO: go to end or where last prediction possible 
+    unlist() %>% union((len_seq - maxlen + 1):len_seq) %>% unique()  
   # drop non-positive values 
   if (length(non_start_index[non_start_index < 1])){
     non_start_index <- unique(c(1, non_start_index[non_start_index >= 1]))
@@ -171,7 +171,7 @@ extractStartIndices <- function(fasta.path, sequence, maxlen, step, vocabulary, 
   start_indices[1] <- allowed_start[1]
   count <- 1
   for (i in 1:len_start_vector-1){
-    if (allowed_start[i + 1] - index >=step){
+    if (allowed_start[i + 1] - index >= step){
       count <- count + 1  
       start_indices[count] <- allowed_start[i + 1]
       index <- allowed_start[i + 1]
@@ -352,7 +352,8 @@ fastaFileGenerator_withStartInd <- function(corpus.dir,
         filePath <<- fasta.files[[file_index]]
         fasta.file <<- Biostrings::readDNAStringSet(filePath)
         start_indices <<- extractStartIndices(sequence = seq, maxlen = maxlen, step = step, vocabulary = vocabulary, 
-                                              seqStart = seqStart, withinFile = withinFile, seqEnd = seqEnd, considerTargets = !genPredictions) 
+                                              seqStart = seqStart, withinFile = withinFile, seqEnd = seqEnd,
+                                              ambTargetsAllowed = genPredictions) 
         # test for chars outside vocabulary
         if (showWarnings){
           charsOutsideVoc <- stringr::str_detect(stringr::str_to_lower(seq), pattern)  
