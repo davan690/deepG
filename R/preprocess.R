@@ -225,6 +225,10 @@ fastaFileGenerator <- function(corpus.dir,
       stop("seqStart, seqEnd and withinFile variables must be in vocabulary")
   }  
   
+  if (withinFile == "" & shuffleFastaEntries){
+    stop("Entries can only be shuffled with non-empty separator")
+  }
+  
   fasta.files <- list.files(
     path = xfun::normalize_path(corpus.dir),
     pattern = paste0("*.", format),
