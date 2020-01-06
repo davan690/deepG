@@ -46,6 +46,7 @@
 #' @param max_iter stop after max_iter number of iterations failed to produce new sample 
 #' @param seed sets seed for fastaFileGenerator if randomFiles = TRUE
 #' @param shuffleFastaEntries shuffle entries in every fasta file 
+#' @param output list of optional outputs
 #' @export
 trainNetwork <- function(model_path,
                          path,
@@ -88,16 +89,35 @@ trainNetwork <- function(model_path,
                          compile = TRUE,
                          max_iter = 1000, 
                          seed = 1234,
-                         shuffleFastaEntries = FALSE) {  
-
-   ## create folder for checkpoints using run.name
-  ## filenames contain epoch, validation loss and validation accuracy 
-  checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
-  dir.create(checkpoint_dir, showWarnings = FALSE)
-  filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-val_loss{val_loss:.2f}-val_acc{val_acc:.3f}.hdf5")
+                         shuffleFastaEntries = FALSE,
+                         output = list(none = FALSE, # no output if none = TRUE
+                                       checkpoints =TRUE, 
+                                       tensorboard = TRUE,
+                                       log = TRUE,
+                                       serialize_model = TRUE,
+                                       full_model = TRUE
+                                       ) 
+                         ) {  
+  
+  if (output$none){
+    output$checkpoints <- FALSE 
+    output$tensorboard <- FALSE
+    output$log <- FALSE
+    output$serialize_model <- FALSE
+    output$full_model <- FALSE
+  }
+  
+  
+  if (output$checkpoints){
+    ## create folder for checkpoints using run.name
+    ## filenames contain epoch, validation loss and validation accuracy 
+    checkpoint_dir <- paste0(checkpoint_path, "/", run.name, "_checkpoints")
+    dir.create(checkpoint_dir, showWarnings = FALSE)
+    filepath_checkpoints <- file.path(checkpoint_dir, "Ep.{epoch:03d}-val_loss{val_loss:.2f}-val_acc{val_acc:.3f}.hdf5")
+  }
   
   # Check if run.name is unique
-  if (dir.exists(file.path(tensorboard.log, run.name))) {
+  if (dir.exists(file.path(tensorboard.log, run.name)) & output$tensorboard) {
     stop(paste0("Tensorboard entry '", run.name , "' is already present. Please give your run a unique name."))
   }
   
@@ -301,35 +321,37 @@ trainNetwork <- function(model_path,
     
   }
   
-  hp <- reticulate::import("tensorboard.plugins.hparams.api")
-  
-  # list of hyperparameters
-  hparams <- reticulate::dict(
-    HP_PATH = path,
-    HP_DROPOUT = dropout,
-    HP_RECURRENT_DROPOUT = recurrent_dropout,
-    HP_LAYER.SIZE =  layer.size,
-    HP_OPTIMIZER = solver,
-    HP_MAXLEN = maxlen,
-    HP_USE.CUDNN = use.cudnn,
-    HP_USE.MULTIPLE.GPUS = use.multiple.gpus,
-    HP_MERGE.ON.CPU = merge.on.cpu,
-    HP_GPU.NUM = gpu.num,
-    HP_EPOCHS = epochs,
-    HP_MAX.QUEUE.SIZE = max.queue.size,
-    HP_LR.PLATEAU.FACTOR = lr.plateau.factor,
-    HP_NUM_LAYERS = layers.lstm,
-    HP_BATCH.SIZE = batch.size,
-    HP_LEARNING.RATE = learning.rate,
-    HP_DROPOUT = dropout,
-    HP_USE.CODON.CNN = use.codon.cnn,
-    HP_PATIENCE = patience,
-    HP_COOLDOWN = cooldown,
-    HP_SPEPS.PER.EPOCHE = steps.per.epoch,
-    HP_STEP = step,
-    HP_RANDOM.FILES = randomFiles,
-    HP_BIDIRECTIONAL = bidirectional
-  )
+  if (output$tensorboard){
+    hp <- reticulate::import("tensorboard.plugins.hparams.api")
+    
+    # list of hyperparameters
+    hparams <- reticulate::dict(
+      HP_PATH = path,
+      HP_DROPOUT = dropout,
+      HP_RECURRENT_DROPOUT = recurrent_dropout,
+      HP_LAYER.SIZE =  layer.size,
+      HP_OPTIMIZER = solver,
+      HP_MAXLEN = maxlen,
+      HP_USE.CUDNN = use.cudnn,
+      HP_USE.MULTIPLE.GPUS = use.multiple.gpus,
+      HP_MERGE.ON.CPU = merge.on.cpu,
+      HP_GPU.NUM = gpu.num,
+      HP_EPOCHS = epochs,
+      HP_MAX.QUEUE.SIZE = max.queue.size,
+      HP_LR.PLATEAU.FACTOR = lr.plateau.factor,
+      HP_NUM_LAYERS = layers.lstm,
+      HP_BATCH.SIZE = batch.size,
+      HP_LEARNING.RATE = learning.rate,
+      HP_DROPOUT = dropout,
+      HP_USE.CODON.CNN = use.codon.cnn,
+      HP_PATIENCE = patience,
+      HP_COOLDOWN = cooldown,
+      HP_SPEPS.PER.EPOCHE = steps.per.epoch,
+      HP_STEP = step,
+      HP_RANDOM.FILES = randomFiles,
+      HP_BIDIRECTIONAL = bidirectional
+    )
+  }
   
   # if no dataset is supplied, external fasta generator will generate batches
   if (missing(dataset)) {
@@ -349,6 +371,45 @@ trainNetwork <- function(model_path,
                                   vocabulary = vocabulary, max_iter = max_iter, seed = seed,
                                   shuffleFastaEntries = shuffleFastaEntries)
 
+    # callback list
+    callbacks = list(keras::callback_reduce_lr_on_plateau(
+      monitor = "loss",
+      factor = lr.plateau.factor,
+      patience = patience,
+      cooldown = cooldown
+    )
+    )
+    
+    # add optional callbacks
+    list_index <- 2
+    if (output$checkpoints){
+      callbacks[[list_index]] <- keras::callback_model_checkpoint(filepath = filepath_checkpoints,
+                                                                  save_weights_only = FALSE,
+                                                                  save_best_only = save_best_only,
+                                                                  verbose = 1)
+      
+      list_index <- list_index + 1                 
+    }                
+    
+    if (output$tensorboard){
+      callbacks[[list_index]] <- keras::callback_tensorboard(file.path(tensorboard.log, run.name),
+                                                             write_graph = TRUE, 
+                                                             histogram_freq = 1,
+                                                             write_images = TRUE,
+                                                             write_grads = TRUE)
+      # log hparams
+      callbacks[[list_index + 1]] <- hp$KerasCallback(file.path(tensorboard.log, run.name), hparams, trial_id = run.name) 
+      list_index <- list_index + 2
+    }
+                   
+    if (output$log){
+      callbacks[[list_index]] <-  keras::callback_csv_logger(
+        paste0(run.name, "_log.csv"),
+        separator = ";",
+        append = TRUE)
+    }            
+    
+    
     # training
     message("Start training ...")
     history <-
@@ -360,29 +421,7 @@ trainNetwork <- function(model_path,
         max_queue_size = max.queue.size,
         epochs = epochs,
         initial_epoch = initial_epoch,
-        callbacks = list(
-          keras::callback_model_checkpoint(filepath = filepath_checkpoints,
-                                           save_weights_only = FALSE,
-                                           save_best_only = save_best_only,
-                                           verbose = 1),
-          
-          keras::callback_reduce_lr_on_plateau(
-            monitor = "loss",
-            factor = lr.plateau.factor,
-            patience = patience,
-            cooldown = cooldown
-          ),
-          keras::callback_tensorboard(file.path(tensorboard.log, run.name),
-                                      write_graph = TRUE, 
-                                      histogram_freq = 1,
-                                      write_images = TRUE,
-                                      write_grads = TRUE),
-          keras::callback_csv_logger(
-            paste0(run.name, "_log.csv"),
-            separator = ";",
-            append = TRUE),
-          hp$KerasCallback(file.path(tensorboard.log, run.name), hparams, trial_id = run.name)  # log hparams
-        )
+        callbacks = callbacks
       )
   } else {
     message("Start training ...")
@@ -397,14 +436,20 @@ trainNetwork <- function(model_path,
   
   # save final model
   message("Training done.\nSave model.")
-  Rmodel <-
-    keras::serialize_model(model, include_optimizer = TRUE)
-  save(Rmodel, file = paste0(run.name, "_full_model.Rdata"))
-  keras::save_model_hdf5(
-    model,
-    paste0(run.name, "_full_model.hdf5"),
-    overwrite = TRUE,
-    include_optimizer = TRUE
-  )
+  
+  if (output$serialize_model){
+    Rmodel <-
+      keras::serialize_model(model, include_optimizer = TRUE)
+    save(Rmodel, file = paste0(run.name, "_full_model.Rdata"))
+  }
+  
+  if (output$full_model){
+    keras::save_model_hdf5(
+      model,
+      paste0(run.name, "_full_model.hdf5"),
+      overwrite = TRUE,
+      include_optimizer = TRUE
+    )
+  }
   return(history)
 }
